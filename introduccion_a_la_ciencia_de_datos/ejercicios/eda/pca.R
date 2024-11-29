@@ -1,0 +1,3 @@
+library(FactoMineR)
+library("factoextra")
+

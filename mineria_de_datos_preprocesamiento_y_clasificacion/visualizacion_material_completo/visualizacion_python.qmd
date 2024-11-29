@@ -1,0 +1,1021 @@
+---
+title: Visualización de Datos (en Python)
+# theme: CambridgeUS
+theme: Montpellier
+author: |
+      Minería de Datos: Preprocesamiento y clasificación
+date: Máster en Ciencias de Datos e Ingeniería de Computadores
+toc-title: Tabla de Contenidos
+toc: true
+license: "CC BY-SA"
+toc-depth: 1
+jupyter: python3
+# classoption: compress
+execute:
+  echo: true
+output:
+  beamer_presentation:
+    slide_level: 1
+    includes:
+      in_header: ./simple.txt
+format:
+  html:
+    code-fold: show
+    code-overflow: wrap
+    code-summary: "Muestra código"
+    fig-width: 6
+    fig-height: 4
+    fig-align: center
+  beamer:
+    fig-width: 4
+    fig-height: 2
+  revealjs:
+    theme: dark
+    fig-align: center
+---
+
+# Ecosistema de visualización
+
+## Ecosistemas de Visualización
+
+La visualización es crucial en ciencia de datos:
+
+ 1. Aumenta la comprensión de los datos.
+
+2. Facilita la detección de outliers y errores.
+
+3. Permite la comparación rápida de relación entre variables.
+
+4. Apoya la toma de decisiones.
+
+5. Comunicación efectiva.
+
+Es fundamental en cualquier entorno: R, Python, Julia.
+
+## Ejemplo: Iris
+
+```{python}
+import seaborn as sns 
+iris = sns.load_dataset('iris') 
+sns.set_style("whitegrid") 
+sns.relplot(data=iris, x='sepal_length', y='petal_length', hue="species")
+```
+
+## Ecosistema de visualización en R
+
+![](ggplot2.png){width="40%"}
+
+R ofrece el que muchos consideran el mejor sistema de visualización: 'ggplot2':
+
+- Combina distintos elementos para generar la gráfica.
+- Muy flexible y potente.
+
+[Enlace al material para R](visualizacion_R.html)
+
+## Ejemplo
+
+```{r}
+ggplot(data=filtrados, aes(x = exper, y=wage, color=sex)) + 
+       geom_point(alpha=0.7,size=3) +
+       labs(x="Experiencia", y="Salario", color="Sexo") +
+       theme(text=element_text(size=20))
+````
+
+![](R_example1.png){width="80%"}
+
+## Ecosistema de visualización en Julia
+
+Julia no es rival en ecosistema con R ó Python. 
+
+- `Makie`: Presenta un buen modelo que es potente y flexible.
+
+- `AlgebraOfGraphics.jl` sobre él que permite usar Makie para esquema parecido a ggplot.
+
+- `TidierPlots.jl` que permite simular el interfaz  de ggplot bajo R.
+
+## Ejemplo con AlgebraOfGraphics
+
+```{julia}
+penguin_bill = data(penguins) * mapping(
+    :bill_length_mm => (t -> t / 10) => "bill length (cm)",
+    :bill_depth_mm => (t -> t / 10) => "bill depth (cm)",
+)
+plt = penguin_bill * mapping(color = :species)
+draw(plt; axis = axis)
+```
+
+![](julia_ejemplo.png){width="80%"}
+
+## Ejemplo con TidierPlots
+
+```{julia}
+ggplot(penguins, @aes(x = body_mass_g, y = bill_length_mm, color = species)) +
+   geom_point() +
+   scale_x_sqrt() +
+   theme_minimal()
+```
+
+![](julia_ejemplo2.png){width="80%"}
+
+
+## Ecosistema de visualización en Python
+
+Python es un lenguaje muy usado en Ciencia de Datos, aunque no era su propósito
+inicial por lo que las librerías de visualización han ido evolucionando. Hay
+múltiples opciones:
+
+![](visualizacion.png){width="80%"}
+
+## Matplotlib
+
+[![](matplotlib.jpg){width="70%"}](https://matplotlib.org/)
+
+- Inspirada en las funciones de visualización de Matlab.
+
+- La mayoría (como seaborn) se basan en esta.
+
+- Es demasiado bajo nivel, se puede usar para ajustar al detalle.
+
+## Seaborn
+
+[![](seaborn.png){width="70%"}](https://seaborn.pydata.org/)
+
+- Más orientada a Ciencias de Datos.
+
+- Permite visualizar directamente DataFrames.
+
+- Permite resaltar/distinguir por un atributo o incluso separar por filas y/o columnas usándolo.
+
+## Altair
+
+- [Altair](https://altair-viz.github.io/) está basada en el **Álgebra de Análisis** (usado por ejemplo por `ggplot2` en **R**).
+
+- Si se pilla el 'truco' puede ser más intuitivo, pero está algo más limitado.
+
+## Bokeh
+
+- [Bokeh](https://bokeh.org/) es una librería de visualización usando JavaScript.
+
+- Mejor para interactivo.
+
+## Plotly
+
+[![](plotly.png){width="70%"}](https://plotly.com/python/)
+
+- Parte de un ecosistema de una empresa.
+
+- Permite compartir entre investigadores (visualiza en servidor).
+
+- Se puede combinar con **[Dash](https://plotly.com/dash/)** (similar a Shiny in
+  R).
+
+## Plotnine
+
+[![](plotnine.png){width="70%"}](https://plotnine.readthedocs.io/en/stable/)
+
+- [Plotnine]((https://plotnine.readthedocs.io/en/stable/)) Implementa el
+ interfaz de `ggplot2`.
+     - No completamente.
+
+- Presenta interés para quien quiera usar el mismo interfaz que en R.
+
+## Herramienta Interactiva: Pygwalker
+
+[Pygwalker](https://github.com/Kanaries/pygwalker) Permite explorar de forma interactiva un datasets. 
+
+No permite gráficas adecuadas, pero sí permite explorar mucho más fácilmente.
+
+Empezamos con los Pingüinos.
+
+```{python}
+import pygwalker as pyg
+penguins = sns.load_dataset("penguins")
+pyg.walk(penguins)
+```
+
+---
+
+Ahora el de sueldos.
+
+```{python}
+import pandas as pd
+pop = pd.read_csv("CPS85.csv")
+pyg.walk(pop)
+```
+
+## Veremos
+
+Recomendamos Seaborn y Altair, principalmente.
+
+- Ambos: Descriptivos, más alto nivel que matplotlib o pandas. Soportan *DataFrames*.
+
+- Seaborn: Sobre matplotlib.
+
+- Altair: Formato web.
+
+En los siguientes ejemplos usaré seaborn principalmente. 
+
+Luego volveremos a la interactiva.
+
+Para las prácticas podréis usar el que queráis.
+
+
+
+# Primeras visualizaciones
+
+## Nomenclatura
+
+En la documentación suele aparecer `fig` y `axis`, cuidado.
+
+- fig: Es todo el área a pintar (una o varias figuras juntas).
+- axis: Es realmente una figura, no unas coordenadas.
+
+Hay un interfaz más básico, pero lo mejor es el moderno, que permite crear
+fácilmente subfiguras:
+
+```{python}
+from matplotlib import pyplot as plt
+import seaborn as sns
+import altair as alt
+import numpy as np
+```
+
+## Imagen de ejemplo
+
+```{python,size=\\scriptsize}
+fig, ax = plt.subplots()
+ax.plot([1,2,3,4],[10,15,20,30])
+ax.set_title("Figura de ejemplo")
+ax.set_xlabel("Eje X")
+ax.set_ylabel("Eje Y")
+plt.show()
+```
+
+---
+
+Se pueden crear varias figuras
+
+```{python,size=\\scriptsize}
+fig, axs = plt.subplots(1, 2)
+x = np.arange(10)
+axs[0].plot(x,x+np.ones(len(x)))
+axs[1].plot(x, np.power(x,2))
+axs[0].set_title("Lineal")
+axs[1].set_title("Cuadrado")
+plt.show()
+```
+
+## Visualizando
+
+Vamos a cargar un dataset clásico y luego analizarlo con visualizaciones.
+
+Uno con datos sobre sueldos.
+
+```{python}
+import pandas as pd
+pop = pd.read_csv("CPS85.csv")
+print(pop.columns.tolist())
+pop.head(3)
+```
+
+---
+
+Otro *dataset* son distintos pingüinos. Es un problema de clasificación
+(*specie*) similar al *iris*.
+
+```{python}
+penguins = sns.load_dataset("penguins")
+print(penguins.columns.tolist())
+penguins.head(3)
+```
+
+## Seaborn
+
+Antes de empezar comento algunas características:
+
+- Las funciones trabajan con un DataFrame, por medio del parámetro `data`.
+- Se puede identificar para cada dimensión, color, tamaño, ... el nombre de un atributo.
+- Se pueden crear distintas figuras (por filas, columnas, ...).
+
+Hay un excelente tutorial _online_ en [https://seaborn.pydata.org/tutorial/introduction.html](https://seaborn.pydata.org/tutorial/introduction.html).
+
+```{python}
+#| echo: false
+# Import seaborn
+import seaborn as sns
+
+# Apply the default theme
+sns.set_theme()
+```
+
+---
+
+Es muy potente:
+
+```python
+dots = sns.load_dataset("dots")
+sns.relplot(
+    data=dots, kind="line",
+    x="time", y="firing_rate", col="align",
+    hue="choice", size="coherence", style="choice",
+    facet_kws=dict(sharex=False),
+)
+```
+
+---
+
+```{python}
+#| echo: false
+dots = sns.load_dataset("dots")
+sns.relplot(
+    data=dots, kind="line",
+    x="time", y="firing_rate", col="align",
+    hue="choice", size="coherence", style="choice",
+    facet_kws=dict(sharex=False),
+)
+plt.show()
+```
+
+---
+
+Posee muchas funciones distintas:
+
+- scatterplot: Visualización de instancias como puntos.
+
+- lineplot: Visualiza las instancias como puntos.
+
+- lmplot: Visualiza como puntos, y lo aproxima.
+
+- barplot: Diagramas de barras (incluyendo líneas de error).
+
+- swarmplot: Visualiza en forma de violín.
+
+- boxplot: Distribución usando boxplot.
+
+- ...
+
+----
+
+Sin embargo, es mejor limilarse a tres funciones:
+![](seaborn_opciones.png)
+
+Se distingue el concreto mediante el parámetro *kind*.
+
+Ventajas: permite múltiples figuras a la vez según un criterio.
+
+## Visualizando sueldos
+
+. . .
+
+Es una distribución, por tanto usamos **displot**.
+
+```{python}
+sns.displot(x="wage", data=pop, aspect=2)
+plt.show()
+```
+
+---
+
+Se puede añadir como función kde.
+
+```{python}
+sns.displot(x="wage", data=pop, aspect=2, kde=True)
+plt.show()
+```
+
+---
+
+O directamente solo el kde:
+
+```{python}
+sns.displot(x="wage", data=pop, aspect=2, kind="kde")
+plt.show()
+```
+
+---
+
+También podríamos mostrarlo de valor categórico:
+
+```{python}
+sns.catplot(x="wage", data=pop, aspect=2, kind="box")
+plt.show()
+```
+
+## Altair
+
+Altair tiene una sintaxis muy homogénea:
+
+```{python}
+import altair as alt
+```
+
+Ventajas:
+
+- Permite aplicar transformaciones.
+
+- Permite poner en una variable expresión (count(), max(), ...).
+
+- Sintaxis muy homogénea.
+
+La sintaxis es:
+
+```python
+alt.Chart(df).mark_xxxx().encode(
+    x=...
+    y=...
+)
+```
+
+
+---
+
+Donde mark_xxx puede ser:
+
+- mark_lines: Líneas.
+- mark_points: Versión con puntos.
+- mark_bar: Diagrama de barras.
+- mark_boxplot: Diagrama boxplot.
+- ...
+
+---
+
+Definir el tipo de un datos como '*Variable*:*Tipo*' indicando el tipo de datos.
+
+Tipo:
+
+- 'Q': Valor real.
+- 'O': Valor ordinal.
+- 'N': Valor como categórico.
+
+
+---
+
+Vamos a visualizar las gráficas anteriores con `Altair`.
+
+. . .
+
+```{python}
+alt.Chart(pop).mark_bar().encode(
+    alt.X('wage:Q', bin=alt.Bin(step=1)),
+    y='count():O',
+).properties(width=800, height=400)
+```
+
+---
+
+Ahora como líneas.
+
+```{python}
+alt.Chart(pop).mark_line().encode(
+    alt.X('wage:Q', bin=alt.Bin(step=1)),
+    y='count():O',
+).properties(width=800, height=400)
+```
+
+---
+
+Ahora como boxplot.
+
+```{python}
+alt.Chart(pop).mark_boxplot(size=50).encode(
+    x='wage:Q',
+).properties(width=800, height=400)
+```
+
+
+
+
+## Relación sueldo y formación
+
+Vamos a mostrar el sueldo con distintas funciones:
+
+```{python}
+sns.relplot(x="educ", y="wage", data=pop, aspect=2)
+plt.show()
+```
+
+---
+
+```{python}
+alt.Chart(pop).mark_point().encode(
+    y='wage:Q',
+    x='educ:Q',
+).properties(width=800, height=400)
+```
+
+---
+
+También permite mostrar la media y remarca el 95% del intervalo de confianza.
+
+```{python}
+sns.relplot(x="educ", y="wage", data=pop, aspect=2, kind="line")
+plt.show()
+```
+
+---
+
+Directamente se confirma con el box-plot.
+
+```{python}
+sns.catplot(x="educ", y="wage", data=pop, aspect=2, kind="box", color="skyblue")
+plt.show()
+```
+
+. . .
+
+Se ve que con mayor nivel educativo mayor es la variabilidad.
+
+---
+
+
+En Altair es muy directo:
+```{python}
+alt.Chart(pop).mark_boxplot(size=30).encode(
+    y='wage:Q',
+    x='educ:Q',
+).configure_mark(
+    color='skyblue'
+).properties(width=800, height=400)
+```
+
+---
+
+Otra forma, diagrama de barras:
+
+. . .
+
+```{python}
+sns.catplot(y="wage", x="educ", data=pop, kind="bar",
+            color="skyblue", aspect=2)
+plt.show()
+```
+
+----
+
+Se pueden quitar las barras de error:
+
+```{python}
+sns.catplot(y="wage", x="educ", data=pop, kind="bar", errorbar=None,
+            color="skyblue", aspect=2)
+plt.show()
+```
+
+----
+
+```{python}
+alt.Chart(pop).mark_bar(size=30).encode(
+    y='mean(wage):Q',
+    x='educ:Q',
+).configure_mark(
+    color='skyblue'
+).properties(width=800, height=400)
+```
+
+----
+
+
+¿Y si queremos ver las combinaciones más numerosas?
+
+. . .
+
+```{python}
+sns.displot(y="wage", x="educ", data=pop, kind="hist", aspect=2)
+plt.show()
+```
+
+. . .
+
+Un nivel educativo de 12 con sueldo inferior a 10 es común.
+
+----
+
+```{python}
+alt.Chart(pop).mark_rect(color='skyblue').encode(
+    alt.Y('wage:Q', bin=alt.Bin(step=1)),
+    alt.X('educ:Q', bin=alt.Bin(step=1)),
+    alt.Color('count():Q', scale=alt.Scale(scheme='greenblue')),
+).properties(width=800, height=400)
+```
+
+
+
+# Diferenciando por más atributos
+
+Si queremos ver la influencia sobre una clase, se puede usar el atributo hue:
+
+- Permite repetir la gráfica al lado discriminando por ese atributo.
+
+- Añade nuevo color.
+
+- Se refleja en la leyenda.
+
+---
+
+Ejemplo: Distribución considerando el sexo.
+
+. . .
+
+```{python}
+sns.displot(x="wage", hue="sex", alpha=0.5, data=pop, kind="kde", aspect=2)
+plt.show()
+```
+
+. . .
+
+Parece diferente por sexo.
+
+---
+
+```{python}
+alt.Chart(pop).mark_line().encode(
+    alt.X('wage:Q',bin=alt.Bin(step=1)),
+    y='count():Q',
+    color=alt.Color('sex:N',sort=alt.SortOrder('descending')),
+).properties(width=800, height=400)
+```
+
+
+---
+
+El box-plot lo visualiza mejor:
+
+
+```{python}
+sns.catplot(x="wage", y="sex", data=pop, kind="box", aspect=2)
+plt.show()
+```
+
+---
+
+```{python}
+alt.Chart(pop).mark_boxplot(size=30,color='skyblue').encode(
+    x='wage:Q',
+    y='sex:N',
+    color='sex:N'
+).properties(width=800, height=400)
+```
+
+---
+
+Analizamos con diagrama de barra:
+
+. . .
+
+```{python}
+sns.catplot(y="wage", x="educ", data=pop, hue="sex", kind="bar",
+            errorbar=None, aspect=2); plt.show()
+```
+
+. . .
+
+Se ve que el ingreso promedio es mayor para cada nivel formativo.
+
+---
+
+```{python}
+alt.Chart(pop).mark_bar(size=30,color='skyblue').encode(
+    column='educ:Q',
+    y='mean(wage):Q',
+    color='sex:N',
+    x='sex:N'
+).properties(width=50, height=400)
+```
+
+
+## Subfiguras por criterio
+
+A menudo nos interesa visualizar ciertos datos de forma separada.
+
+Se podría hacer haciendo selecciones usando pandas, pero la librería lo permite.
+
+AVamos a usar el otro *datasets*, el de los pingüinos.
+
+Primero vamos a mostrar para los tamaños la especie que es
+
+---
+
+```{python}
+sns.relplot(x="bill_length_mm", y="bill_depth_mm", data=penguins, aspect=2)
+plt.show()
+```
+
+. . .
+
+Vamos a visualizar las clases.
+
+---
+
+```{python}
+sns.relplot(x="bill_length_mm", y="bill_depth_mm", data=penguins,
+            hue="species", aspect=2)
+plt.show()
+```
+
+. . .
+
+Tiene pinta de ser bastante separables, de todas formas vamos a analizar por
+islas.
+
+---
+
+```{python}
+scale=alt.Scale(zero=False)
+alt.Chart(penguins).mark_point().encode(
+    x=alt.X('bill_length_mm:Q',scale=scale),
+    y=alt.Y('bill_depth_mm:Q',scale=scale),
+    color='species'
+).properties(width=800,height=400)
+```
+
+---
+
+Podemos usar otros atributos, pero a veces no es claro:
+
+```{python}
+sns.relplot(x="bill_length_mm", y="bill_depth_mm", data=penguins,
+            hue="species", style='island', aspect=2)
+plt.show()
+```
+
+---
+
+```{python}
+sns.relplot(x="bill_length_mm", y="bill_depth_mm", data=penguins,
+            hue="species", col="island", aspect=1)
+plt.show()
+```
+
+. . .
+
+
+Se observa que el problema es aún más fácil, no en todas las islas están todas
+las especies.
+
+---
+
+Se puede limitar usando *col_wrap* y *row_wrap* para que no sea tan alargado.
+
+```{python}
+# setting the dimensions of the plot
+g=sns.relplot(x="bill_length_mm", y="bill_depth_mm", data=penguins,
+              hue="species", col="island", col_wrap=2,
+              height=2.5, aspect=1.5)
+plt.show()
+```
+
+---
+
+Desde `Altair` también es fácil.
+
+```{python}
+alt.Chart(penguins).mark_point().encode(
+    x = 'bill_length_mm:Q',
+    y = 'bill_depth_mm:Q',
+    color='species:N',
+    column='island:N'
+).properties(width=250, height=400)
+```
+
+# Mejorando el estilo
+
+## Estilo (theme)
+
+Se puede visualizar los themes:
+
+- darkgrid: Formato por defecto (como `ggplot2`).
+- dark: Sin líneas horizontales.
+- whitegrid: Blanco con líneas.
+- white: Blanco sin líneas.
+- ticks: Como *white* pero con *ticks* en los ejes.
+
+---
+
+![](themes.png){height="90%"}
+
+---
+
+```{python}
+sns.set_theme(style="whitegrid")
+sns.catplot(y="wage", x="educ", data=pop, hue="sex", kind="bar",
+            errorbar=None, aspect=2)
+plt.show()
+```
+
+
+## Renombrar los ejes y/o title
+
+Las funciones devuelven un objeto al que se puede definir los elementos.
+
+Definir atributos, por medio de set:
+
+- xlabel: Etiqueta eje x.
+- ylabel: Etiqueta eje y.
+
+---
+
+```{python}
+g=sns.catplot(y="wage", x="educ", data=pop, hue="sex", kind="bar",
+            errorbar=None, aspect=2)
+g.set(xlabel="Educación", ylabel="Sueldo")
+plt.show()
+```
+
+---
+
+Falta la leyenda, se cambia con plt.legend:
+
+```{python}
+g=sns.catplot(y="wage", x="educ", data=pop, hue="sex", kind="bar",
+              errorbar=None, aspect=2, legend=False)
+g.set(xlabel="Educación", ylabel="Sueldo")
+plt.legend(title="Sexo")
+plt.show()
+```
+
+---
+
+Re-etiquetar:
+
+```{python}
+g=sns.catplot(y="wage", x="educ", data=pop, hue="sex", kind="bar",
+              errorbar=None, aspect=2, legend=False)
+g.set(xlabel="Educación", ylabel="Sueldo")
+plt.legend(title="Sexo", labels=["Hombre", "Mujer"])
+plt.show()
+```
+
+---
+
+Localización
+
+```{python}
+g=sns.catplot(y="wage", x="educ", data=pop, hue="sex", kind="bar",
+              errorbar=None, aspect=2, legend=False)
+g.set(xlabel="Educación", ylabel="Sueldo")
+plt.legend(title="Sexo", labels=["Hombre", "Mujer"],
+           bbox_to_anchor= (1.02,1))
+plt.show()
+```
+
+---
+
+Usando **move_legend**
+
+```{python}
+g=sns.catplot(y="wage", x="educ", data=pop, hue="sex", kind="bar",
+              errorbar=None, aspect=2)
+g.set(xlabel="Educación", ylabel="Sueldo")
+sns.move_legend(g, "upper left", bbox_to_anchor=(0.92, 0.6),
+                title="Sexo", labels=["Hombre", "Mujer"])
+plt.show()
+```
+
+---
+
+Dado que se pueden crear subfiguras para el título es bueno usar
+'XX.figure.suptitle'.
+
+```{python}
+g=sns.relplot(x="bill_length_mm", y="bill_depth_mm", data=penguins,
+              hue="species", col="island", col_wrap=2,
+              height=2.5, aspect=1.5)
+g.figure.suptitle("Distribución por islas")
+plt.show()
+```
+
+## Personalizando en Altair
+
+Personalizando una gráfica en `Altair` es más intuitivo, al ser más explícito.
+
+```{python}
+scale=alt.Scale(zero=False)
+alt.Chart(penguins).mark_point().encode(
+    x=alt.X('bill_length_mm:Q',scale=scale),
+    y=alt.Y('bill_depth_mm:Q',scale=scale),
+    color='species'
+).properties(width=800,height=400)
+```
+
+---
+
+```{python}
+scale=alt.Scale(zero=False)
+alt.Chart(penguins).mark_point().encode(
+    x=alt.X('bill_length_mm:Q',scale=scale, title="Longitud (mm)"),
+    y=alt.Y('bill_depth_mm:Q',scale=scale, title="Profundidad (mm)"),
+    color=alt.Color('species', title="Especie")
+).properties(width=800,height=400)
+```
+
+---
+
+`Altair` es interactivo:
+
+```{python}
+scale=alt.Scale(zero=False)
+alt.Chart(penguins).mark_point().encode(
+    x=alt.X('bill_length_mm:Q',scale=scale, title="Longitud (mm)"),
+    y=alt.Y('bill_depth_mm:Q',scale=scale, title="Profundidad (mm)"),
+    color=alt.Color('species', title="Especie")
+).properties(width=800,height=400).interactive()
+```
+
+---
+
+Altair también permite asociar diagramas:
+
+
+```{python}
+#| echo: false
+scale=alt.Scale(zero=False)
+brush = alt.selection_interval()
+
+p1=alt.Chart(penguins).mark_point().encode(
+    x=alt.X('bill_length_mm:Q',scale=scale, title="Longitud (mm)"),
+    y=alt.Y('bill_depth_mm:Q',scale=scale, title="Profundidad (mm)"),
+    color=alt.Color('species', title="Especie")
+).properties(width=800,height=400).add_selection(brush)
+
+p2=alt.Chart(penguins).mark_bar().encode(
+    y='species:N',
+    color='species:N',
+    x='count(species):O'
+).transform_filter(brush)
+
+alt.vconcat(p1,p2)
+```
+
+---
+
+Altair también permite asociar diagramas:
+
+```{python}
+#| echo: true
+#| eval: false
+scale=alt.Scale(zero=False)
+brush = alt.selection_interval()
+
+p1=alt.Chart(penguins).mark_point().encode(
+    x=alt.X('bill_length_mm:Q',scale=scale, title="Longitud (mm)"),
+    y=alt.Y('bill_depth_mm:Q',scale=scale, title="Profundidad (mm)"),
+    color=alt.Color('species', title="Especie")
+).properties(width=800,height=400).add_selection(brush)
+
+p2=alt.Chart(penguins).mark_bar().encode(
+    y='species:N',
+    color='species:N',
+    x='count(species):O'
+).transform_filter(brush)
+
+alt.vconcat(p1,p2)
+```
+
+## Ejercicios de visualización
+
+Vamos a usar un datasets *tips* existen datos de consumo en un restaurante. Indica para cada
+consumición el precio *total_bill*, la *propina* y datos del cliente (*sex*,
+*smoker*), el día de la semana, y la hora (*Lunch*, *Dinner*).
+
+```{python}
+tips = sns.load_dataset("tips")
+```
+
+## Ejercicios de visualización
+
+1. Visualizar la distribución de propinas en función de la factura total.
+
+2. Igual pero destacando por la hora.
+
+3. Mostrar la frecuencia distinguiendo por sexo del cliente.
+
+4. Mostrar la frecuencia distinguiendo por sexo en función de la hora.
+
+5. Crear el diagrama (lmplot) de la relación propina y factura en función de la
+   hora.
+
+6. Mostrar en un box-plot la factura en función de la hora.
+
+7. Igual que el anterior pero distinguiendo por el sexo.
+
+## Ejercicios de visualización
+
+8. Mostrar un kde de la factura distinguiendo por sexo y separando por la hora.
+
+9. Calcular el ratio y visualizar las facturas y el ratio separando en base a la hora.
+
+10. ¿Ser fumador influye?
+
+11. ¿La hora influye en la factura? ¿Y en el ratio? Visualiza para justificarlo.
+
+12. Visualizar la distribución del ratio para cada hora.
+
+13. Crear un diagrama de barras para comparar el ratio promedio por cada sexo
+    para cada hora. ¿La diferencia es relevante?
+
+14. Crear un diagrama de barras para comparar el ratio promedio por cada sexo
+    separando si es fumador. ¿La diferencia es relevante?
+
+15. ¿Está bien balanceados los experimentos respecto a la hora, el sexo, o si
+    son fumador?
+
+16. Mejora y "traduce" uno de las gráficas complejas anteriores.

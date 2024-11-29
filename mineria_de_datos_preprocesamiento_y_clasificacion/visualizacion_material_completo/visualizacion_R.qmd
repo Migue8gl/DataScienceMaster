@@ -1,0 +1,744 @@
+---
+title: Visualización de Datos en R
+# theme: CambridgeUS
+theme: Montpellier
+author: |
+      Minería de Datos: Preprocesamiento y clasificación
+date: Máster en Ciencias de Datos e Ingeniería de Computadores
+toc-title: Tabla de Contenidos
+toc: true
+license: "CC BY-SA"
+toc-depth: 1
+# classoption: compress
+execute:
+  echo: true
+output:
+  beamer_presentation:
+    slide_level: 1
+    includes:
+      in_header: ./simple.txt
+format:
+  html:
+    code-fold: false
+    code-summary: "Muestra código"
+    fig-width: 6
+    fig-height: 4
+    fig-align: center
+  beamer:
+    fig-width: 4
+    fig-height: 2
+  revealjs:
+    theme: dark
+    fig-align: center
+---
+
+# Ecosistema de visualización en R
+
+## Ecosistema de visualización en R
+
+**ggplot2** es con diferencia el elemento de R mejor valorado para Ciencias de Datos.
+
+Tiene una filosofía muy diferente de otros entornos, está basado en **Grammar of graphics** o **Gramática de gráficos**. Consiste en crear los gráficos por capas que se unen. Es muy fácil de usar pero al mismo tiempo muy personalizable.
+
+Vamos a ver sólo un poco como usarlo con ejemplos, no todas las opciones posibles, existen
+otros tutoriales recomendables[^1].
+
+[^1]: [https://www.cedricscherer.com/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/](https://www.cedricscherer.com/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/)
+
+## Cargamos unos datos de ejemplo
+
+Vamos a cargar unos datos de sueldos.
+
+```{r}
+list.of.packages <- c("ggplot2", "mosaicData", "dplyr", "treemapify", "GGally", "carData", "ggthemes", "ggridges", "gapminder", "palmerpenguins", "ggcorrplot")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)>0) install.packages(new.packages, repos="https://cloud.r-project.org/")
+library(ggplot2)
+library(mosaicData)
+library(dplyr)
+# se cargan los datos del paquete mosaicData: incluye
+# datos obtenidos para estudiar las relaciones entre
+# salarios y experiencia laboral
+df <- data(CPS85 , package = "mosaicData")
+df <- CPS85
+colnames(df)
+```
+
+## Introducción a ggplot
+
+Una gráfica **ggplot** se contruye por combinación de distintos elementos: 
+
+- *Data*: Los datos (tabla o *dataframe*) que se desean visualizar.
+- *Aesthetics aes()*: Estética, como el eje, color, tamaño, ...
+- *Geometries geom_*: El tipo de figura.
+- *Labs*: Titulos del eje de coordenadas, leyenda, ...
+- *Scales scale_*: Relación entre datos y las dimensiones. 
+- *Facets facet_*: Atributos sobre los que agrupar.
+- *Visual themes theme()*: Aspectos visuales como fondo, colores, ...
+
+## Introducción a ggplot
+
+ggplot requiere primero un conjunto de datos, y los atributos a visualizar.
+
+la funcion ggplot especifica la el conjunto de datos a visualizar y establece la
+relacion entre las variables y las propiedades visuales del grafico. 
+
+Estas relaciones se establecen con la la funcion aes (aes - aesthetics). 
+
+# Primera figura con ggplot
+
+## Relacionando dos valores
+
+El salario (**wage**) en función de la experiencia (**exper**)
+
+```{r}
+ggplot(data=df, aes(x = exper, y=wage))
+```
+. . .
+
+¿Y los datos?  No hay porque no hemos indicado el tipo de figura que queremos.
+
+---
+
+El código anterior genera un gráfico vacío porque no se ha definido qué queremos visualizar en el gráfico.
+
+Esto se realiza especificando los objetos geométricos que se mostrarán en el gráfico: puntos, líneas, barras, etc:
+
+- **geom_point**: Pinta puntos (_scatter_).
+- **geom_plot**: Pinta líneas.
+- ...
+
+---
+
+```{r}
+ggplot(data=df, aes(x = exper, y=wage)) + 
+       geom_point()
+```
+
+---
+
+```{r}
+ggplot(data=df, aes(x = exper, y=wage)) + 
+       geom_point()
+```
+El signo + debe situarse al final de la línea, no al principio.
+
+---
+
+Se observa un punto muy extremo en sueldo que _fastidia_ la escala, limitamos el
+rango. Lo filtramos:
+
+```{r}
+filtrados <- dplyr::filter(df, wage < 40)
+```
+---
+
+Quedaría algo así:
+
+```{r}
+ggplot(data=filtrados, aes(x = exper, y=wage)) + 
+       geom_point()
+```
+
+. . .
+
+Mucho mejor, ¿no?
+
+--- 
+
+Muy feo, podemos poner opciones a visualizar dentro de geom_point, como el
+color (negro por defecto), si usar transparencias (por defecto es opaco), o el
+tamaño del punto (sobre el de referencia, > 1 lo aumenta).
+
+- Usamos `color` para cambiarlo.
+- Definimos `alpha` para usar transparencia.
+- Ajustamos tamaño con `size`.
+
+```{r}
+ggplot(data=filtrados, aes(x = exper, y=wage)) + 
+       geom_point(color='cornflowerblue', alpha=0.7,size=3)
+```
+
+---
+
+```{r}
+ggplot(data=filtrados, aes(x = exper, y=wage)) + 
+       geom_point(color='cornflowerblue', alpha=0.7,size=3)
+```
+
+Mucho más bonito, ¿no? Podemos usar los colores no sólo por estética, si no para distinguir.
+
+# Añadiendo otro criterio
+
+## Añadiendo otro criterio
+
+Vamos a distinguir al anterior por colores. Usamos `color` no en `geom_point`, si no en aes, e indicamos el atributo `sex`.
+
+. . .
+
+```{r}
+ggplot(data=filtrados, aes(x = exper, y=wage, color=sex)) + 
+       geom_point(alpha=0.7,size=3)
+```
+
+## Mejorando el eje de coordenadas
+
+Ahora vamos a mejorar el eje de coordenadas, poniéndolo en castellano. Para eso usamos `labs` y `theme`.
+
+- `labs` permite especificar los nombre de cada eje (x, y), color, ....
+
+- `theme` permite especificar temas de presentación, lo usamos para indicar el tamaño del texto usando `element_text`.
+
+---
+
+```{r}
+#| label: salario_sexo
+ggplot(data=filtrados, aes(x = exper, y=wage, color=sex)) + 
+       geom_point(alpha=0.7,size=3) +
+       labs(x="Experiencia", y="Salario", color="Sexo") +
+       theme(text=element_text(size=20))
+```
+
+## Guardando la figura
+
+La figura se puede guardar, y luego mostrar.
+
+```{r}
+g <- ggplot(data=filtrados, aes(x = exper, y=wage, color=sex)) + 
+       geom_point(alpha=0.7,size=3) +
+       labs(x="Experiencia", y="Salario", color="Sexo") +
+       theme(text=element_text(size=20))
+```
+
+Para mostrar luego basta con añadir una línea con `g` (en Notebook).
+
+A partir de ahora lo usamos combinando más capas.
+
+## Distinguiendo sexo por separado
+
+Podemos añadir elementos para adaptar la figura.
+Usamos `facet_wrap` (o `facet_grid`) para separar por atributos.
+
+. . .
+
+```{r}
+g + facet_wrap(~sex)
+```
+
+## Ajuste de presentación
+
+- Usar una técnica que ajusta una serie de puntos, `geom_smooth`.
+
+- Los colores son feos, los ajustamos manualmente con `scale_color_manual`.
+
+```{r}
+g + facet_wrap(~sex) +
+    geom_smooth(method = "lm", formula=y ~ x, color="red") +
+    scale_y_continuous(label = scales::dollar) + # Añadimos un $
+    scale_color_manual(values = c("indianred3", "cornflowerblue"))
+```
+
+---
+
+```{r}
+g2 <- g + facet_wrap(~sex) +
+    geom_smooth(method = "lm", formula=y ~ x, color="red") +
+    scale_y_continuous(label = scales::dollar) + # Añadimos un $
+    scale_color_manual(values = c("indianred3", "cornflowerblue"))
+g2
+```
+
+## Uso combinado de facet para mejorar el sector
+
+```{r}
+g + geom_smooth(method = "auto", se = FALSE, linewidth = 1.5) +
+scale_y_continuous(label = scales::dollar) +
+scale_color_manual(values = c("indianred3","cornflowerblue")) +
+    facet_wrap(~sector) # O g2+facet_wrap(~sector)
+```
+
+# Mejorando la presentación
+
+## Mejorando la presentación
+
+Ya hemos visto temas de presentación:
+
+- `labs` para indicar el tamaño.
+- `cols, alpha` en geom_XXXX para fijar un mismo color a toda la figura. 
+- `scale_color_manual` para especificamos los colores cuando usamos `color` en `aes`.
+
+Ahora vemos:
+
+- `title` y `subtitle` para el título.
+- `caption` para indicar información específica (fuente de los datos, ...).
+
+---
+
+```{r}
+g2 + facet_wrap(~sector) +labs(title="Relaciones entre salario y experiencia", 
+      subtitle="Resumen de la población global", 
+      caption = "source: http://mosaic-web.org")
+```
+
+# Tipos de Gráficos de una variable
+
+## Tipos de Gráficos de una variable
+
+Son gráficos muestran la distribución de una variable, pueden ser categóricos o cuantitivas.
+
+- Categóricos: Se aplica diagrama de barras.
+
+- Cuantitativas: Distribución, diagramas de box-plot ó violin.
+
+## Diagrama de Barras
+
+Vamos a estudiar cómo se distribuyen los ejemplos por sector. Usamos para ello 
+`geom_bar`.
+
+```{r}
+ggplot(df, aes(x = sector)) + geom_bar()
+```
+
+--- 
+
+Vamos a ponerlo más bonito:
+
+- Usando `labs`.
+- Cambiando el color de relleno `fill` en `geom_bar`.
+
+---
+
+```{r}
+ggplot(df, aes(x = sector)) + theme(aspect.ratio=.5) +
+geom_bar(fill="cornflowerblue") +
+labs(x = "Sector", y = "Contador", title="Trabajadores por sector")
+```
+
+---
+
+Versión final, ordenado y con valores:
+
+```{r}
+ggplot(df %>% count(sector), aes(x = reorder(sector, n), y=n)) +
+geom_bar(fill="cornflowerblue", stat="identity") +
+geom_text(aes(label=n), vjust=-1) + 
+labs(x = "Sector", y = "Porcentaje", title="Trabajadores por sector")
+```
+
+---
+
+Rotar el eje x usando _angle_ de `element_text`.
+
+```{r}
+ggplot(df %>% count(sector), aes(x = reorder(sector, n), y=n)) +
+geom_bar(fill="cornflowerblue", stat="identity") + geom_text(aes(label=n), vjust=-1) + 
+labs(x = "Sector", y = "Porcentaje", title="Trabajadores por sector") +
+    theme(axis.text.x = element_text(angle = 45, hjust=1, size=15),
+                axis.text.y=element_text(size=15))
+```
+
+---
+
+También se podía poner horizontal con `coord_flip`.
+
+```{r}
+ggplot(df %>% count(sector), aes(x = reorder(sector, n), y=n)) +
+geom_bar(fill="cornflowerblue", stat="identity") +
+geom_text(aes(label=n), hjust=1.5, color="white") + coord_flip() +
+labs(x = "Sector", y = "Porcentaje", title="Trabajadores por sector")
+```
+
+## Diagrama de Sectores
+
+No es directo, pero es fácil de hacer, con `coord_polar`. Para ello, al igual que antes, usamos count():
+
+- Contamos elementos que queremos visualizar.
+- Hacemos _stats_ igual a **identity** en `geom_bar`.
+- definimos coordenadas polares del eje `y` empezando desde la parte superior (0).
+
+```{r}
+ggplot(df %>% count(sector), aes(x="", y=n, fill=sector)) +
+geom_bar(stat="identity",width=1)+
+coord_polar("y", start=0) +
+labs(x = NULL, y = NULL, fill = "Sector")
+```
+
+---
+
+```{r}
+ggplot(df %>% count(sector), aes(x="", y=n, fill=sector)) +
+geom_bar(stat="identity",width=1)+
+coord_polar("y", start=0) +
+labs(x = NULL, y = NULL, fill = "Sector")
+```
+
+---
+
+Podemos crear un nuevo dataframe para hacerlo más claramente.
+
+```{r}
+categories <- df %>% group_by(sector) %>%
+                 summarize(total=n())
+categories <- categories %>% mutate(prop=round(100*total/sum(total), 1))
+head(categories,10)
+```
+
+----
+
+Ahora lo pintamos, e indicamos el valor por cada una:
+
+```{r}
+ggplot(categories, aes(x="", y=total, fill=sector)) +
+geom_bar(stat="identity",width=1)+ coord_polar("y", start=0)+
+labs(x = NULL, y = NULL, fill = "Sector")+
+    geom_text(aes(label = paste0(prop, "%")),
+    position = position_stack(vjust=0.5))+
+    theme_void()
+```
+
+## Diagrama de área 
+
+Es soportado por `geom_treemap` de la librería `treemapify`.
+
+```{r}
+library('treemapify')
+ggplot(categories, aes(fill=sector, area=total,label=sector)) +
+geom_treemap() +
+labs(title="Trabajadores por sector",fill="Sector")
+```
+
+---
+
+Vamos a quitar la leyenda:
+
+```{r}
+ggplot(categories, aes(fill=sector, area=total,label=sector)) +
+geom_treemap() +
+geom_treemap_text(colour="white",place="center")+
+labs(title="Trabajadores por sector",fill="Sector")+
+theme(legend.position="none")
+```
+
+## Distribución (por edad)
+
+Usamos directamente `geom_histogram` ajustando _bins_.
+
+```{r}
+ggplot(df, aes(x=age)) +
+geom_histogram(fill="cornflowerblue",bins=20) +
+labs(title="Distribución por edad", x="Edad", y="Casos")
+```
+
+---
+
+Podemos poner la escala de un eje de forma porcentual
+
+```{r}
+ggplot(df, aes(x=age,y=..count../sum(..count..))) +
+geom_histogram(fill="cornflowerblue",bins=20) +
+labs(title="Distribución por edad", x="Edad", y="Ratio") +
+scale_y_continuous(labels=scales::percent_format(scale = 1))
+```
+
+## Gráfico de densidad
+
+Usamos `geom_density` para un gráfico de densidad.
+
+```{r}
+ggplot(df, aes(x=age)) +
+geom_density(fill="cornflowerblue", alpha=0.5) +
+labs(title="Distribución por edad", x="Edad", y="Densidad")
+```
+
+## Gráfico de densidad por sexo
+
+Usamos _fill_ en vez de _color_.
+
+```{r}
+ggplot(df, aes(x=age,fill=sex)) +
+geom_density(alpha=0.5) +
+labs(title="Distribución por edad", x="Edad", y="Densidad",fill="Sexo") +
+scale_fill_manual(values = c("indianred3","cornflowerblue"))
+```
+
+# Gráficos de varias variables
+
+## Diagramas de barras
+
+Es muy común usar diagramas de barras para comparar dos variables.
+
+ggplot permite distintos diagramas de barras en función del atributo `position`: `stack`, `dogde` y `fill`:
+
+- `dodge`: Para cada categoría una barra por cada grupo.
+- `stack`: Para cada categoría una barra, distingue grupo por color.
+- `fill`: Igual que stack pero por porcentaje, todas igual altura.
+
+## Comparando sector y sexo estilo `dodge`
+
+```{r}
+ggplot(df, aes(x=sector,fill=sex)) +
+geom_bar(position="dodge") +
+labs(x='Sector',y='Casos')
+```
+## Comparando sector y sexo estilo `stack`
+
+```{r}
+ggplot(df, aes(x=sector,fill=sex)) +
+geom_bar(position="stack") +
+labs(x='Sector',y='Casos')
+```
+
+## Comparando sector y sexo estilo `fill`
+
+```{r}
+ggplot(df, aes(x=sector,fill=sex)) +
+geom_bar(position="fill") +
+labs(x='Sector',y='Porcentaje')
+```
+
+## Cambiando categóricos
+
+Con `labs` podemos cambiar los nombres de atributos, y con `scale_fill_discrete` sus valores.
+
+```{r}
+ggplot(df, aes(x=sector, fill=sex))+ geom_bar(position="fill") +
+scale_fill_discrete(labels=c("Mujer", "Hombre"))+
+labs(x='Sector', y='Porcentaje',fill='Sexo')
+```
+
+## Gráficos de línea
+
+Los gráficos de líneas permiten representar la evolución de variables,
+especialmente cuando una representa el paso del tiempo.
+
+Vamos a mostrar la evaluación de la población
+
+```{r}
+data(gapminder, package="gapminder")
+df_spain  <- filter(gapminder, country=="Spain")
+head(df_spain %>% select(year, lifeExp))
+```
+
+## Gráficos de línea
+
+Se muestra la subida de edad promedio con los años.
+
+```{r}
+ggplot(df_spain, aes(x=year, y=lifeExp)) +
+geom_line()
+```
+
+## Usando varias gráficas
+
+Se pueden combinar distintas gráficas simplemente sumando `geom_XXX`.
+
+```{r}
+ggplot(df_spain, aes(x=year, y=lifeExp)) +
+geom_line(color="lightgrey",linewidth=1.5) + geom_point(color="steelblue",size=3)
+```
+
+## Mostrando visualización
+
+A menudo intera ver cómo es la distribución de una variable en función de otra:
+
+- **Diagrama de densidad ** no es suficiente.
+- **boxplot** permite mostrar claramente la distribución.
+- **violin** es una combinación, es discutible porque ambos diagramas no tienen escala comparable.
+
+Vamos a cargar datos de sueldos entre distintas categorías de sueldos de profesores universitarios.
+
+```{r}
+library(carData)
+data(Salaries, package="carData")
+```
+
+## Distribución de sueldo por sector
+
+```{r}
+ggplot(Salaries, aes(x=salary, fill=rank)) +
+geom_density(alpha=0.5) +
+labs(title="Distribución de salario por categoría")
+```
+
+## Gráficos ridge line/joyplot
+
+Permiten mostrar distintas distribuciones.
+
+```{r}
+library(ggridges)
+ggplot(Salaries, aes(x=salary, y=rank, fill=rank)) +
+    geom_density_ridges(alpha=0.7) +
+    theme_ridges() + theme(legend.position="none")
+```
+## Boxplot
+
+Los boxplot son muy informativos:
+
+![](boxplot.png){height="80%"}
+
+## Distribución de sueldo por sector
+
+Usando boxplot se ve mejor.
+
+```{r}
+ggplot(Salaries, aes(x=rank, y=salary)) +
+geom_boxplot(fill="cornflowerblue", alpha=0.7) +
+labs(title="Distribución de salario por categoría")
+```
+
+## Distribución de sueldo por sector
+
+Los violin permiten incorporar un poco la distribución.
+
+```{r}
+ggplot(Salaries, aes(x=rank, y=salary)) +
+geom_violin(fill="cornflowerblue", alpha=0.7) +
+labs(title="Distribución de salario por categoría")
+```
+
+## Boxplot+violin
+
+Lo muestro solo para que se vea la relación.
+
+```{r}
+ggplot(Salaries, aes(x=rank, y=salary)) +
+geom_violin(fill="cornflowerblue", alpha=0.7) +
+geom_boxplot(fill="indianred3", alpha=0.7) +
+labs(title="Distribución de salario por categoría")
+```
+
+# Gráficos estadísticos
+
+## Datos de pinguinos
+
+Vamos a usar clasificación de pinguinos en base a su isla y detalles físicos.
+
+Es como el iris pero algo menos manido.
+
+```{r}
+library('palmerpenguins')
+```
+
+## Pairs de datos
+
+Permite mostrar un atributo en base al resto de atributos.
+
+Usamos paquete **GGally**, es similar a **pairs** pero más integrado con *tidyverse*.
+
+```{r}
+library(GGally)
+ggpairs(penguins, columns=1:4, aes(color=species))
+```
+
+## Relación entre distintos atributos
+
+```{r}
+ggplot(data = penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(aes(color=species, shape=island), 
+                 alpha = 0.8) +
+  scale_color_manual(values = c("darkorange","purple","cyan4")) +
+  theme_minimal()
+```
+
+## Datos de correlación
+
+Requiere el paquete **ggcorrplot**.
+
+Vamos a convertir primer a formato numérico
+
+```{r}
+species_factor = factor(penguins$species)
+island_factor = factor(penguins$island)
+sex_factor = factor(penguins$sex)
+penguins_cor <- penguins %>%
+                mutate(species=as.numeric(species_factor),
+                       island=as.numeric(island_factor),
+                       sex=as.numeric(sex_factor))
+```
+
+
+
+## Datos de correlación
+
+```{r}
+library(ggcorrplot)
+corr <- cor(penguins_cor)
+ggcorrplot(corr)
+```
+
+## Diagramas con barras de error
+
+**ggplot** permite mostrar barras de error. Estas barras pueden representar
+desviaciones estándar, errores o intervalos de confianza.
+
+```{r}
+df_acum <- Salaries %>%
+           group_by(rank) %>%
+           summarise(n=n(), mean=mean(salary), sd=sd(salary),
+           se = sd/sqrt(n),
+           ci = qt(0.0975, df=n-1)*sd/sqrt(n))
+```
+
+## Gráfica con desviación estándar
+
+```{r}
+ggplot(df_acum, aes(x=rank, y=mean, group=1)) +
+geom_point() + geom_line() +
+geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd, width=0.1)) +
+labs(x="Categoría", y="Sueldo")
+```
+
+## Gráfica con intervalo de confianza
+
+```{r}
+ggplot(df_acum, aes(x=rank, y=mean, group=1)) +
+geom_point() + geom_line() +
+geom_errorbar(aes(ymin=mean-ci, ymax=mean+ci, width=0.1)) +
+labs(x="Categoría", y="Sueldo")
+```
+
+---
+
+```{r}
+df_acum <- Salaries %>%
+           group_by(rank,sex) %>%
+           summarise(n=n(), mean=mean(salary), sd=sd(salary), se = sd/sqrt(n))
+ggplot(df_acum, aes(x=rank, y=mean, color=sex, group=1)) +
+geom_point() + labs(x="Categoría", y="Sueldo") +
+geom_errorbar(aes(ymin=mean-se, ymax=mean+se, width=0.1))
+```
+
+## Ejercicios de visualización
+
+En tips.csv existen datos de consumo en un restaurante. Indica para cada
+consumición el precio *total_bill*, la *propina* y datos del cliente (*sex*,
+*smoker*), el día de la semana, y la hora (*Lunch*, *Dinner*).
+
+## Ejercicios de visualización
+
+ Ejercicios: 
+
+1. Visualizar la distribución de ejemplos por día y por hora.
+
+2. Visualizar la propina en base a la factura.
+
+3. Crear el ratio de la propina respecto a la factura.
+
+4. Mostrar la variación del ratio en base 
+
+5. Gráfico anterior distinguiendo por sexo y fumador en la misma.
+
+6. Visualizar de forma separada los precios y ratio (con facet_wrap) en base a
+   la hora.
+   
+## Ejercicios de visualización
+
+7. Mostrar con barra "stack" el porcentaje de fumadores por sexo.
+
+8. Mostrar con boxplot y violin la relación en base a la hora y día.
+
+9. Gráfica de correlación.
+
+
+
+
