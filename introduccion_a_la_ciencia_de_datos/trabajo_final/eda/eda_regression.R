@@ -245,3 +245,4 @@ con presiones altas y vientos altos, ya que los valores que se encuentran en
 esa zona son combinaciones de valores altos para esas variables. Obviamente
 valors bajos de las variables de temperatura (max, min) contribuyen muchísimo
 a la temperatura media, pero por ser ta obvios son menos interesantes."
+
