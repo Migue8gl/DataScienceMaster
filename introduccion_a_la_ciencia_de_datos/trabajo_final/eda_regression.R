@@ -72,19 +72,13 @@ considero más probable es la toma de datos en distintas zonas geográficas de
 Ankara, dando lugar a distintas modas. El calentamiento climático podría ser
 factible, pero no sería tan evidente y se necesitarían tomas de muchos años."
 
-ggplot(long_data, aes(x = Variable, y = Value, fill = Variable)) +
-  geom_boxplot() +
-  labs(title = "Boxplots", x = "Variable", y = "Value") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+"Vamos a escalar los datos, ya que así se reduciran las diferencias entre
+variables. Escalar permite que todas las variables contribuyan equitativamente a
+la distancia calculada, evitando que una variable desproporcionada influya en
+la detección de outliers."
 
-sapply(data, var)
-
-"Observando las variables y sus valore máximos y mínimos no consideraría que
-existan ourliers univariantes, ya que son valores posibles y nada irreales.
-Las precipitaciones es la que tiene valores más extremos, pero por lo general,
-al ser una zona seca, es normal que la mayoría de valores sean cero. Más tarde
-comprobaré si pueden existir outliers multivariantes."
+data <- as.data.frame(scale(data))
+summary(data)
 
 "A continuación vamos a aplicar test de normalidad a aquellas variables más
 prometedoras y ver si la cumplen. Además obtenemos los qqplots de todas las
@@ -106,6 +100,20 @@ ggplot(long_data, aes(sample = Value)) +
 
 shapiro.test(data$Sea_level_pressure)
 shapiro.test(data$Standard_pressure)
+
+"Vamos a analizar los boxplots de las variables"
+
+ggplot(long_data, aes(x = Variable, y = Value, fill = Variable)) +
+  geom_boxplot() +
+  labs(title = "Boxplots", x = "Variable", y = "Value") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+"Observando las variables y sus valore máximos y mínimos no consideraría que
+existan outliers univariantes, ya que son valores posibles y nada irreales.
+Las precipitaciones es la que tiene valores más extremos, pero por lo general,
+al ser una zona seca, es normal que la mayoría de valores sean cero. Más tarde
+comprobaré si pueden existir outliers multivariantes."
 
 "Si bien es cierto que el test rechaza (no es una distribución normal). Los
 qqplot de las variables concernientes a la presión son muy buenos. De hecho en
@@ -149,13 +157,15 @@ poca altitud en este conjunto de datos."
 ggplot(data, aes(x = Mean_temperature, y = Sea_level_pressure)) +
   geom_point()
 
-"Vamos a escalar los datos, ya que así se reduciran las diferencias entre
-variables. Escalar permite que todas las variables contribuyan equitativamente a
-la distancia calculada, evitando que una variable desproporcionada influya en
-la detección de outliers."
+"Vamos a crear dos nuevas variables que resuman la información de max_temperature,
+min_temperature y las variables relativas a presión."
 
-data <- scale(data)
-summary(data)
+data <- data %>%
+  mutate(
+    Diff_temperature = Max_temperature + Min_temperature,
+    Diff_pressure = Standard_pressure - Sea_level_pressure
+  ) %>%
+  select(-Min_temperature, -Max_temperature, -Sea_level_pressure, -Standard_pressure)
 
 "Vamos a realizar un análisis de comprobación de outliers multivariantes, es
 decir, en combinación con múltiples variables. Primero, comprobamos

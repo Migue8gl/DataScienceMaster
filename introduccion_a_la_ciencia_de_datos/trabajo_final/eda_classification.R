@@ -1,6 +1,7 @@
 library(tidyverse)
 library(moments)
 library("corrplot")
+library(ggfortify)
 
 "Leemos los datos saltandonos las cabeceras iniciales y después las parseamos
 a mano. Seguido, vamos a ver unos pocos datos con head para hacernos una primera
@@ -200,6 +201,18 @@ plot_distribution_for_every_class(data, "Triiodothyronine")
 
 "Parece observarse que para todas las variables, valores altos de la misma
 suelen agruparse en la clase 1."
+
+pca_res <- prcomp(data %>% select(-Class))
+
+# Biplot
+autoplot(
+  pca_res,
+  data = data,
+  colour = 'Class',
+  loadings = TRUE,
+  loadings.label = TRUE,
+  loadings.label.size = 3
+)
 
 "Vamos a mirar si existe alguna correlación entre variables, para ello podemos
 usar dos métodos. Con pairs mostramos cada variable en relación a otra variable.
