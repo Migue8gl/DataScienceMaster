@@ -5,10 +5,12 @@ from typing import List, Tuple, Dict, Optional
 
 import cv2
 import numpy as np
+import polars as pl
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.svm import SVC
+import time
 
 
 def create_hog_descriptor(hog_params: Optional[Dict] = None) -> cv2.HOGDescriptor:
@@ -58,15 +60,34 @@ def read_dataset(
     path: str,
     labels: List[str],
     image_size: Tuple[int, int],
-    limit: int,
     hog_params: Dict,
+    parquet_file: str = "dataset.parquet",
 ) -> Tuple[np.ndarray, np.ndarray]:
-    """Reads images from a dataset path and extracts descriptor features."""
+    """
+    Reads images from a dataset path, extracts descriptor features, and saves the dataset as a Parquet file.
+    Reloads the dataset if the Parquet file already exists using Polars.
+
+    Args:
+        path (str): Path to the dataset directory.
+        labels (List[str]): List of label subdirectories.
+        image_size (Tuple[int, int]): Target image size for processing.
+        hog_params (Dict): Parameters for HOG descriptor.
+        parquet_file (str): Path to save or load the dataset in Parquet format.
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray]: Processed data and corresponding labels.
+    """
+    if os.path.exists(parquet_file):
+        print(f"Loading dataset from {parquet_file} using Polars...")
+        df = pl.read_parquet(parquet_file)
+        data = np.vstack(df["features"].to_numpy())
+        data_labels = df["label"].to_numpy()
+        return data, data_labels
+
     if not os.path.exists(path):
         raise FileNotFoundError("Dataset path does not exist.")
 
     data, data_labels = [], []
-    label_limit = limit // len(labels)
     hog_descriptor = create_hog_descriptor(hog_params)
 
     for label_idx, label_name in enumerate(labels):
@@ -75,23 +96,31 @@ def read_dataset(
             raise FileNotFoundError(
                 f"Data not found for label '{label_name}' at {label_dir}."
             )
-
-        count = 0
         for filename in os.listdir(label_dir):
-            if count >= label_limit:
-                break
-
             file_path = os.path.join(label_dir, filename)
             if filename.lower().endswith((".png", ".jpg", ".jpeg")):
                 try:
                     features = process_image(file_path, image_size, hog_descriptor)
                     data.append(features)
                     data_labels.append(label_idx)
-                    count += 1
                 except ValueError:
+                    print(f"Invalid image removed: {file_path}")
                     os.remove(file_path)
 
-    return np.array(data), np.array(data_labels)
+    # Convert to NumPy arrays
+    data = np.array(data)
+    data_labels = np.array(data_labels)
+
+    # Shuffle
+    p = np.random.permutation(data.shape[0])
+    data, data_labels = data[p], data_labels[p]
+
+    # Save as Parquet file using Polars
+    print(f"Saving processed dataset to {parquet_file} using Polars...")
+    df = pl.DataFrame({"features": data.tolist(), "label": data_labels.tolist()})
+    df.write_parquet(parquet_file)
+
+    return data, data_labels
 
 
 def train_and_evaluate_model(
@@ -105,72 +134,99 @@ def train_and_evaluate_model(
 
 
 def random_search(
-    X_train: np.ndarray, y_train: np.ndarray, image_size: Tuple[int, int]
+    X_train: np.ndarray,
+    y_train: np.ndarray,
+    image_size: Tuple[int, int],
+    search_hog_parameters: bool = False,
 ) -> Tuple[Dict, Dict, SVC]:
     """Perform Randomized Search for HOG and SVM parameters."""
-    hog_param_grid = {
-    "nbins": [6, 9, 12],
-    "winSigma": [0.5, 1.0, 2.0, 5.0],
-    "L2HysThreshold": [0.1, 0.2, 0.3, 0.4],
-    "signedGradients": [True, False],
-    "gammaCorrection": [0, 1],
-}
-
     svm_param_grid = {
-        "C": [0.01, 0.1, 1, 10],
+        "C": [0.001, 0.01, 0.1, 1, 10],
         "gamma": [1e-3, 1e-2, 1e-1, 1],
         "kernel": ["rbf", "linear"],
     }
 
-    best_hog_params = None
     best_model = None
     best_svm_params = None
     best_score = 0
 
-    for nbins in hog_param_grid["nbins"]:
-        for winSigma in hog_param_grid["winSigma"]:
-            for L2HysThreshold in hog_param_grid["L2HysThreshold"]:
-                for signedGradients in hog_param_grid["signedGradients"]:
-                    for gammaCorrection in hog_param_grid["gammaCorrection"]:
-                        hog_params = {
-                            "winSize": (image_size[0] // 2, image_size[1] // 2),
-                            "blockSize": (image_size[0] // 2, image_size[1] // 2),
-                            "blockStride": (image_size[0] // 4, image_size[1] // 4),
-                            "cellSize": (image_size[0] // 2, image_size[1] // 2),
-                            "nbins": nbins,
-                            "winSigma": winSigma,
-                            "L2HysThreshold": L2HysThreshold,
-                            "signedGradients": signedGradients,
-                            "gammaCorrection": gammaCorrection,
-                        }
+    start_time = time.time()
 
-                        X_train_transformed = np.array(
-                            [
-                                extract_hog_features(
-                                    x.reshape(image_size[0], image_size[1], -1),
-                                    create_hog_descriptor(hog_params),
-                                )
-                                for x in X_train
-                            ]
-                        )
+    if search_hog_parameters:
+        hog_param_grid = {
+            "nbins": [6, 9, 12],
+            "winSigma": [0.5, 1.0, 2.0, 5.0],
+            "L2HysThreshold": [0.1, 0.2, 0.3, 0.4],
+            "signedGradients": [True, False],
+            "gammaCorrection": [0, 1],
+        }
+        best_hog_params = None
+        for nbins in hog_param_grid["nbins"]:
+            for winSigma in hog_param_grid["winSigma"]:
+                for L2HysThreshold in hog_param_grid["L2HysThreshold"]:
+                    for signedGradients in hog_param_grid["signedGradients"]:
+                        for gammaCorrection in hog_param_grid["gammaCorrection"]:
+                            hog_params = {
+                                "winSize": (image_size[0] // 2, image_size[1] // 2),
+                                "blockSize": (image_size[0] // 2, image_size[1] // 2),
+                                "blockStride": (image_size[0] // 4, image_size[1] // 4),
+                                "cellSize": (image_size[0] // 2, image_size[1] // 2),
+                                "nbins": nbins,
+                                "winSigma": winSigma,
+                                "L2HysThreshold": L2HysThreshold,
+                                "signedGradients": signedGradients,
+                                "gammaCorrection": gammaCorrection,
+                            }
+                            X_train_transformed = np.array(
+                                [
+                                    extract_hog_features(
+                                        x.reshape(image_size[0], image_size[1], -1),
+                                        create_hog_descriptor(hog_params),
+                                    )
+                                    for x in X_train
+                                ]
+                            )
+                            random_search = RandomizedSearchCV(
+                                SVC(),
+                                svm_param_grid,
+                                n_iter=10,
+                                scoring="accuracy",
+                                cv=5,
+                            )
+                            random_search.fit(X_train_transformed, y_train)
+                            if random_search.best_score_ > best_score:
+                                best_score = random_search.best_score_
+                                best_hog_params = hog_params
+                                best_svm_params = random_search.best_params_
+                                best_model = random_search.best_estimator_
+    else:
+        random_search = RandomizedSearchCV(
+            SVC(),
+            svm_param_grid,
+            n_iter=30,
+            scoring="accuracy",
+            cv=3,
+        )
+        random_search.fit(X_train, y_train)
+        if random_search.best_score_ > best_score:
+            best_score = random_search.best_score_
+            if search_hog_parameters:
+                best_hog_params = hog_params
+            best_svm_params = random_search.best_params_
+            best_model = random_search.best_estimator_
 
-                        svm = SVC()
-                        random_search = RandomizedSearchCV(
-                            svm, svm_param_grid, n_iter=5, scoring="accuracy", cv=3
-                        )
-                        random_search.fit(X_train_transformed, y_train)
-
-                        if random_search.best_score_ > best_score:
-                            best_score = random_search.best_score_
-                            best_hog_params = hog_params
-                            best_svm_params = random_search.best_params_
-                            best_model = random_search.best_estimator_
-
-    print(f"Best HOG Parameters: {best_hog_params}")
+    diff_time = time.time() - start_time
+    if search_hog_parameters:
+        print(f"Best HOG Parameters: {best_hog_params}")
     print(f"Best SVM Parameters: {best_svm_params}")
     print(f"Best Cross-Validation Accuracy: {best_score:.2f}")
+    print(f"Hyperparameter Search Time: {diff_time:.2f} secs")
 
-    return best_hog_params, best_svm_params, best_model
+    return (
+        best_svm_params,
+        best_model,
+        best_hog_params if search_hog_parameters else None,
+    )
 
 
 def main(args: argparse.Namespace):
@@ -191,20 +247,30 @@ def main(args: argparse.Namespace):
         "signedGradients": True,
     }
 
-    X, y = read_dataset(args.data_path, args.labels, image_size, args.limit, None)
-    print(f"Loaded dataset: {X.shape[0]} images, each resized to {image_size}.")
+    X, y = read_dataset(
+        args.data_path,
+        args.labels,
+        image_size,
+        hog_params if not args.search_hog else None,
+    )
+
+    print(
+        f"Loaded dataset: {min(X.shape[0], args.limit)} images, each resized to {image_size}."
+    )
     print(f"Labels: {args.labels}")
     print(f"Labels encoded: {np.unique(y)}")
 
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42
+        X[: args.limit], y[: args.limit], test_size=0.2, random_state=42
     )
     print("Dataset split into training and test sets.")
 
     # accuracy = train_and_evaluate_model(X_train, y_train, X_test, y_test)
     # print(f"Model accuracy: {accuracy:.2f}")
 
-    hog_params, models_params, best_svc = random_search(X_train, y_train, image_size)
+    models_params, best_svc, hog_params = random_search(
+        X_train, y_train, image_size, args.search_hog
+    )
 
 
 if __name__ == "__main__":
@@ -234,6 +300,12 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "-li", "--limit", type=int, default=1000, help="Total number of images to load."
+    )
+    parser.add_argument(
+        "-sh",
+        "--search_hog",
+        action="store_true",
+        help="Whether to search best hyperparameters for HOG.",
     )
     args = parser.parse_args()
     main(args)
