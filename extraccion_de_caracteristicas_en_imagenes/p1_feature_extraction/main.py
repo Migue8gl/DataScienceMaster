@@ -109,12 +109,12 @@ def random_search(
 ) -> Tuple[Dict, Dict, SVC]:
     """Perform Randomized Search for HOG and SVM parameters."""
     hog_param_grid = {
-        "winSize": [(64, 64), (128, 128)],
-        "blockSize": [(16, 16), (32, 32)],
-        "blockStride": [(8, 8), (16, 16)],
-        "cellSize": [(8, 8), (16, 16)],
-        "nbins": [6, 9, 12],
-    }
+    "nbins": [6, 9, 12],
+    "winSigma": [0.5, 1.0, 2.0, 5.0],
+    "L2HysThreshold": [0.1, 0.2, 0.3, 0.4],
+    "signedGradients": [True, False],
+    "gammaCorrection": [0, 1],
+}
 
     svm_param_grid = {
         "C": [0.01, 0.1, 1, 10],
@@ -127,17 +127,21 @@ def random_search(
     best_svm_params = None
     best_score = 0
 
-    for winSize in hog_param_grid["winSize"]:
-        for blockSize in hog_param_grid["blockSize"]:
-            for blockStride in hog_param_grid["blockStride"]:
-                for cellSize in hog_param_grid["cellSize"]:
-                    for nbins in hog_param_grid["nbins"]:
+    for nbins in hog_param_grid["nbins"]:
+        for winSigma in hog_param_grid["winSigma"]:
+            for L2HysThreshold in hog_param_grid["L2HysThreshold"]:
+                for signedGradients in hog_param_grid["signedGradients"]:
+                    for gammaCorrection in hog_param_grid["gammaCorrection"]:
                         hog_params = {
-                            "winSize": winSize,
-                            "blockSize": blockSize,
-                            "blockStride": blockStride,
-                            "cellSize": cellSize,
+                            "winSize": (image_size[0] // 2, image_size[1] // 2),
+                            "blockSize": (image_size[0] // 2, image_size[1] // 2),
+                            "blockStride": (image_size[0] // 4, image_size[1] // 4),
+                            "cellSize": (image_size[0] // 2, image_size[1] // 2),
                             "nbins": nbins,
+                            "winSigma": winSigma,
+                            "L2HysThreshold": L2HysThreshold,
+                            "signedGradients": signedGradients,
+                            "gammaCorrection": gammaCorrection,
                         }
 
                         X_train_transformed = np.array(
