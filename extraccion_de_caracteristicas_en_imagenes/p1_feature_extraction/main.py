@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.svm import SVC
 import time
-
+from LBPDescriptor import LBPDescriptor
 
 def create_hog_descriptor(hog_params: Optional[Dict] = None) -> cv2.HOGDescriptor:
     """Create and return a HOG descriptor with specified parameters."""
@@ -37,6 +37,7 @@ def extract_hog_features(
     img: np.ndarray, hog_descriptor: cv2.HOGDescriptor
 ) -> np.ndarray:
     """Extract HOG features from an image using a HOG descriptor."""
+    img = img.astype(np.uint8)
     return hog_descriptor.compute(img).flatten()
 
 
@@ -46,7 +47,7 @@ def process_image(
     hog_descriptor: Optional[cv2.HOGDescriptor] = None,
 ) -> np.ndarray:
     """Load and preprocess an image, returning its HOG features."""
-    img = cv2.imread(file_path)
+    img = cv2.imread(file_path, cv2.IMREAD_GRAYSCALE) # One channel
     if img is None or img.size == 0:
         raise ValueError(f"Invalid image at {file_path}")
     img = cv2.resize(img, image_size)
@@ -78,9 +79,11 @@ def read_dataset(
         Tuple[np.ndarray, np.ndarray]: Processed data and corresponding labels.
     """
     if os.path.exists(parquet_file):
-        print(f"Loading dataset from {parquet_file} using Polars...")
+        print(f"Loading dataset from {parquet_file} using Polars.")
         df = pl.read_parquet(parquet_file)
-        data = np.vstack(df["features"].to_numpy())
+        data = np.array(df["features"].to_list())
+        original_shape = df["shape"][0]  # Retrieve the original shape
+        data = data.reshape(original_shape)
         data_labels = df["label"].to_numpy()
         return data, data_labels
 
@@ -116,8 +119,14 @@ def read_dataset(
     data, data_labels = data[p], data_labels[p]
 
     # Save as Parquet file using Polars
-    print(f"Saving processed dataset to {parquet_file} using Polars...")
-    df = pl.DataFrame({"features": data.tolist(), "label": data_labels.tolist()})
+    print(f"Saving processed dataset to {parquet_file} using Polars.")
+    df = pl.DataFrame(
+        {
+            "features": data.tolist(),
+            "label": data_labels.tolist(),
+            "shape": [tuple(data.shape)] * len(data),
+        }
+    )
     df.write_parquet(parquet_file)
 
     return data, data_labels
@@ -166,11 +175,12 @@ def random_search(
                 for L2HysThreshold in hog_param_grid["L2HysThreshold"]:
                     for signedGradients in hog_param_grid["signedGradients"]:
                         for gammaCorrection in hog_param_grid["gammaCorrection"]:
+                            X = X_train.copy()
                             hog_params = {
-                                "winSize": (image_size[0] // 2, image_size[1] // 2),
+                                "winSize": (image_size[0], image_size[1]),
                                 "blockSize": (image_size[0] // 2, image_size[1] // 2),
                                 "blockStride": (image_size[0] // 4, image_size[1] // 4),
-                                "cellSize": (image_size[0] // 2, image_size[1] // 2),
+                                "cellSize": (image_size[0] // 4, image_size[1] // 4),
                                 "nbins": nbins,
                                 "winSigma": winSigma,
                                 "L2HysThreshold": L2HysThreshold,
@@ -183,7 +193,7 @@ def random_search(
                                         x.reshape(image_size[0], image_size[1], -1),
                                         create_hog_descriptor(hog_params),
                                     )
-                                    for x in X_train
+                                    for x in X
                                 ]
                             )
                             random_search = RandomizedSearchCV(
@@ -236,7 +246,7 @@ def main(args: argparse.Namespace):
         "winSize": (image_size[0] // 2, image_size[1] // 2),
         "blockSize": (image_size[0] // 2, image_size[1] // 2),
         "blockStride": (image_size[0] // 4, image_size[1] // 4),
-        "cellSize": (image_size[0] // 2, image_size[1] // 2),
+        "cellSize": (image_size[0] // 4, image_size[1] // 4),
         "nbins": 9,
         "derivAperture": 1,
         "winSigma": -1.0,
@@ -252,6 +262,7 @@ def main(args: argparse.Namespace):
         args.labels,
         image_size,
         hog_params if not args.search_hog else None,
+        "dataset_raw.parquet" if args.search_hog else "dataset.parquet",
     )
 
     print(
@@ -272,6 +283,23 @@ def main(args: argparse.Namespace):
         X_train, y_train, image_size, args.search_hog
     )
 
+def test(args: argparse.Namespace):
+    image_size = tuple(map(int, args.image_size.split(",")))
+    X, y = read_dataset(
+        args.data_path,
+        args.labels,
+        image_size,
+        None, 
+        "dataset_raw.parquet",
+    )
+    
+    print(X[0].shape)
+    
+    lbp = LBPDescriptor(radius=20, n_neighbors=8)
+    
+    start = time.time()
+    print(lbp.compute(X[0]))
+    print(f"Time for one image LBP computation: {time.time() - start:.2f} secs")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -281,7 +309,7 @@ if __name__ == "__main__":
         )
     )
     parser.add_argument(
-        "-d", "--data_path", type=str, default="./data", help="Path to the dataset."
+        "-d", "--data-path", type=str, default="./data", help="Path to the dataset."
     )
     parser.add_argument(
         "-l",
@@ -293,9 +321,9 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "-s",
-        "--image_size",
+        "--image-size",
         type=str,
-        default="128,128",
+        default="28,28",
         help="Image size (width,height) to resize.",
     )
     parser.add_argument(
@@ -303,9 +331,10 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "-sh",
-        "--search_hog",
+        "--search-hog",
         action="store_true",
         help="Whether to search best hyperparameters for HOG.",
     )
     args = parser.parse_args()
-    main(args)
+    #main(args)
+    test(args)
