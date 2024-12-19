@@ -1,4 +1,3 @@
-from typing import Tuple, List
 import numpy as np
 
 
@@ -35,7 +34,9 @@ class LBPDescriptor:
             raise ValueError("Input image must be a 2D grayscale image.")
 
         rows, cols = img.shape
-        lbps = np.zeros((rows - 2 * self.radius, cols - 2 * self.radius), dtype=np.uint8)
+        lbps = np.zeros(
+            (rows - 2 * self.radius, cols - 2 * self.radius), dtype=np.uint8
+        )
 
         for i in range(self.radius, rows - self.radius):
             for j in range(self.radius, cols - self.radius):
@@ -43,9 +44,7 @@ class LBPDescriptor:
                 binary_pattern = 0
 
                 for idx, (dx, dy) in enumerate(self.neighbor_offsets):
-                    neighbor_value = self._bilinear_interpolation(
-                        img, i + dy, j + dx
-                    )
+                    neighbor_value = self._bilinear_interpolation(img, i + dy, j + dx)
                     binary_pattern |= (neighbor_value > center_pixel) << idx
 
                 lbps[i - self.radius, j - self.radius] = binary_pattern
