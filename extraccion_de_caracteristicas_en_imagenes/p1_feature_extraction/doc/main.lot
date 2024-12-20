@@ -1,3 +1,13 @@
 \babel@toc {spanish}{}\relax 
-\contentsline {table}{\numberline {1}{\ignorespaces Parámetros del modelo SVM.}}{4}{}%
-\contentsline {table}{\numberline {2}{\ignorespaces Parámetros del descriptor HOG.}}{5}{}%
+\contentsline {table}{\numberline {1}{\ignorespaces Parámetros del modelo \textbf {SVM}.}}{6}{}%
+\contentsline {table}{\numberline {2}{\ignorespaces Parámetros del descriptor \textbf {HOG}.}}{6}{}%
+\contentsline {table}{\numberline {3}{\ignorespaces Métricas de clasificación para \textbf {HOG}.}}{7}{}%
+\contentsline {table}{\numberline {4}{\ignorespaces Reporte de clasificación para \textbf {HOG}.}}{7}{}%
+\contentsline {table}{\numberline {5}{\ignorespaces Métricas de clasificación para \textbf {LBP}.}}{11}{}%
+\contentsline {table}{\numberline {6}{\ignorespaces Reporte de clasificación para \textbf {LBP}.}}{12}{}%
+\contentsline {table}{\numberline {7}{\ignorespaces Parámetros del modelo \textbf {SVM} con el descriptor \textbf {HOG}.}}{13}{}%
+\contentsline {table}{\numberline {8}{\ignorespaces Métricas de clasificación para el modelo con \textbf {HOG} con tres clases.}}{13}{}%
+\contentsline {table}{\numberline {9}{\ignorespaces Reporte de clasificación para el modelo con \textbf {HOG} con tres clases.}}{13}{}%
+\contentsline {table}{\numberline {10}{\ignorespaces Parámetros del modelo \textbf {SVM} con el descriptor \textbf {LBP}.}}{15}{}%
+\contentsline {table}{\numberline {11}{\ignorespaces Métricas de clasificación para el modelo con \textbf {LBP} para tres clases.}}{15}{}%
+\contentsline {table}{\numberline {12}{\ignorespaces Reporte de clasificación para el modelo con \textbf {LBP} para tres clases.}}{15}{}%

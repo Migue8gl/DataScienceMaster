@@ -1,3 +1,10 @@
 \babel@toc {spanish}{}\relax 
-\contentsline {figure}{\numberline {1}{\ignorespaces Grafo de decisión de tareas.}}{2}{}%
-\contentsline {figure}{\numberline {2}{\ignorespaces Flujo de cómputo del descriptor HOG.}}{3}{}%
+\contentsline {figure}{\numberline {1}{\ignorespaces Grafo de decisión de tareas.}}{3}{}%
+\contentsline {figure}{\numberline {2}{\ignorespaces Flujo de cómputo del descriptor \textbf {HOG}.}}{5}{}%
+\contentsline {figure}{\numberline {3}{\ignorespaces Ejemplo de \textit {k-fold cross validation}.}}{7}{}%
+\contentsline {figure}{\numberline {4}{\ignorespaces Curva de \textit {ROC} para el modelo \textbf {SVM+HOG}.}}{8}{}%
+\contentsline {figure}{\numberline {5}{\ignorespaces Ejemplo de cálculo de \textbf {LBP}.}}{9}{}%
+\contentsline {figure}{\numberline {6}{\ignorespaces Diagrama de la clase \textbf {LBP}.}}{11}{}%
+\contentsline {figure}{\numberline {7}{\ignorespaces Curva de \textit {ROC} para el modelo \textbf {SVM+LBP}.}}{12}{}%
+\contentsline {figure}{\numberline {8}{\ignorespaces Matriz de confusión con \textbf {SVM+HOG} para tres clases.}}{14}{}%
+\contentsline {figure}{\numberline {9}{\ignorespaces Matriz de confusión con \textbf {SVM+LBP} para tres clases.}}{16}{}%

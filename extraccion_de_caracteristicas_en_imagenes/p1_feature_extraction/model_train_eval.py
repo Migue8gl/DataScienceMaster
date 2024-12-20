@@ -4,11 +4,17 @@ import time
 from typing import Dict, Tuple
 
 import numpy as np
+from sklearn.metrics import accuracy_score
 from sklearn.model_selection import RandomizedSearchCV, train_test_split
 from sklearn.svm import SVC
 
 from process_data import read_dataset
-from utils import create_descriptor, save_model, save_search_results
+from utils import (
+    create_descriptor,
+    save_evaluation_plots,
+    save_model,
+    save_search_results,
+)
 
 
 def random_search(
@@ -82,7 +88,7 @@ def random_search(
                                 ]
                             )
                             random_search = RandomizedSearchCV(
-                                SVC(),
+                                SVC(probability=True),
                                 svm_param_grid,
                                 n_iter=20,
                                 scoring="accuracy",
@@ -108,7 +114,7 @@ def random_search(
                     [descriptor.compute(x.astype(np.uint8)).flatten() for x in X_train]
                 )
                 random_search = RandomizedSearchCV(
-                    SVC(),
+                    SVC(probability=True),
                     svm_param_grid,
                     n_iter=20,
                     scoring="accuracy",
@@ -131,7 +137,7 @@ def random_search(
                 [descriptor.compute(x.astype(np.uint8)) for x in X_train]
             )
         random_search = RandomizedSearchCV(
-            SVC(),
+            SVC(probability=True),
             svm_param_grid,
             n_iter=20,
             scoring="accuracy",
@@ -157,14 +163,18 @@ def random_search(
         best_score=best_score,
         execution_time=diff_time,
         descriptor_name=descriptor_name if descriptor_hyperparameter_search else None,
-        descriptor_params=best_descriptor_params if descriptor_hyperparameter_search else None
+        descriptor_params=best_descriptor_params
+        if descriptor_hyperparameter_search
+        else None,
     )
     save_model(
         model=best_model,
         model_score=best_score,
         svm_params=best_svm_params,
         descriptor_name=descriptor_name if descriptor_hyperparameter_search else None,
-        descriptor_params=best_descriptor_params if descriptor_hyperparameter_search else None
+        descriptor_params=best_descriptor_params
+        if descriptor_hyperparameter_search
+        else None,
     )
 
     return (
@@ -203,6 +213,36 @@ def main(args: argparse.Namespace):
             y_train,
             descriptor_name,
         )
+
+    # Get predictions on test set
+    if (len(X_test.shape) > 2 and descriptor_name != "raw") or (
+        len(X_test.shape) > 2 and args.descriptor is not None
+    ):
+        # If we have raw images, we need to transform them using the descriptor
+        descriptor = create_descriptor(
+            descriptor_params if descriptor_params else {},
+            descriptor_name if args.descriptor is None else args.descriptor,
+            X_test.shape[1],
+        )
+        X_test_transformed = np.array(
+            [descriptor.compute(x.astype(np.uint8)).flatten() for x in X_test]
+        )
+        y_pred = best_svc.predict(X_test_transformed)
+        y_pred_proba = best_svc.predict_proba(X_test_transformed)[:, 1]
+    else:
+        # If we already have features, use them directly
+        y_pred = best_svc.predict(X_test)
+        y_pred_proba = best_svc.predict_proba(X_test)[:, 1]
+
+    # Generate model name based on parameters
+    model_name = f"svm_{descriptor_name}_{'with_desc_search' if args.hyperparameter_search else 'base'}"
+    test_acc = accuracy_score(y_test, y_pred)
+    print(f"Test acurracy: {test_acc:.2f}")
+
+    # Save evaluation plots and metrics
+    save_evaluation_plots(y_test, y_pred, y_pred_proba, model_name)
+
+    print("\nEvaluation complete. Results saved in 'results' directory.")
 
 
 if __name__ == "__main__":

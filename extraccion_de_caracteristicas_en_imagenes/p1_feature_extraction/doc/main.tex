@@ -100,6 +100,9 @@
 \listoftables
 \newpage
 
+\section{Camino}
+El camino escogido en las tareas a realizar es: $(1,4,6,8)$.
+
 \section{Introducción}
 En la presente práctica de la asignatura de \textbf{Extracción de Características en Imágenes}, se llevarán a cabo una serie de tareas definidas por un grafo de decisión (fig \ref{fig:de_graph}). Dado este grafo es necesario seguir el camino hasta al final y allí donde haya una bifurcación, escoger entre una tarea básica o una tarea bonificadora. Las tareas bonificadores son iguales que las básicas, pero con un toque de dificultad y desarrollo por parte del alumno. De forma resumida, las tareas a realizar son las siguientes: 
 
@@ -135,7 +138,7 @@ El descriptor \textbf{HOG} es una técnica ampliamente utilizada en la visión p
 \begin{figure}[htp]
     \centering
     \includegraphics[width=1\linewidth]{img/hog}
-    \caption{Flujo de cómputo del descriptor HOG.}
+    \caption{Flujo de cómputo del descriptor \textbf{HOG}.}
     \label{fig:hog}
 \end{figure}
 
@@ -166,7 +169,7 @@ Los parámetros optimizados no han sido todos. Inicialmente se realizó un estud
     svm\_C & 1 \\
     \hline
     \end{tabular}
-    \caption{Parámetros del modelo SVM.}
+    \caption{Parámetros del modelo \textbf{SVM}.}
     \label{tab:svm_params}
 \end{table}
 
@@ -187,14 +190,335 @@ Los parámetros optimizados no han sido todos. Inicialmente se realizó un estud
     gammaCorrection & 0 \\
     \hline
     \end{tabular}
-    \caption{Parámetros del descriptor HOG.}
+    \caption{Parámetros del descriptor \textbf{HOG}.}
     \label{tab:hog_params}
 \end{table}
 
 Los valores escogidos finalmente para los parámetros tanto del descriptor como para el \textbf{SVM} se encuentran descritos en las tablas \ref{tab:hog_params},\ref{tab:svm_params}.
 
-\newpage
-\section{Bibliografía}
+\subsection{Resultados}
+Tras buscar los hierparámetros para \textbf{HOG} se realizó el ajuste final con un total de $8000$ imágenes utilizando una búsqueda de hiperparámetros solo para \textbf{SVM} que a su vez por la naturaleza de la implementación, sirve como \textit{k-fold cross validation.}\\[6pt]
+\textit{K-fold cross validation} (fig \ref{fig:kfold}) es una técnica utilizada en aprendizaje automático para evaluar el rendimiento de un modelo de manera más confiable. En lugar de dividir los datos en un único conjunto de entrenamiento y prueba, esta metodología divide el conjunto completo en $k$ subconjuntos o \textit{folds}. Posteriormente, el modelo se entrena y evalúa $k$ veces, asegurando que en cada iteración uno de los subconjuntos actúe como conjunto de prueba mientras los restantes se utilizan para el entrenamiento. Este proceso se repite tantas veces como folds se hayan definido, rotando el subconjunto que se usa para la evaluación.\\[6pt]
+Una vez completadas todas las iteraciones, se calcula el promedio de las métricas de desempeño obtenidas en cada ciclo. Este promedio proporciona una estimación más robusta del rendimiento del modelo, ya que considera variaciones en los datos al usar diferentes particiones para el entrenamiento y la prueba. 
 
-\printbibliography[heading=none, category=cited]
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.7\linewidth]{img/grid_search_cross_validation}
+    \caption{Ejemplo de \textit{k-fold cross validation}.}
+    \label{fig:kfold}
+\end{figure}
+
+Como se puede ver en las tablas \ref{tab:classification_metrics_hog}, \ref{tab:classification_report_hog}, los resultados son bastante buenos teniendo en cuenta la dificultad del \textit{dataset} y que solo se ha empleado un descriptor.\\[6pt]
+Las métricas están muy balanceadas para ambas clases, aunque era de esperar teniendo en cuenta que el conjunto de datos lo está de igual forma.
+
+\begin{table}[htp]
+    \centering
+    \begin{tabular}{ll}
+    \hline
+    \textbf{Metric} & \textbf{Value} \\
+    \hline
+    Accuracy    & 0.7131 \\
+    Precision   & 0.6976 \\
+    Recall      & 0.7408 \\
+    F1 Score    & 0.7186 \\
+    ROC AUC     & 0.7895 \\
+    PR AUC      & 0.7797 \\
+    \hline
+    \end{tabular}
+    \caption{Métricas de clasificación para \textbf{HOG}.}
+    \label{tab:classification_metrics_hog}
+\end{table}
+
+\begin{table}[htp]
+    \centering
+    \begin{tabular}{lcccc}
+    \hline
+    \textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{Support} \\
+    \hline
+    0 & 0.73 & 0.69 & 0.71 & 809 \\
+    1 & 0.70 & 0.74 & 0.72 & 791 \\
+    \hline
+    \textbf{Macro Avg} & 0.71 & 0.71 & 0.71 & 1600 \\
+    \textbf{Weighted Avg} & 0.71 & 0.71 & 0.71 & 1600 \\
+    \hline
+    \end{tabular}
+    \caption{Reporte de clasificación para \textbf{HOG}.}
+    \label{tab:classification_report_hog}
+\end{table}
+
+El área bajo la curva \textit{ROC} (fig \ref{fig:roc_hog}) sugiere que el modelo tiene un buen desempeño separando las clases, con un $78.95\%$ de probabilidad de clasificar correctamente una muestra positiva frente a una negativa.\\[6pt]
+El modelo tiene un buen rendimiento con métricas consistentes, aunque hay margen de mejora en la precisión y el área bajo las curvas para aplicaciones críticas, aunque en esos casos es conveniente usar técnicas más complejas.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/svm_hog_base_roc_curve}
+    \caption{Curva de \textit{ROC} para el modelo \textbf{SVM+HOG}.}
+    \label{fig:roc_hog}
+\end{figure}
+
+\section{Clasificación con LBP}
+\subsection{LBP}
+El descriptor \textbf{LBP} se basa en analizar la relación de un píxel central con sus píxeles vecinos en una ventana local, capturando patrones que describen la estructura de la textura de la región.\\[6pt]
+Se compara la intensidad del píxel central con cada uno de los píxeles vecinos. Si la intensidad de un vecino es mayor o igual a la del píxel central, se asigna un valor de uno, de lo contrario, se asigna un valor de cero. Esto produce un conjunto de valores binarios, que se organizan como un número binario. Al convertir este número binario a su equivalente decimal, se obtiene el valor LBP correspondiente al píxel central.\\[6pt]
+El cálculo se realiza iterando a través de toda la imagen en una ventana deslizante, generando un mapa de características donde cada píxel está representado por su valor LBP. Este mapa puede interpretarse como una nueva representación de la imagen, enfatizando los patrones locales de textura.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.8\linewidth]{img/lbp}
+    \caption{Ejemplo de cálculo de \textbf{LBP}.}
+    \label{fig:lbp}
+\end{figure}
+
+\subsection{Implementación}
+Se ha realizado una implementación propia del descriptor, siguiendo la interfaz de \textbf{HOG} en \textit{OpenCV} para mayor coherencia y cohesión con el \textit{software} desarrollado.\\[6pt]
+La función de inicialización se encarga de recoger los paráemtros y realizar ciertas comprobaciones necesarias para el correcto funcionamiento del algoritmo, de esta forma el usuario será advertido si no los está introduciendo correctamente. Se comprueban cosas básicas como que el \texttt{radius} (radio) no pueda ser menor que $1$ y que \texttt{n\_neighbors} (número de vecinos) sean múltiplos de $8$ y nunca menor a ese número.
+
+\begin{lstlisting}[language=python]
+    def __init__(self, radius: int = 1, n_neighbors: int = 8):
+        if radius < 1:
+            raise ValueError("The radius must be greater than 0.")
+        if n_neighbors % 8 != 0 or n_neighbors < 8:
+            raise ValueError(
+                "The number of neighbors (n_neighbors) must be a multiple of 8 and at least 8."
+            )
+        self.radius = radius
+        self.n_neighbors = n_neighbors
+
+        # Precompute relative offsets for neighbors
+        self.neighbor_offsets = [
+            (
+                radius * np.cos(2 * np.pi * i / n_neighbors),
+                radius * np.sin(2 * np.pi * i / n_neighbors),
+            )
+            for i in range(n_neighbors)
+        ]
+\end{lstlisting}
+
+La función principal del algoritmo es la de \texttt{compute} que se encarga de la funcionalidad principal de codificación de la imagen. De nuevo realiza comprobaciones básicas, y si se pasan, calcula el patrón binario asociado a cada píxel con sus vecinos dentro de un radio específico. Normalmente es necesario realizar una interpolación de los píxeles de los vecinos, pues se calculan siguiendo una fórmula radial.\\[6pt]
+Después de obtener el patrón es necesario pasar este a decimal y, finalmente, calcular el histograma.
+
+\begin{lstlisting}[language=python]
+    def compute(self, img: np.ndarray) -> np.ndarray:
+        """
+        Computes the Local Binary Pattern (LBP) for the given image.
+
+        Args:
+            img (np.ndarray): Grayscale image as a 2D numpy array.
+        Returns:
+            np.ndarray: Flattened normalized histogram of LBP values.
+        """
+        if len(img.shape) != 2:
+            raise ValueError("Input image must be a 2D grayscale image.")
+
+        rows, cols = img.shape
+        lbps = np.zeros(
+            (rows - 2 * self.radius, cols - 2 * self.radius), dtype=np.uint8
+        )
+
+        for i in range(self.radius, rows - self.radius):
+            for j in range(self.radius, cols - self.radius):
+                center_pixel = img[i, j]
+                binary_pattern = 0
+
+                for idx, (dx, dy) in enumerate(self.neighbor_offsets):
+                    neighbor_value = self._bilinear_interpolation(img, i + dy, j + dx)
+                    binary_pattern |= (neighbor_value > center_pixel) << idx
+
+                lbps[i - self.radius, j - self.radius] = binary_pattern
+
+        # Compute histogram of LBP values
+        hist, _ = np.histogram(lbps.flatten(), bins=np.arange(255), range=(0, 255))
+        return hist / hist.sum()
+\end{lstlisting}
+
+El cálculo de los vecinos se realiza mediante la siguiente fórmula. Esto sol:
+$$x_i^\prime = r \cdot \cos\left(\frac{2 \pi i}{n}\right)+x_i, \quad
+y_i^\prime = r \cdot \sin\left(\frac{2 \pi i}{n}\right)+y_i$$
+Otra opción posible habría sido coger el vecino más cercano en vez de interpolar.\\[6pt]
+Se ha creado un diagrama (fig \ref{fig:lbp_diagram}) que describe las funcionalidades de la clase y cómo se ha dividido el trabajo en distintos métodos dentro de esta.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/lbp_diagram}
+    \caption{Diagrama de la clase \textbf{LBP}.}
+    \label{fig:lbp_diagram}
+\end{figure}
+
+\subsection{Resultados}
+
+\begin{table}[htp]
+    \centering
+    \begin{tabular}{ll}
+    \hline
+    \textbf{Metric} & \textbf{Value} \\
+    \hline
+    Accuracy    & 0.6469 \\
+    Precision   & 0.6549 \\
+    Recall      & 0.6731 \\
+    F1 Score    & 0.6639 \\
+    ROC AUC     & 0.7042 \\
+    PR AUC      & 0.6960 \\
+    \hline
+    \end{tabular}
+    \caption{Métricas de clasificación para \textbf{LBP}.}
+    \label{tab:classification_metrics_lbp}
+\end{table}
+
+\begin{table}[htp]
+    \centering
+    \begin{tabular}{lcccc}
+    \hline
+    \textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{Support} \\
+    \hline
+    0 & 0.64 & 0.62 & 0.63 & 771 \\
+    1 & 0.65 & 0.67 & 0.66 & 829 \\
+    \hline
+    \textbf{Macro Avg} & 0.65 & 0.65 & 0.65 & 1600 \\
+    \textbf{Weighted Avg} & 0.65 & 0.65 & 0.65 & 1600 \\
+    \hline
+    \end{tabular}
+    \caption{Reporte de clasificación para \textbf{LBP}.}
+    \label{tab:classification_report_lbp}
+\end{table}
+
+Como puede observarse en las figuras \ref{tab:classification_report_lbp}, \ref{tab:classification_metrics_lbp}, las métricas obtenidas son igual de balanceadas que las de \textbf{SVM+HOG}. En este caso la predicción es menos potente en todos los sentidos, los resultados son inferiores y el tiempo de cómputo (al ser una implementación en \textit{Python}) más elevado.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/svm_lbp_base_roc_curve}
+    \caption{Curva de \textit{ROC} para el modelo \textbf{SVM+LBP}.}
+    \label{fig:roc_lbp}
+\end{figure}
+
+La curva \textit{ROC} (fig \ref{fig:roc_lbp}) obtenida es bastante menos pronunciada que la anterior, más plana, pero aún así son resultados decentes.
+
+\section{Clasificación con tres clases}
+Para la clasificación con otra clase extra se han añadido 2700 imágenes de caballos, de forma que ahora el predictor debe decidir entre gatos, perros y caballos. Estas imágenes han sido sacadas del siguiente enlace: \textit{https://www.kaggle.com/datasets/alessiocorrado99/animals10}.\\[6pt]
+Se han recortado las imágenes de gatos y perros para poder equilibrar el número de imágenes por clase. De todas formas, son bastantes.
+\subsection{Resultados con HOG}
+\begin{table}[htp]
+    \centering
+    \begin{tabular}{ll}
+    \hline
+    \textbf{Parámetro} & \textbf{Valor} \\
+    \hline
+    svm\_kernel & rbf \\
+    svm\_gamma & 0.1 \\
+    svm\_C & 1 \\
+    \hline
+    \end{tabular}
+    \caption{Parámetros del modelo \textbf{SVM} con el descriptor \textbf{HOG}.}
+    \label{tab:svm_params3}
+\end{table}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/svm_hog_base_confusion_matrix}
+    \caption{Matriz de confusión con \textbf{SVM+HOG} para tres clases.}
+    \label{fig:confusion_matrix}
+\end{figure}
+
+Los parámetros encontrados en la búsqueda de hiperparámetros para \textbf{SVM} son los mencionados en la figura \ref{tab:svm_params3}.\\[6pt]
+Como puede verse en la figura \ref{fig:confusion_matrix}, los resultados son bastante buenos. Añadiendo una clase sigue siendo capaz de diferenciar las tres. Caballo es mucho más diferenciable que un gato o perro, como puede verse en el gráfico.
+
+\begin{table}[htp]
+    \centering
+    \begin{tabular}{ll}
+    \hline
+    \textbf{Metric} & \textbf{Value} \\
+    \hline
+    Accuracy    & 0.7081 \\
+    Precision   & 0.7081 \\
+    Recall      & 0.7081 \\
+    F1 Score    & 0.7081 \\
+    \hline
+    \end{tabular}
+    \caption{Métricas de clasificación para el modelo con \textbf{HOG} con tres clases.}
+    \label{tab:classification_metrics_hog_3}
+\end{table}
+
+\begin{table}[htp]
+    \centering
+    \begin{tabular}{lcccc}
+    \hline
+    \textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{Support} \\
+    \hline
+    0 & 0.67 & 0.72 & 0.70 & 526 \\
+    1 & 0.62 & 0.61 & 0.61 & 531 \\
+    2 & 0.84 & 0.80 & 0.82 & 543 \\
+    \hline
+    \textbf{Accuracy} & \multicolumn{4}{c}{0.71 (total: 1600)} \\
+    \textbf{Macro Avg} & 0.71 & 0.71 & 0.71 & 1600 \\
+    \textbf{Weighted Avg} & 0.71 & 0.71 & 0.71 & 1600 \\
+    \hline
+    \end{tabular}
+    \caption{Reporte de clasificación para el modelo con \textbf{HOG} con tres clases.}
+    \label{tab:classification_report_hog_3}
+\end{table}
+
+En las tablas \ref{tab:classification_metrics_hog_3}, \ref{tab:classification_report_hog_3} quedan registrados los resultados del clasificador. La clase caballo es mucho más diferenciable que el resto. Pese a ello, se obtienen resultados buenos.
+
+\subsection{Resultados con LBP}
+\begin{table}[htp]
+    \centering
+    \begin{tabular}{ll}
+    \hline
+    \textbf{Parámetro} & \textbf{Valor} \\
+    \hline
+    svm\_kernel & rbf \\
+    svm\_gamma & 0.1 \\
+    svm\_C & 1 \\
+    \hline
+    \end{tabular}
+    \caption{Parámetros del modelo \textbf{SVM} con el descriptor \textbf{LBP}.}
+    \label{tab:svm_params4}
+\end{table}
+
+Los parámetros encontrados en la búsqueda de hiperparámetros para \textbf{SVM} son los mencionados en la figura \ref{tab:svm_params4}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/svm_lbp_base_confusion_matrix}
+    \caption{Matriz de confusión con \textbf{SVM+LBP} para tres clases.}
+    \label{fig:confusion_matrix_3}
+\end{figure}
+
+\begin{table}[htp]
+    \centering
+    \begin{tabular}{ll}
+    \hline
+    \textbf{Metric} & \textbf{Value} \\
+    \hline
+    Accuracy    & 0.6206 \\
+    Precision   & 0.6206 \\
+    Recall      & 0.6206 \\
+    F1 Score    & 0.6206 \\
+    \hline
+    \end{tabular}
+    \caption{Métricas de clasificación para el modelo con \textbf{LBP} para tres clases.}
+    \label{tab:classification_metrics_lbp3}
+\end{table}
+
+\begin{table}[htp]
+    \centering
+    \begin{tabular}{lcccc}
+    \hline
+    \textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{Support} \\
+    \hline
+    0 & 0.62 & 0.64 & 0.63 & 551 \\
+    1 & 0.52 & 0.46 & 0.48 & 536 \\
+    2 & 0.70 & 0.78 & 0.74 & 513 \\
+    \hline
+    \textbf{Accuracy} & \multicolumn{4}{c}{0.6206 (total: 1600)} \\
+    \textbf{Macro Avg} & 0.62 & 0.62 & 0.62 & 1600 \\
+    \textbf{Weighted Avg} & 0.61 & 0.62 & 0.62 & 1600 \\
+    \hline
+    \end{tabular}
+    \caption{Reporte de clasificación para el modelo con \textbf{LBP} para tres clases.}
+    \label{tab:classification_report_lbp3}
+\end{table}
+
+Los resultados mostrados por \textbf{LBP} en las figuras \ref{fig:confusion_matrix_3} y tablas \ref{tab:classification_report_lbp3}, \ref{tab:classification_metrics_lbp3} son exáctamente iguales que en \textbf{HOG}, pero con una precisión peor.\\[6pt]
+Dados estos resultados es visible que el descriptor \textbf{LBP} parece menos potente en este problema comparándolo con \textbf{HOG}.
+
 \end{document}

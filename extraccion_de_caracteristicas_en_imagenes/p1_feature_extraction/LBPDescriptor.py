@@ -57,6 +57,7 @@ class LBPDescriptor:
     def _bilinear_interpolation(img: np.ndarray, y: float, x: float) -> float:
         """
         Performs bilinear interpolation on the given image at the specified (x, y) coordinates.
+        https://stackoverflow.com/questions/8661537/how-to-perform-bilinear-interpolation-in-python
 
         Args:
             img (np.ndarray): The input image.

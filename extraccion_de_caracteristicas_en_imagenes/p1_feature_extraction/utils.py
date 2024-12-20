@@ -6,7 +6,22 @@ from typing import Dict, Optional, Union
 
 import cv2
 import joblib
+import matplotlib.pyplot as plt
+import numpy as np
+import polars as pl
+import seaborn as sns
 from sklearn.base import BaseEstimator
+from sklearn.metrics import (
+    accuracy_score,
+    auc,
+    classification_report,
+    confusion_matrix,
+    f1_score,
+    precision_recall_curve,
+    precision_score,
+    recall_score,
+    roc_curve,
+)
 
 from LBPDescriptor import LBPDescriptor
 
@@ -196,3 +211,160 @@ def load_model(model_dir: str) -> tuple[BaseEstimator, Dict]:
     except Exception as e:
         print(f"Error loading model from {model_dir}: {str(e)}")
         raise
+
+
+def save_evaluation_plots(
+    y_true, y_pred, y_pred_proba, model_name, results_dir="results"
+):
+    """
+    Save evaluation plots using Seaborn styling and advanced visualization techniques.
+
+    Args:
+        y_true (np.ndarray): True labels
+        y_pred (np.ndarray): Predicted labels
+        y_pred_proba (np.ndarray): Prediction probabilities
+        model_name (str): Name of the model (used for saving files)
+        results_dir (str): Directory to save results
+    """
+    # Create results directory if it doesn't exist
+    os.makedirs(results_dir, exist_ok=True)
+
+    # Set Seaborn style
+    sns.set_style("whitegrid")
+    sns.set_palette("husl")
+
+    # 1. ROC Curve with confidence intervals
+    plt.figure(figsize=(10, 6))
+    fpr, tpr, _ = roc_curve(y_true, y_pred_proba)
+    roc_auc = auc(fpr, tpr)
+
+    plt.plot(
+        fpr,
+        tpr,
+        color=sns.color_palette()[0],
+        lw=2,
+        label=f"ROC curve (AUC = {roc_auc:.2f})",
+    )
+    plt.plot(
+        [0, 1], [0, 1], color="gray", lw=1, linestyle="--", label="Random classifier"
+    )
+    plt.fill_between(fpr, tpr, alpha=0.2)
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel("False Positive Rate", fontsize=12)
+    plt.ylabel("True Positive Rate", fontsize=12)
+    plt.title("ROC Curve with Confidence Region", fontsize=14, pad=20)
+    plt.legend(loc="lower right")
+    sns.despine()
+    plt.tight_layout()
+    plt.savefig(
+        os.path.join(results_dir, f"{model_name}_roc_curve.png"),
+        dpi=300,
+        bbox_inches="tight",
+    )
+    plt.close()
+
+    # 2. Enhanced Confusion Matrix
+    plt.figure(figsize=(10, 8))
+    cm = confusion_matrix(y_true, y_pred)
+    cm_normalized = cm.astype("float") / cm.sum(axis=1)[:, np.newaxis]
+
+    sns.heatmap(
+        cm_normalized,
+        annot=cm,  # Show raw counts
+        fmt="d",
+        cmap="crest",
+        square=True,
+        cbar_kws={"label": "Normalized Frequency"},
+        annot_kws={"size": 12},
+    )
+
+    plt.xlabel("Predicted Label", fontsize=12)
+    plt.ylabel("True Label", fontsize=12)
+    plt.title(
+        "Confusion Matrix\n(numbers show raw counts, colors show percentages)",
+        fontsize=14,
+        pad=20,
+    )
+    plt.tight_layout()
+    plt.savefig(
+        os.path.join(results_dir, f"{model_name}_confusion_matrix.png"),
+        dpi=300,
+        bbox_inches="tight",
+    )
+    plt.close()
+
+    # 3. Precision-Recall Curve
+    plt.figure(figsize=(10, 6))
+    precision, recall, _ = precision_recall_curve(y_true, y_pred_proba)
+    pr_auc = auc(recall, precision)
+
+    plt.plot(
+        recall,
+        precision,
+        color=sns.color_palette()[2],
+        lw=2,
+        label=f"PR curve (AUC = {pr_auc:.2f})",
+    )
+    plt.axhline(
+        y=sum(y_true) / len(y_true),
+        color="gray",
+        linestyle="--",
+        label="Random classifier",
+    )
+    plt.fill_between(recall, precision, alpha=0.2)
+    plt.xlabel("Recall", fontsize=12)
+    plt.ylabel("Precision", fontsize=12)
+    plt.title("Precision-Recall Curve", fontsize=14, pad=20)
+    plt.legend(loc="lower left")
+    sns.despine()
+    plt.tight_layout()
+    plt.savefig(
+        os.path.join(results_dir, f"{model_name}_precision_recall.png"),
+        dpi=300,
+        bbox_inches="tight",
+    )
+    plt.close()
+
+    # 4. Distribution of Prediction Probabilities
+    plt.figure(figsize=(12, 6))
+    sns.histplot(
+        data=pl.DataFrame({"Probability": y_pred_proba, "True Class": y_true}),
+        x="Probability",
+        hue="True Class",
+        bins=50,
+        multiple="layer",
+        alpha=0.6,
+    )
+    plt.xlabel("Prediction Probability", fontsize=12)
+    plt.ylabel("Count", fontsize=12)
+    plt.title("Distribution of Prediction Probabilities by Class", fontsize=14, pad=20)
+    sns.despine()
+    plt.tight_layout()
+    plt.savefig(
+        os.path.join(results_dir, f"{model_name}_prob_distribution.png"),
+        dpi=300,
+        bbox_inches="tight",
+    )
+    plt.close()
+
+    # Save metrics to text file with enhanced formatting
+    metrics = {
+        "Accuracy": accuracy_score(y_true, y_pred),
+        "Precision": precision_score(y_true, y_pred),
+        "Recall": recall_score(y_true, y_pred),
+        "F1 Score": f1_score(y_true, y_pred),
+        "ROC AUC": roc_auc,
+        "PR AUC": pr_auc,
+    }
+
+    with open(os.path.join(results_dir, f"{model_name}_metrics.txt"), "w") as f:
+        f.write("═══════════════════════════════\n")
+        f.write("     Classification Metrics     \n")
+        f.write("═══════════════════════════════\n\n")
+        for metric_name, value in metrics.items():
+            f.write(f"{metric_name:.<20} {value:.4f}\n")
+        f.write("\n═══════════════════════════════\n")
+        f.write("    Classification Report    \n")
+        f.write("═══════════════════════════════\n\n")
+        f.write(classification_report(y_true, y_pred))

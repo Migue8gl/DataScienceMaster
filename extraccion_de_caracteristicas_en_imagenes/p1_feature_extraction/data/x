@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Rutas de las carpetas
+ORIGEN="Cat"
+DESTINO="Cat_2"
+
+# Crear la carpeta destino si no existe
+mkdir -p "$DESTINO"
+
+# Copiar imágenes del rango especificado
+for i in {1..2700}; do
+    if [ -f "$ORIGEN/$i.jpg" ]; then
+        cp "$ORIGEN/$i.jpg" "$DESTINO/"
+    else
+        echo "Archivo $ORIGEN/$i.jpg no encontrado."
+    fi
+done
+
+echo "Copia finalizada."
+
