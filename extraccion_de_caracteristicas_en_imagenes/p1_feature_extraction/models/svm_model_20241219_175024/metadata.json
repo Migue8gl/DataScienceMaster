@@ -1,0 +1,10 @@
+{
+    "timestamp": "20241219_175024",
+    "model_type": "SVM",
+    "best_score": 0.643611111111111,
+    "svm_parameters": {
+        "kernel": "rbf",
+        "gamma": 1,
+        "C": 10
+    }
+}

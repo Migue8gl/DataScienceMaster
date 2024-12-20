@@ -1,0 +1,7 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {section}{\numberline {1}Introducción}{2}{}%
+\contentsline {section}{\numberline {2}Dataset}{2}{}%
+\contentsline {section}{\numberline {3}Clasificación con HOG}{3}{}%
+\contentsline {subsection}{\numberline {3.1}HOG}{3}{}%
+\contentsline {subsection}{\numberline {3.2}Búsqueda de hiperparámetros}{4}{}%
+\contentsline {section}{\numberline {4}Bibliografía}{5}{}%

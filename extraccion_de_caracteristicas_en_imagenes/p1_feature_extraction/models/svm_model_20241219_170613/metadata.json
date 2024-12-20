@@ -1,0 +1,17 @@
+{
+    "timestamp": "20241219_170613",
+    "model_type": "SVM",
+    "best_score": 0.6309107849988354,
+    "svm_parameters": {
+        "kernel": "rbf",
+        "gamma": 1,
+        "C": 10
+    },
+    "descriptor": {
+        "name": "lbp",
+        "parameters": {
+            "radius": 2,
+            "n_neighbors": 8
+        }
+    }
+}

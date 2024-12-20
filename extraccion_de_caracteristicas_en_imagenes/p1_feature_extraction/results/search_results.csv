@@ -1,0 +1,6 @@
+timestamp,best_score,execution_time_seconds,svm_kernel,svm_gamma,svm_C,descriptor_name,descriptor_winSize,descriptor_blockSize,descriptor_blockStride,descriptor_cellSize,descriptor_nbins,descriptor_winSigma,descriptor_L2HysThreshold,descriptor_signedGradients,descriptor_gammaCorrection,
+20241219_170327,0.637433030514792,24.5054030418396,rbf,1,1,hog,"(28, 28)","(14, 14)","(7, 7)","(7, 7)",12,5,0.3,True,0,hog busqueda hiper
+20241219_174119,0.720555555555556,42.9696683883667,linear,0.001,1,hog v2,,,,,,,,,,
+20241219_175024,0.643611111111111,32.5144519805908,rbf,1,10, lbp v1,,,,,,,,,,
+20241219_181509,0.7337507193090298,187.02215909957886,rbf,1,10
+20241219_181705,0.6620294027314776,96.69097590446472,rbf,1,10

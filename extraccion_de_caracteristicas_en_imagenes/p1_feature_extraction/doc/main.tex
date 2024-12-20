@@ -1,0 +1,200 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[a4paper, top=1.2in, bottom=1.4in, left=1in, right=1in]{geometry}
+\usepackage{graphicx} % Required for inserting images
+\graphicspath{ {./img/} }
+\usepackage[spanish]{babel}
+\usepackage{float}
+\usepackage{fancyhdr}
+\setlength{\parskip}{1em}  % Adds space between paragraphs (1em)
+\usepackage{amsmath,amssymb}
+\usepackage{tikz}
+\newcommand{\tikzmark}[1]{\tikz[baseline,remember picture] \coordinate (#1) {};}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shadows,arrows.meta} % For adding edges label
+\usetikzlibrary{calc}
+\usepackage{eso-pic}
+\usepackage[backend=biber, defernumbers=true, citestyle=numeric-comp, bibstyle=ieee, sorting=none]{biblatex}
+\addbibresource{bibliography/bibliography.bib}
+\DeclareBibliographyCategory{cited}
+\AtEveryCitekey{\addtocategory{cited}{\thefield{entrykey}}}
+% Configurando BibLaTeX
+\DefineBibliographyStrings{spanish}{
+  url = {URL},
+  andothers={et ~al\adddot}
+}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\AddToShipoutPictureBG{%
+\begin{tikzpicture}[remember picture, overlay]
+\node[opacity=.15, inner sep=0pt]
+    at(current page.center){\includegraphics[scale=1.5]{img/logo-ugr2.png}};
+\end{tikzpicture}%
+}
+
+\title{Extracción de Características en Imágenes - Práctica 1}
+\author{Miguel García López}
+\date{Diciembre 2024}
+
+\pagestyle{fancyplain}
+\headheight 35pt
+\lhead{Miguel García López}            
+\chead{\textbf{\small Práctica 1}}
+\rhead{Master Ciencia de Datos \\ \today}
+\lfoot{\scriptsize\LaTeX}
+\cfoot{\small Extracción de Características en Imágenes}
+\rfoot{\small\thepage}
+\headsep 1.5em
+
+\author{Miguel García López} % Nombre y apellidos
+
+\date{\normalsize\today} % Incluye la fecha actual
+
+\begin{document}
+\begin{titlepage}
+\begin{figure}
+    \vspace{-1.3cm}
+    \begin{center}
+        \includegraphics[width=0.75\textwidth]{img/UGR-Logo.png}
+    \end{center}
+\end{figure}
+\vspace{1.3cm}
+\centering
+\normalfont \normalsize
+\textsc{\textbf{Extracción de Características en Imágenes 2024-2025} \\ \vspace{.15cm} Master Ciencia de Datos\\ \vspace{.15cm} Universidad de Granada} \\ [25pt] 
+    \huge Práctica 1
+
+\normalfont \normalsize \vspace{.30cm}
+\textsc{Miguel García López}
+
+\end{titlepage}
+
+\tableofcontents
+\listoffigures
+\listoftables
+\newpage
+
+\section{Introducción}
+En la presente práctica de la asignatura de \textbf{Extracción de Características en Imágenes}, se llevarán a cabo una serie de tareas definidas por un grafo de decisión (fig \ref{fig:de_graph}). Dado este grafo es necesario seguir el camino hasta al final y allí donde haya una bifurcación, escoger entre una tarea básica o una tarea bonificadora. Las tareas bonificadores son iguales que las básicas, pero con un toque de dificultad y desarrollo por parte del alumno. De forma resumida, las tareas a realizar son las siguientes: 
+
+\begin{itemize}
+    \item \textbf{Búsqueda de un conjunto de datos:} El estudiante puede usar el \textit{dataset} \textbf{MNIST} por defecto, pero en este caso se ha optado por la tarea complementaria de escoger uno.
+    \item \textbf{Clasificación con HOG:} Se entrenará un modelo \textbf{SVM} usando el descriptor \textbf{HOG} y se realizará un análisis de los resultados del mismo. Además se aplicarán técnicas como validación cruzada y selección de hiperparámetros.
+    \item \textbf{Clasificación con LBP:} Se realizará lo mismo que con \textbf{HOG} descrito en el apartado anterior. Además, como parte de la tarea complementaria bonificada, se usará una implementación propia de \textbf{LBP} para extraer las características del \textit{dataset}.
+\end{itemize}
+
+De las $24000$ imágenes se han escogido de forma aleatoria, y teniendo en cuenta equilibrio entre clases, $8000$ imágenes para la clasificación con \textbf{SVM+LBP} y \textbf{SVM+HOG}.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.6\linewidth]{img/decision_graph}
+    \caption{Grafo de decisión de tareas.}
+    \label{fig:de_graph}
+\end{figure}
+
+\section{Dataset}
+Para el \textit{dataset} se ha escogido el conjunto de ``Gatos vs Perros" de \textit{Kaggle}. Este se puede encontrar en el siguiente enlace: \textit{https://www.kaggle.com/competitions/dogs-vs-cats}.\\[6pt]
+El conjunto contiene cerca de $24000$ imágenes, la mitad de perros y la mitad de gatos. Este conjunto se compone de imágenes de multitud de resoluciones, por lo que se ha procedido a realizar varias pruebas en el código y se ha llegado a la conclusión de que $28\times 28$ píxeles es un tamaño con el que poder trabajar por los siguiente motivos:
+\begin{itemize}
+    \item La extracción de descriptores en imágenes de alta resolución lleva a altos tiempos de cómputo.
+    \item La implementación de \textbf{LBP} es rápida, pero no tanto como las implementaciones de otros descriptores como \textbf{HOG} en \textit{OpenCV}.
+    \item Se han realizado varias pruebas y con tamaños de resolución mucho mayores no se consiguen unos resultados mucho mejores (hasta donde se ha podido comprobar).
+\end{itemize}
+Además de lo descrito, se han transformado las imágenes a escala de grises para trabajar con un solo canal. 
+
+\section{Clasificación con HOG}
+\subsection{HOG}
+El descriptor \textbf{HOG} es una técnica ampliamente utilizada en la visión por computador, cuyo objetivo es capturar la estructura local de las imágenes basándose en los gradientes de intensidad. Divide la imagen (fig \ref{fig:hog}) en celdas pequeñas y calcula un histograma de orientaciones de gradiente dentro de cada celda. Para mejorar la robustez frente a cambios de iluminación, se normalizan los histogramas en bloques de celdas adyacentes.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/hog}
+    \caption{Flujo de cómputo del descriptor HOG.}
+    \label{fig:hog}
+\end{figure}
+
+\subsection{Búsqueda de hiperparámetros}
+Se ha implementado una búsqueda de hiperparámetros de forma que es posible buscar solo hiperparámetros del algoritmos \textbf{SVM} o, si se selecciona, búsqueda para \textbf{SVM} y \textbf{HOG}. Hay que tener en cuenta que la búsqueda de hiperparámetros es un proceso muy costoso computacionalmente, por lo que esta búsqueda en lo relativo a \textbf{HOG} se ha realizado con $200$ imágenes usando el algoritmo \textbf{RandomSearch} de \textit{Scikit-Learn}. Las principales ventajas de este algoritmo son:
+\begin{itemize}
+    \item Un espacio de búsqueda más amplio al realizar combinaciones aleatorias.
+    \item Más eficiente en espacios de dimensionalidad alta.
+\end{itemize}
+Los parámetros optimizados no han sido todos. Inicialmente se realizó un estudio de los parámetros tanto experimental como teórico. Dado ese primer paso se decidió que \texttt{winSize} sería del tamaño de la imagen, \texttt{blockSize} la mitad y \texttt{blockStride} y \texttt{cellSize} un cuarto. Se realizan búsquedas sobre los siguientes parámetros:
+
+\begin{itemize}
+    \item \texttt{nbins}: Número de histogramas por celda. Valores: $\{6, 9, 12\}$.
+    \item \texttt{winSigma}: Sigma de la ventana de suavizado gaussiano. Valores: $\{0.5, 1.0, 2.0, 5.0\}$.
+    \item \texttt{L2HysThreshold}: Umbral para la normalización L2. Valores: $\{0.1, 0.2, 0.3, 0.4\}$.
+    \item \texttt{signedGradients}: Indicador de gradientes firmados (booleano).
+    \item \texttt{gammaCorrection}: Aplicación de corrección gamma (booleano).
+\end{itemize}
+
+\begin{table}[htp]
+    \centering
+    \begin{tabular}{ll}
+    \hline
+    \textbf{Parámetro} & \textbf{Valor} \\
+    \hline
+    svm\_kernel & rbf \\
+    svm\_gamma & 1 \\
+    svm\_C & 1 \\
+    \hline
+    \end{tabular}
+    \caption{Parámetros del modelo SVM.}
+    \label{tab:svm_params}
+\end{table}
+
+\begin{table}[htp]
+    \centering
+    \begin{tabular}{ll}
+    \hline
+    \textbf{Parámetro} & \textbf{Valor} \\
+    \hline
+    winSize & (28, 28) \\
+    blockSize & (14, 14) \\
+    blockStride & (7, 7) \\
+    cellSize & (7, 7) \\
+    nbins & 12 \\
+    winSigma & 5 \\
+    L2HysThreshold & 0.3 \\
+    signedGradients & True \\
+    gammaCorrection & 0 \\
+    \hline
+    \end{tabular}
+    \caption{Parámetros del descriptor HOG.}
+    \label{tab:hog_params}
+\end{table}
+
+Los valores escogidos finalmente para los parámetros tanto del descriptor como para el \textbf{SVM} se encuentran descritos en las tablas \ref{tab:hog_params},\ref{tab:svm_params}.
+
+\newpage
+\section{Bibliografía}
+
+\printbibliography[heading=none, category=cited]
+\end{document}

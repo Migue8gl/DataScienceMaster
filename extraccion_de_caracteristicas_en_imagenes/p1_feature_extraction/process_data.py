@@ -143,7 +143,7 @@ def main(args: argparse.Namespace):
     if mode == "lbp":
         descriptor_params = {}
         descriptor_params["type"] = mode
-        descriptor_params["config"] = {"radius": 1, "n_neighbors": 8}
+        descriptor_params["config"] = {"radius": 2, "n_neighbors": 8}
     elif mode == "hog":
         descriptor_params = {}
         descriptor_params["type"] = mode
@@ -152,12 +152,12 @@ def main(args: argparse.Namespace):
             "blockSize": (args.image_size // 2, args.image_size // 2),
             "blockStride": (args.image_size // 4, args.image_size // 4),
             "cellSize": (args.image_size // 4, args.image_size // 4),
-            "nbins": 9,
+            "nbins": 12,
             "derivAperture": 1,
-            "winSigma": -1.0,
+            "winSigma": 5.0,
             "histogramNormType": 0,
-            "L2HysThreshold": 0.2,
-            "gammaCorrection": 1,
+            "L2HysThreshold": 0.3,
+            "gammaCorrection": 0,
             "nlevels": 64,
             "signedGradients": True,
         }

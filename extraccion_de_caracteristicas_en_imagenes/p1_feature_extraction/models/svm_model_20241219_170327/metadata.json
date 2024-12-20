@@ -1,0 +1,36 @@
+{
+    "timestamp": "20241219_170327",
+    "model_type": "SVM",
+    "best_score": 0.6374330305147916,
+    "svm_parameters": {
+        "kernel": "rbf",
+        "gamma": 1,
+        "C": 1
+    },
+    "descriptor": {
+        "name": "hog",
+        "parameters": {
+            "winSize": [
+                28,
+                28
+            ],
+            "blockSize": [
+                14,
+                14
+            ],
+            "blockStride": [
+                7,
+                7
+            ],
+            "cellSize": [
+                7,
+                7
+            ],
+            "nbins": 12,
+            "winSigma": 5.0,
+            "L2HysThreshold": 0.3,
+            "signedGradients": true,
+            "gammaCorrection": 0
+        }
+    }
+}
