@@ -11,10 +11,11 @@ Ensure you have the following dependencies installed:
 * polars
 * opencv-python
 * scikit-learn
+* seaborn
 
 Install these dependencies using pip:
 ```bash
-pip install numpy polars opencv-python scikit-learn
+pip install -r requirements.txt
 ```
 
 ## File Overview
@@ -75,21 +76,21 @@ python model_train_eval.py -d <data_file> -l <limit> -hs -desc <descriptor>
 
 Train a model with HOG descriptor and hyperparameter search:
 ```bash
-python model_train_eval.py -d dataset_hog_cat_dog_64.parquet -l 1000 -hs -desc hog
+python model_train_eval.py -d dataset_raw_cat_dog_64.parquet -l 1000 -hs -desc hog
 ```
-This command loads the processed dataset `dataset_hog_cat_dog_64.parquet`, trains an SVM with hyperparameter search for the HOG descriptor, and evaluates its performance.
+This command loads the processed dataset `dataset_raw_cat_dog_64.parquet`, trains an SVM with hyperparameter search for the HOG descriptor, and evaluates its performance. Its must be the raw one so the function can apply different HOG transformations.
 
 Train a model with LBP descriptor:
 ```bash
-python model_train_eval.py -d dataset_lbp_apple_orange_32.parquet -l 500 -desc lbp
+python model_train_eval.py -d dataset_raw_apple_orange_32.parquet -l 500 -desc lbp
 ```
-This command trains an SVM using features extracted with the LBP descriptor.
+This command trains an SVM using features extracted with the LBP descriptor. Its must be the raw one so the function can apply different LBP transformations.
 
 Train a model with raw images:
 ```bash
 python model_train_eval.py -d dataset_raw_car_bike_128.parquet -l 2000
 ```
-This command trains an SVM without applying any feature descriptor.
+This command trains an SVM and search hyperparameters only for SVM.
 
 ## Workflow
 
@@ -102,14 +103,7 @@ This command trains an SVM without applying any feature descriptor.
 2. Train and Evaluate the Model:
    * Use `model_train_eval.py` to train and evaluate the model.
    ```bash
-   python model_train_eval.py -d dataset_hog_cat_dog_64.parquet -l 1000 -hs -desc hog
-   ```
-
-3. Experiment with Different Descriptors:
-   * Test the effect of different descriptors and parameters on model performance.
-   ```bash
-   python process_data.py -d ./data -l Fruit Animal -s 48 -m lbp
-   python model_train_eval.py -d dataset_lbp_fruit_animal_48.parquet -l 1500 -desc lbp
+   python model_train_eval.py -d dataset_raw_cat_dog_64.parquet -l 1000 -hs -desc hog
    ```
 
 ## Output
