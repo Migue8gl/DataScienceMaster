@@ -256,6 +256,29 @@ El modelo tiene un buen rendimiento con métricas consistentes, aunque hay marge
     \label{fig:roc_hog}
 \end{figure}
 
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.7\linewidth]{img/1}
+    \caption{Ejemplo de prueba 1.}
+    \label{fig:1}
+\end{figure}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.7\linewidth]{img/2}
+    \caption{Ejemplo de prueba 2.}
+    \label{fig:2}
+\end{figure}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.7\linewidth]{img/3}
+    \caption{Ejemplo de prueba 3.}
+    \label{fig:3}
+\end{figure}
+
+Los ejemplo de pruebas \ref{fig:1},\ref{fig:2},\ref{fig:3} han sido clasificados de forma correcta, excepto el último que ha dado un resultado incorrecto.
+
 \section{Clasificación con LBP}
 \subsection{LBP}
 El descriptor \textbf{LBP} se basa en analizar la relación de un píxel central con sus píxeles vecinos en una ventana local, capturando patrones que describen la estructura de la textura de la región.\\[6pt]
@@ -389,6 +412,8 @@ Como puede observarse en las figuras \ref{tab:classification_report_lbp}, \ref{t
     \caption{Curva de \textit{ROC} para el modelo \textbf{SVM+LBP}.}
     \label{fig:roc_lbp}
 \end{figure}
+
+Los ejemplo de pruebas \ref{fig:1},\ref{fig:2},\ref{fig:3} han salido peor parados que con \textbf{HOG}. El primero correcto y los otros dos incorrectos.
 
 La curva \textit{ROC} (fig \ref{fig:roc_lbp}) obtenida es bastante menos pronunciada que la anterior, más plana, pero aún así son resultados decentes.
 

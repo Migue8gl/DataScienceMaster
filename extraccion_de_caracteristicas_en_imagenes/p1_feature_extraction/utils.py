@@ -48,13 +48,13 @@ def create_descriptor(
         return None
     if descriptor_type == "hog":
         return cv2.HOGDescriptor(
-            _winSize=params.get("winSize", (image_size // 2, image_size // 2)),
+            _winSize=params.get("winSize", (image_size, image_size)),
             _blockSize=params.get("blockSize", (image_size // 2, image_size // 2)),
             _blockStride=params.get("blockStride", (image_size // 4, image_size // 4)),
             _cellSize=params.get("cellSize", (image_size // 4, image_size // 4)),
-            _nbins=params.get("nbins", 9),
+            _nbins=params.get("nbins", 12),
             _derivAperture=params.get("derivAperture", 1),
-            _winSigma=params.get("winSigma", -1.0),
+            _winSigma=params.get("winSigma", 5),
             _histogramNormType=params.get("histogramNormType", 0),
             _L2HysThreshold=params.get("L2HysThreshold", 0.2),
             _gammaCorrection=params.get("gammaCorrection", 1),

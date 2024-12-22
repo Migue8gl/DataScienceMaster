@@ -3,8 +3,11 @@
 \contentsline {figure}{\numberline {2}{\ignorespaces Flujo de cómputo del descriptor \textbf {HOG}.}}{5}{}%
 \contentsline {figure}{\numberline {3}{\ignorespaces Ejemplo de \textit {k-fold cross validation}.}}{7}{}%
 \contentsline {figure}{\numberline {4}{\ignorespaces Curva de \textit {ROC} para el modelo \textbf {SVM+HOG}.}}{8}{}%
-\contentsline {figure}{\numberline {5}{\ignorespaces Ejemplo de cálculo de \textbf {LBP}.}}{9}{}%
-\contentsline {figure}{\numberline {6}{\ignorespaces Diagrama de la clase \textbf {LBP}.}}{11}{}%
-\contentsline {figure}{\numberline {7}{\ignorespaces Curva de \textit {ROC} para el modelo \textbf {SVM+LBP}.}}{12}{}%
-\contentsline {figure}{\numberline {8}{\ignorespaces Matriz de confusión con \textbf {SVM+HOG} para tres clases.}}{14}{}%
-\contentsline {figure}{\numberline {9}{\ignorespaces Matriz de confusión con \textbf {SVM+LBP} para tres clases.}}{16}{}%
+\contentsline {figure}{\numberline {5}{\ignorespaces Ejemplo de prueba 1.}}{9}{}%
+\contentsline {figure}{\numberline {6}{\ignorespaces Ejemplo de prueba 2.}}{9}{}%
+\contentsline {figure}{\numberline {7}{\ignorespaces Ejemplo de prueba 3.}}{9}{}%
+\contentsline {figure}{\numberline {8}{\ignorespaces Ejemplo de cálculo de \textbf {LBP}.}}{10}{}%
+\contentsline {figure}{\numberline {9}{\ignorespaces Diagrama de la clase \textbf {LBP}.}}{12}{}%
+\contentsline {figure}{\numberline {10}{\ignorespaces Curva de \textit {ROC} para el modelo \textbf {SVM+LBP}.}}{13}{}%
+\contentsline {figure}{\numberline {11}{\ignorespaces Matriz de confusión con \textbf {SVM+HOG} para tres clases.}}{15}{}%
+\contentsline {figure}{\numberline {12}{\ignorespaces Matriz de confusión con \textbf {SVM+LBP} para tres clases.}}{16}{}%

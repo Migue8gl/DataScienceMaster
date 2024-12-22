@@ -8,8 +8,8 @@
 \contentsline {subsection}{\numberline {4.3}Resultados}{6}{}%
 \contentsline {section}{\numberline {5}Clasificación con LBP}{8}{}%
 \contentsline {subsection}{\numberline {5.1}LBP}{8}{}%
-\contentsline {subsection}{\numberline {5.2}Implementación}{9}{}%
-\contentsline {subsection}{\numberline {5.3}Resultados}{11}{}%
-\contentsline {section}{\numberline {6}Clasificación con tres clases}{13}{}%
-\contentsline {subsection}{\numberline {6.1}Resultados con HOG}{13}{}%
-\contentsline {subsection}{\numberline {6.2}Resultados con LBP}{15}{}%
+\contentsline {subsection}{\numberline {5.2}Implementación}{10}{}%
+\contentsline {subsection}{\numberline {5.3}Resultados}{12}{}%
+\contentsline {section}{\numberline {6}Clasificación con tres clases}{14}{}%
+\contentsline {subsection}{\numberline {6.1}Resultados con HOG}{14}{}%
+\contentsline {subsection}{\numberline {6.2}Resultados con LBP}{14}{}%
