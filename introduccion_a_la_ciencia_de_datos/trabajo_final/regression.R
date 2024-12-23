@@ -23,15 +23,13 @@ str(data)
 "Vamos a aplicar las transformaciones realizadas en la parte del EDA."
 
 data <- as.data.frame(scale(data))
-data <- data %>%
-  mutate(
-    Diff_temperature = Max_temperature + Min_temperature,
-    Diff_pressure = Standard_pressure - Sea_level_pressure
-  ) %>%
-  select(-Min_temperature,
-         -Max_temperature,
-         -Sea_level_pressure,
-         -Standard_pressure)
+data$Diff_temperature <- data$Max_temperature + data$Min_temperature
+data$Diff_pressure <- data$Standard_pressure - data$Sea_level_pressure
+
+data <- data[, !names(data) %in% c("Min_temperature",
+                                   "Max_temperature",
+                                   "Sea_level_pressure",
+                                   "Standard_pressure")]
 
 summary(data)
 pairs(data)
@@ -292,16 +290,13 @@ run_k_fold_cv <- function(data, model = "lm", k = 5) {
   train_mse_list <- numeric()
   test_mse_list <- numeric()
   
-  data <- data %>%
-    mutate(
-      Diff_temperature = Max_temperature + Min_temperature,
-      Diff_pressure = Standard_pressure - Sea_level_pressure
-    ) %>%
-    select(-Min_temperature,
-           -Max_temperature,
-           -Sea_level_pressure,
-           -Standard_pressure)
+  data$Diff_temperature <- data$Max_temperature + data$Min_temperature
+  data$Diff_pressure <- data$Standard_pressure - data$Sea_level_pressure
   
+  data <- data[, !names(data) %in% c("Min_temperature",
+                                     "Max_temperature",
+                                     "Sea_level_pressure",
+                                     "Standard_pressure")]
   idx <- sample(nrow(data))
   data <- data[idx, ]
   
@@ -423,12 +418,12 @@ mejor se ajusta a este dataset es regresión lineal múltiple seguido muy de cer
 
 resultados_test <-  read.csv("regr_test_alumnos.csv")
 resultados_train <- read.csv("regr_train_alumnos.csv")
-tablatst <- cbind(resultados[, 2:dim(resultados)[2]])
-colnames(tablatst) <- names(resultados)[2:dim(resultados)[2]]
-rownames(tablatst) <- resultados[, 1]
-tablatra <- cbind(resultados[, 2:dim(resultados)[2]])
-colnames(tablatra) <- names(resultados)[2:dim(resultados)[2]]
-rownames(tablatra) <- resultados[, 1]
+tablatst <- cbind(resultados_test[, 2:dim(resultados_test)[2]])
+colnames(tablatst) <- names(resultados_test)[2:dim(resultados_test)[2]]
+rownames(tablatst) <- resultados_test[, 1]
+tablatra <- cbind(resultados_train[, 2:dim(resultados_train)[2]])
+colnames(tablatra) <- names(resultados_train)[2:dim(resultados_train)[2]]
+rownames(tablatra) <- resultados_train[, 1]
 
 tablatst[17, 1] <- lm_mse
 tablatst[17, 2] <- knn_mse
@@ -463,11 +458,9 @@ Rmenos
 Rmas
 pvalue
 
-"Dado un p-valor de menos de 0.05, se puede recharzar la hipótesis nula, por lo que
-podemos asegurar que existen diferencias estadísticamente significativas entre
-KNN y LM. Además Rmenos es mucho más alto que Rmas, lo que indica que el algoritmo
-KNN obtiene sistemáticamente resutados más bajos. Eso junto al p-valor, indican
-que KNN es superior a LM."
+"Dado un p-valor de menos de 0.7, no se puede recharzar la hipótesis nula, por lo que
+no podemos asegurar que existen diferencias estadísticamente significativas entre
+KNN y LM."
 
 "Ahora realizamos test múltiples para comparar todos los algoritmos entre sí. Para
 ello usamos el test de friedman."
