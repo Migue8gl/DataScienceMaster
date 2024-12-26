@@ -29,6 +29,12 @@ data <- data %>% mutate(Class = as.factor(Class))
 class_column = data$Class
 data <- as.data.frame(scale(data[1:ncol(data) - 1]))
 data$Class <- class_column
+
+data <- data %>%
+  mutate(
+    Thyroidstimulating = log1p(Thyroidstimulating),
+    TSH_value = log1p(TSH_value)
+  )
 summary(data)
 
 "Vamos a dividir el conjunto d datos en conjuntos de train y test. Para eso definimos
@@ -125,6 +131,13 @@ fit4 <- kknn(Class ~ .,
 
 make_confusion_matrix(fit4)
 
+fit5 <- kknn(Class ~ .,
+             train = train,
+             test = test,
+             k = 100)
+
+make_confusion_matrix(fit5)
+
 "El modelo con k cada vez mayor pierde precisión, porque al hacer esto, el
 modelo se suaviza y se vuelve más general. Esto puede reducir el sobreajuste
 al hacer que las predicciones dependan de un número mayor de vecinos, lo que
@@ -197,16 +210,16 @@ lda.pred.test <- predict(lda_model, test)
 
 plot_data <- lda.pred.train$x %>%
   as_tibble() %>%
-  mutate(Class = train$Class) 
+  mutate(Class = train$Class)
 
-"Mostramos el gráfico donde se muestra como se distribuyen las observaciones de 
+"Mostramos el gráfico donde se muestra como se distribuyen las observaciones de
 las clases en el espacio generado por LDA utilizando las primeras dos componentes
 lineales discriminantes (LD1 y LD2)."
 
-"Se puede observar que las clases están bien separadas en el espacio generado por 
-LDA. Una buena separación indica que el modelo ha logrado discriminar 
+"Se puede observar que las clases están bien separadas en el espacio generado por
+LDA. Una buena separación indica que el modelo ha logrado discriminar
 correctamente entre clases."
-  
+
 ggplot(data = plot_data) +
   geom_point(aes(x = LD1, y = LD2, color = Class)) +
   scale_colour_manual(
@@ -216,24 +229,31 @@ ggplot(data = plot_data) +
   ) +
   labs(title = "Data Transformed After LDA")
 
-t <- table(lda.pred.test$class, test$Class) 
+t <- table(lda.pred.test$class, test$Class)
 t
 
 sum(diag(t)) / nrow(test)
 
 plot_data <- lda.pred.test$x %>%
   as_tibble() %>%
-  mutate(known = test$Class,  # Replace with the correct column for class labels
+  mutate(known = test$Class, # Replace with the correct column for class labels
          prediction = lda.pred.test$class) %>%
-  pivot_longer(c("prediction", "known"), names_to = "Type", values_to = "Class")
+  pivot_longer(c("prediction", "known"),
+               names_to = "Type",
+               values_to = "Class")
 
-ggplot(data = plot_data) + 
-  geom_point(aes(x = LD1, y = LD2, shape = Type, color = Class)) +
+ggplot(data = plot_data) +
+  geom_point(aes(
+    x = LD1,
+    y = LD2,
+    shape = Type,
+    color = Class
+  )) +
   scale_colour_manual(
     name = "Species",
     values = c("red", "green", "blue"),
     labels = c("1", "2", "3")
-  ) + 
+  ) +
   scale_shape_manual(name = "Type", values = c(5, 3)) +
   labs(title = "Validation Data + Predictions Transformed After LDA")
 
@@ -246,7 +266,130 @@ qda_model
 qda.pred.train <- predict(qda_model, train)
 qda.pred.test <- predict(qda_model, test)
 
-t <- table(qda.pred.test$class, test$Class) 
+t <- table(Predicted = qda.pred.test$class, Actual = test$Class)
 t
 
 sum(diag(t)) / nrow(test)
+
+conf_matrix_df <- as.data.frame(as.table(t))
+
+ggplot(conf_matrix_df, aes(x = Actual, y = Predicted, fill = Freq)) +
+  geom_tile() +
+  geom_text(aes(label = sprintf("%d", Freq)), color = "white", size = 10) +
+  scale_fill_gradient(low = "cyan", high = "darkgreen") +
+  theme_minimal() +
+  theme(
+    axis.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 10),
+    legend.title = element_text(size = 10),
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5)
+  ) +
+  labs(title = "Confusion Matrix",
+       x = "Actual Class",
+       y = "Predicted Class",
+       fill = "Count") +
+  coord_equal()
+
+"Vamos a comparar los tres algoritmos."
+
+k_fold_cross_validation <- function(data,
+                                    k = 10,
+                                    model_function,
+                                    metric_function,
+                                    seed = 42) {
+  set.seed(seed)
+  folds <- sample(1:k, size = nrow(data), replace = TRUE)
+  performance_metrics <- c()
+  
+  for (i in 1:k) {
+    test_indices <- which(folds == i)
+    train_indices <- setdiff(1:nrow(data), test_indices)
+    
+    train_data <- data[train_indices, ]
+    test_data <- data[test_indices, ]
+    
+    model <- model_function(train_data, test_data)
+    if (inherits(model, "kknn")) {
+      predictions <- fitted(model)
+    } else {
+      predictions <- predict(model, test_data)
+    }
+    
+    if (inherits(model, "lda") | inherits(model, "qda")) {
+      predictions_class <- predictions$class
+    } else {
+      predictions_class <- predictions
+    }
+    
+    performance <- metric_function(predictions_class, test_data$Class)
+    performance_metrics <- c(performance_metrics, performance)
+  }
+  
+  mean_performance <- mean(performance_metrics)
+  std_deviation <- sd(performance_metrics)
+  
+  return(list(mean = mean_performance, std_deviation = std_deviation))
+}
+
+model_function_knn <- function(train_data, test_data) {
+  model <- kknn(Class ~ .,
+                train = train_data,
+                test = test_data,
+                k = 5)
+  return(model)
+}
+
+model_function_lda <- function(train_data, test_data) {
+  model <- lda(Class ~ ., data = train_data)
+  return(model)
+}
+
+model_function_qda <- function(train_data, test_data) {
+  model <- qda(Class ~ ., data = train_data)
+  return(model)
+}
+
+metric_function_accuracy <- function(predictions, actual) {
+  confusion_matrix <- table(predicted = predictions, actual = actual)
+  accuracy <- sum(diag(confusion_matrix)) / sum(confusion_matrix)
+  return(accuracy)
+}
+
+result_knn <- k_fold_cross_validation(
+  data,
+  k = 10,
+  model_function = model_function_knn,
+  metric_function = metric_function_accuracy
+)
+print(paste(
+  "KNN Accuracy: ",
+  round(result_knn$mean, 4),
+  "±",
+  round(result_knn$std_deviation, 4)
+))
+
+result_lda <- k_fold_cross_validation(
+  data,
+  k = 10,
+  model_function = model_function_lda,
+  metric_function = metric_function_accuracy
+)
+print(paste(
+  "LDA Accuracy: ",
+  round(result_lda$mean, 4),
+  "±",
+  round(result_lda$std_deviation, 4)
+))
+
+result_qda <- k_fold_cross_validation(
+  data,
+  k = 10,
+  model_function = model_function_qda,
+  metric_function = metric_function_accuracy
+)
+print(paste(
+  "QDA Accuracy: ",
+  round(result_qda$mean, 4),
+  "±",
+  round(result_qda$std_deviation, 4)
+))
