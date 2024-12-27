@@ -4,6 +4,9 @@ library(tidyverse)
 "El dataset ha sido obtenido de Kaggle."
 "https://www.kaggle.com/datasets/jillanisofttech/market-segmentation-in-insurance-unsupervised"
 
+"Variables explicadas en:
+https://medium.com/@cyrilladrian.wicaksono/market-segmentation-in-insurance-an-unsupervised-learning-approach-c3b4bd1f309e"
+
 "Descripción de las columnas:
 
 Balance:
