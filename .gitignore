@@ -8,3 +8,6 @@ venv/
 .env
 .venv
 __pycache__
+*.avi
+*.mp4
+*.mp3
