@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This network was created in GeNIe Academic, which can be used for academic teaching and research purposes only -->
+<smile version="1.0" id="Network1" numsamples="10000" discsamples="10000">
+	<nodes>
+		<cpt id="EnfermedadDíasHabituales">
+			<state id="Corto" />
+			<state id="Medio" />
+			<state id="Largo" />
+			<probabilities>0.1 0.3 0.6</probabilities>
+		</cpt>
+		<deterministic id="DolenciaAnterior">
+			<state id="Sí" />
+			<state id="No" />
+			<resultingstates>Sí</resultingstates>
+		</deterministic>
+		<cpt id="DíasTratamiento">
+			<state id="Menos3" />
+			<state id="Mas3" />
+			<probabilities>0.5 0.5</probabilities>
+		</cpt>
+		<cpt id="M">
+			<state id="TieneMastitis" />
+			<state id="NoTieneMastitis" />
+			<parents>EnfermedadDíasHabituales DolenciaAnterior DíasTratamiento</parents>
+			<probabilities>0.7 0.3 0.3 0.7 0.5454545454545454 0.4545454545454546 0.4444444444444445 0.5555555555555556 0.3846153846153846 0.6153846153846154 0.7499999999999999 0.2500000000000001 0.2857142857142858 0.7142857142857142 0.6153846153846154 0.3846153846153846 0.2857142857142858 0.7142857142857142 1 0 0.5 0.5 0.5726495726495727 0.4273504273504273</probabilities>
+		</cpt>
+		<cpt id="EstadoGeneral">
+			<state id="Malo" />
+			<state id="Bueno" />
+			<parents>M</parents>
+			<probabilities>0.8 0.2 0.2 0.8</probabilities>
+		</cpt>
+		<cpt id="TestLeche">
+			<state id="H1" />
+			<state id="H2" />
+			<parents>DíasTratamiento M</parents>
+			<probabilities>0.8 0.2 0.8 0.2 0.5 0.5 0.5 0.5</probabilities>
+		</cpt>
+	</nodes>
+	<extensions>
+		<genie version="1.0" app="GeNIe 5.0.4722.0 ACADEMIC" name="Network1">
+			<node id="M">
+				<name>Mastitis</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>276 314 371 401</position>
+				<barchart active="true" />
+			</node>
+			<node id="DolenciaAnterior">
+				<name>DolenciaAnterior</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>110 159 201 250</position>
+				<barchart active="true" />
+			</node>
+			<node id="EnfermedadDíasHabituales">
+				<name>EnfermedadDíasHabituales</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>276 143 371 234</position>
+				<barchart active="true" width="128" height="80" />
+			</node>
+			<node id="DíasTratamiento">
+				<name>DíasTratamiento</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>445 153 541 244</position>
+				<barchart active="true" />
+			</node>
+			<node id="EstadoGeneral">
+				<name>EstadoGeneral</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>172 457 264 546</position>
+				<barchart active="true" />
+			</node>
+			<node id="TestLeche">
+				<name>TestLeche</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>382 459 473 546</position>
+				<barchart active="true" />
+			</node>
+		</genie>
+	</extensions>
+</smile>
