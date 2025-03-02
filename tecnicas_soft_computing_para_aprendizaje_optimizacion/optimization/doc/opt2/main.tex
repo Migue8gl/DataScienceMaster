@@ -1,0 +1,371 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[a4paper, top=1.2in, bottom=1.4in, left=1in, right=1in]{geometry}
+\usepackage{graphicx} % Required for inserting images
+\graphicspath{ {./img/} }
+\usepackage[spanish]{babel}
+\usepackage{float}
+\usepackage{fancyhdr}
+\setlength{\parskip}{1em}  % Adds space between paragraphs (1em)
+\usepackage{amsmath,amssymb}
+\usepackage{tikz}
+\newcommand{\tikzmark}[1]{\tikz[baseline,remember picture] \coordinate (#1) {};}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shadows,arrows.meta} % For adding edges label
+\usetikzlibrary{calc}
+\usepackage{eso-pic}
+\usepackage[backend=biber, defernumbers=true, citestyle=numeric-comp, bibstyle=ieee, sorting=none]{biblatex}
+\addbibresource{bibliography/bibliography.bib}
+\DeclareBibliographyCategory{cited}
+\AtEveryCitekey{\addtocategory{cited}{\thefield{entrykey}}}
+% Configurando BibLaTeX
+\DefineBibliographyStrings{spanish}{
+  url = {URL},
+  andothers={et ~al\adddot}
+}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\AddToShipoutPictureBG{%
+\begin{tikzpicture}[remember picture, overlay]
+\node[opacity=.15, inner sep=0pt]
+    at(current page.center){\includegraphics[scale=1.5]{img/logo-ugr2.png}};
+\end{tikzpicture}%
+}
+
+\title{Revisión de los Algoritmos Genéticos}
+\author{Miguel García López}
+\date{Noviembre 2024}
+
+\pagestyle{fancyplain}
+\headheight 35pt
+\lhead{Miguel García López}            
+\chead{\textbf{\small Revisión de los Algoritmos Genéticos}}
+\rhead{Master Ciencia de Datos \\ \today}
+\lfoot{\scriptsize\LaTeX}
+\cfoot{\small Revisión de los Algoritmos Genéticos}
+\rfoot{\small\thepage}
+\headsep 1.5em
+
+\author{Miguel García López} % Nombre y apellidos
+
+\date{\normalsize\today} % Incluye la fecha actual
+
+\begin{document}
+\begin{titlepage}
+\begin{figure}
+    \vspace{-1.3cm}
+    \begin{center}
+        \includegraphics[width=0.75\textwidth]{img/UGR-Logo.png}
+    \end{center}
+\end{figure}
+\vspace{1.3cm}
+\centering
+\normalfont \normalsize
+\textsc{\textbf{Técnicas de Soft Computing para Aprendizaje y optimización. Redes Neuronales y Metaheurísticas, programación evolutiva y bioinspirada 2024-2025} \\ \vspace{.15cm} Master Ciencia de Datos\\ \vspace{.15cm} Universidad de Granada} \\ [25pt] 
+    \huge Revisión de los Algoritmos Genéticos
+
+\normalfont \normalsize \vspace{.30cm}
+\textsc{Miguel García López}
+
+\end{titlepage}
+
+\tableofcontents
+\listoffigures
+\newpage
+
+\section{Introducción}
+En esta revisión se va a proceder a explicar qué son los \textbf{algoritmos genéticos}, de dónde vienen y cómo surgen a lo largo del tiempo como una solución bio-inspirada para solucionar problemas de optimización con codificación binaria. Se explicará cómo estos algoritmos surgieron y fueron ``evolucionando" con el tiempo, adaptándose a nuevos problemas y creando variaciones del algoritmo original. 
+
+Se recabará información a través del buscador de \textit{Scopus} para realizar un análisis bibliométrico, con el que se analizará la producción científica y académica y se medirá el impacto, la calidad y la evolución de publicaciones, autores, revistas e instituciones en el área específica de los algoritmos genéticos.
+
+Se explicará, además, el funcionamiento básico del algoritmo genético original y el de algunas de sus variantes e hibridaciones. Para ello se explicarán los operadores que lo conforman así como el \textit{workflow} o procesos que sigue el algoritmo y cómo interactúan los operadores entre sí para hacer funcionar al algoritmo de optimización.
+
+\section{Contexto}
+Los algoritmos genéticos están inspirados en la selección natural y se emplean tanto en problemas de optimización con restricciones como en aquellos sin ellas. Esta metaheurística modifica de manera repetida una población de soluciones individuales, seleccionando soluciones ``padre" que generarán la siguiente generación de soluciones en la siguiente iteración del algoritmo.
+
+En su forma más básica, un algoritmo genético opera sobre una población de soluciones potenciales a un problema dado. Cada solución potencial, frecuentemente llamada individuo o cromosoma, está representada como una cadena de símbolos, que puede ser binaria, numérica o simbólica. \cite{10.5555/522098}.
+
+\subsection{Orígenes}
+Los algoritmos genéticos o \textbf{GAs} adquirieron popularidad en la década de $1970$, especialmente en $1975$ con la publicación del libro de John Holland \cite{Holland:1975}. Este tipo de metaheurísticas se diseñan tomando como inspiración la selección natural. Un conjunto de fenotipos (soluciones) evoluciona a lo largo de generaciones para emular el cruce entre especies, es decir, el cruce de soluciones mediante un intercambio común de cromosomas, lo que da lugar a nuevos individuos con características de ambos padres. A lo largo del tiempo, este tipo de algoritmos fueron incorporando nuevas características y, aunque inicialmente fueron concebidos para resolver problemas discretos, también existen versiones que optimizan problemas continuos \cite{eiben2015}.
+
+\subsection{Definición}
+Los algoritmos genéticos definen las soluciones como vectores numéricos, en el caso de un problema binario (\textbf{GAs} originales) la solución es un vector de $0s$ y $1s$, en el caso de un problema sobre un dominio continuo, la solución es un vector de números reales.
+Cada individuo $x \in P$ se representa como una cadena de genes:
+\[ x = (g_1, g_2, ..., g_n) \]
+donde $g_i \in \Sigma$ y $\Sigma$ es el alfabeto de genes que puede ser:
+\begin{itemize}
+    \item Binario: $\Sigma = \{0,1\}$
+    \item Entero: $\Sigma = \mathbb{Z}$
+    \item Real: $\Sigma = \mathbb{R}$
+\end{itemize}
+El algoritmo trata de minimizar o maximizar una función objetivo, esta es conocida como la función \textit{fitness}. En esta se representa una métrica de cómo de bien lo está haciendo el algoritmo (o el error) y se trata de optimizar para guiar la evolución de la población.
+
+Se comienza con una población de soluciones totalmente aleatoria partiendo de una distribución (puede ser normal o uniforme). A partir de ahí se evalúan los individuos y se les proporciona un \textit{score} o evaluación a cada uno. Con esa evaluación se ordenan y se eligen dos padres (o varios, dependiendo de la variante) mediante un proceso de selección, como el método de la ruleta.
+
+Esos padres son cruzados entre sí mediante el operador de cruce para obtener uno o más hijos que compartan características de los padres. Dada una probabilidad defindida como $p$ se le aplicará el operador de mutación a los hijos para favorecer la diversidad y exploración.
+
+A partir de ahí, se introducen los hijos en la población, si se pueden introducir, y se vuelve a iterar. La condición de parada puede ser llegar a un valor de \textit{fitness}, condición de tiempo o condición de iteraciones máximas.
+
+\begin{algorithm}
+\caption{Algoritmo Genético con Elitismo}
+\begin{algorithmic}[1]
+\Require Tamaño de población \( N \), tasa de cruce \( C \), tasa de mutación \( M \), porcentaje de elitismo \( E \), condición de terminación
+\Ensure La mejor solución encontrada
+\State Inicializar población aleatoria \( P \) con \( N \) individuos
+\While{no se cumpla la condición de terminación}
+    \State Evaluar fitness de cada individuo en \( P \)
+    \State Ordenar \( P \) de mejor a peor según fitness
+    \State \( P_{\text{elite}} \gets \) primeros \( E \times N \) individuos de \( P \)
+    \State Inicializar \( P_{\text{descendencia}} \gets \emptyset \)
+    \For{$i$ desde 1 hasta \( N $}
+        \State Seleccionar padres \( p_1, p_2 \) de \( P \) usando selección por ruleta/torneo
+        \State \textbf{if} \( \text{rand}() < C \) \textbf{then}
+            \State \( h \gets \text{Cruce}(p_1, p_2) \)
+        \State \textbf{else}
+            \State \( h \gets \) copia de \( p_1 \) o \( p_2 \) (aleatorio)
+        \State \textbf{endif}
+        \State \textbf{if} \( \text{rand}() < M \) \textbf{then}
+            \State \( h \gets \text{Mutación}(h) \)
+        \State \textbf{endif}
+        \State Agregar \( h \) a \( P_{\text{descendencia}} \)
+    \EndFor
+    \State Reemplazar los \( E \times N \) peores individuos en \( P_{\text{descendencia}} \) con \( P_{\text{elite}} \)
+    \State \( P \gets P_{\text{descendencia}} \)
+\EndWhile
+\State \Return mejor individuo en \( P \)
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Operadores principales}
+Se procede a definir los operadores principales de los algoritmos genéticos, al menos los básicos o más usados, ya que cubrir todos los operadores de todas las variaciones es inabarcable.
+
+\subsection{Selección}
+La selección se puede llevar a cabo por varios métodos. Uno de los más utilizados es \textbf{selección por torneo} (eq: \ref{eq:tournament}). En la selección por torneo, los individuos compiten entre sí en grupos pequeños. Cada grupo (torneo) tiene varios competidores. El competidor con mejor \textit{fitness} dentro del grupo tiene más probabilidades de ganar. Los ganadores son seleccionados para participar en el proceso de cruce.
+El proceso se repite hasta que se completa la \textit{pool} de apareamiento con los ganadores de los torneos \cite{miller_genetic_nodate}.
+
+\begin{equation}
+    P(\text{parent}_i) = \frac{\text{fitness}(\text{parent}_i)}{\sum_{j=1}^N \text{fitness}(\text{parent}_j)}
+    \label{eq:tournament}
+\end{equation}
+
+\subsection{Cruce}
+El operador de cruce (\textit{crossover}) tiene como propósito principal explorar nuevas regiones del espacio de búsqueda combinando las características favorables de dos soluciones ``padres" para generar nuevas soluciones ``hijas" potencialmente mejores. Algunas versiones realizan cruce siempre, mientras que otras proponen una probabilidad para que dos soluciones puedan cruzarse, de forma que ocurra más esporádicamente.
+
+\textbf{One-point crossover (binario)}: Se elige al azar un punto en los cromosomas de
+ambos progenitores y se designa como ``punto de cruce”. Los bits a la
+derecha de ese punto se intercambian entre los dos cromosomas parentales.
+El resultado son dos descendientes, cada uno con información genética de
+ambos progenitores \cite{DAGDIA2020283}.
+Dados dos padres (los cromosomas) \( P_1 = (p_1^1, p_2^1, \dots, p_n^1) \) y \( P_2 = (p_1^2, p_2^2, \dots, p_n^2) \), se selecciona un punto de cruce \( k \) aleatorio. Los hijos \( H_1 \) y \( H_2 \) se generan como:
+
+\begin{equation}
+H_1 = (p_1^1, p_2^1, \dots, p_k^1, p_{k+1}^2, \dots, p_n^2)
+\label{eq:one_point_h1}
+\end{equation}
+
+\begin{equation}
+H_2 = (p_1^2, p_2^2, \dots, p_k^2, p_{k+1}^1, \dots, p_n^1)
+\label{eq:one_point_h2}
+\end{equation}
+
+\textbf{Blend crossover (continuo)}: Dado dos números reales para cada uno de los genes de
+los padres al hijo se le asignará un número aleatorio entre ese rango de gen
+para cada gen que conforme al vector cromosómico \cite{purduelecture}.
+Dados dos padres \( P_1 = (p_1^1, p_2^1, \dots, p_n^1) \) y \( P_2 = (p_1^2, p_2^2, \dots, p_n^2) \), para cada gen \( i \), se calcula un intervalo \( [c_{\text{min}}, c_{\text{max}}] \), donde:
+
+\begin{equation}
+c_{\text{min}} = \text{min}(p_i^1, p_i^2) - \alpha \cdot d
+\label{eq:blx_cmin}
+\end{equation}
+
+\begin{equation}
+c_{\text{max}} = \text{max}(p_i^1, p_i^2) + \alpha \cdot d
+\label{eq:blx_cmax}
+\end{equation}
+
+\begin{equation}
+d = |p_i^1 - p_i^2|
+\label{eq:blx_d}
+\end{equation}
+
+El valor del gen \( i \) en el hijo \( H \) se genera aleatoriamente dentro del intervalo \( [c_{\text{min}}, c_{\text{max}}] \):
+
+\begin{equation}
+H_i = \text{rand}(c_{\text{min}}, c_{\text{max}})
+\label{eq:blx_hi}
+\end{equation}
+
+Por supuesto existen muchos más tipos de cruces tanto para versiones en dominio continuo como en dominio discreto y binario, pero los principales operadores y que más suelen utilizarse son los descritos.
+
+\subsection{Mutación}
+El operador de mutación tiene como propósito principal favorecer la exploración del espacio de búsqueda introduciendo perturbaciones aleatorias en las soluciones hijo. Este operador es más delicado que el de cruce y por lo general se propone un valor bajo de probabilidad de mutación, ya que demasiadas perturbaciones pueden afectar a los resultados. Un desajuste entre el ratio de exploración y explotación a favor de la exploración puede dar como resultado soluciones con un \textit{fitness} muy malo.
+
+\textbf{Mutación binaria}: Este operador básico y clásico consiste en cambiar un \textit{bit} arbitrario de un genotipo o solución de un algoritmo genético binario a su estado inverso dada una probabilidad de mutación \cite{mirjalili2019genetic}.
+
+\begin{equation}
+x_i' = 
+\begin{cases}
+1 - x_i & \text{con probabilidad } p_m, \\
+x_i     & \text{con probabilidad } 1 - p_m.
+\end{cases}
+\label{eq:binary_mutation}
+\end{equation}
+
+\textbf{Mutación continua}: Este tipo de mutación se utiliza especialmente en problemas en los que se busca una exploración más amplia del espacio de búsqueda, ya que la distribución de \textit{Cauchy} tiene colas pesadas y puede generar valores aleatorios alejados del centro con mayor probabilidad en comparación con una distribución normal. La mutación se define como:
+
+\begin{equation}
+m(x_i) = 
+\begin{cases}
+(2r)^{\frac{1}{\eta + 1}} - 1 & \text{si } p \leq 0.5, \\
+1 - (2r)^{\frac{1}{\eta + 1}} & \text{si } p > 0.5,
+\end{cases}
+\label{eq:cauchy_mutation}
+\end{equation}
+
+donde:
+\begin{itemize}
+    \item \( r \) es un número aleatorio en el intervalo \([0, 1]\),
+    \item \( \eta \) es una variable de control que ajusta la distribución,
+    \item \( p \) es una probabilidad aleatoria en \([0, 1]\).
+\end{itemize}
+
+Esta función de mutación está diseñada para generar una exploración más amplia del espacio de búsqueda, con la posibilidad de generar valores más alejados del centro de la distribución.
+
+Por supuesto y tal como se mencionó en el apartado de \textit{crossover}, existen multitud de propuestas en cuanto a operadores de mutación.
+
+\section{Informe bibliométrico}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/scopus_chart_gas.png}
+    \caption{Número de artículos desde $2010-2024$ relacionados con los algoritmos genéticos en \textit{Scopus}.}
+    \label{fig:scopus}
+\end{figure}
+
+Como puede verse en la gráfica de la figura \ref{fig:scopus}, los algoritmos genéticos son, pese a su longeva existencia, cada vez más populares. El número de artículos por año crece y crece cada vez más sin ninguna tendencia evidente a bajar, lo que parece indicar que los algoritmos genéticos son más populares que nunca y se sigue innovando en este sector.
+
+Estos datos han sido obtenido mediante el buscador de \textit{Scopus}. Utilizando una herramienta como \textit{OpenAlex} se han obtenido datos complementarios. Por ejemplo, se puede observar que la gran mayoría de las publicaciones son (fig \ref{fig:openalex-closed}) cerradas (se accede mediante pasarelas de pago o acceso institucional). Otros datos interesantes se pueden obtener de este portal, como cuáles son las instituciones más prolíficas (fig \ref{fig:openalex-institutions}) en relación a los \textbf{GAs} y cuáles son los tipos de publicaciones más comunes (fig \ref{fig:openalex-type}) (un $88\%$ son artículos).
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/open-access.png}
+    \caption{Publicaciones cerradas vs abiertas sobre \textbf{GAs}.}
+    \label{fig:openalex-closed}
+\end{figure}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/top_institutions.png}
+    \caption{Instituciones que más publican sobre \textbf{GAs}.}
+    \label{fig:openalex-institutions}
+\end{figure}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/type.png}
+    \caption{Tipo de publiaciones sobre las \textbf{GAs}.}
+    \label{fig:openalex-type}
+\end{figure}
+
+A partir de los artículos más citados en Scopus relacionados con Genetic Algorithms (\textbf{GAs}), los temas más candentes parecen estar relacionados con:
+\begin{enumerate}
+    \item \textbf{Optimización y mejora de algoritmos genéticos}
+    \begin{itemize}
+        \item Revisión del estado del arte de los \textbf{GAs} y sus mejoras a lo largo del tiempo.
+        \item Optimización de hiperparámetros en modelos de aprendizaje automático, clave para la implementación eficiente de \textbf{GAs}.
+    \end{itemize}
+
+    \item \textbf{Metaheurísticas bioinspiradas y nuevas variantes}
+    \begin{itemize}
+        \item Desarrollo de nuevos algoritmos de optimización como \textit{Marine Predators Algorithm}, \textit{Equilibrium Optimizer} y \textit{Arithmetic Optimization Algorithm}.
+        \item Técnicas para mejorar la convergencia y evitar estancamientos en óptimos locales.
+    \end{itemize}
+
+    \item \textbf{Aplicaciones en biología y bioinformática}
+    \begin{itemize}
+        \item Uso de \textbf{GAs} para predecir estructuras de proteínas con aprendizaje profundo.
+        \item Aplicaciones en la clasificación evolutiva de sistemas \textit{CRISPR-Cas}.
+    \end{itemize}
+
+    \item \textbf{Optimización multiobjetivo y herramientas avanzadas}
+    \begin{itemize}
+        \item Desarrollo de herramientas como \textit{Pymoo}, una biblioteca en Python para optimización multiobjetivo con \textbf{GAs} y otras metaheurísticas.
+    \end{itemize}
+\end{enumerate}
+
+\section{Hibridaciones}
+Los algoritmos híbridos entre genéticos y otras técnicas de búsqueda son muy comunes y ampliamente utilizados. Los algoritmos genéticos se combinan con otros métodos de optimización, como búsqueda local o enfriamiento simulado, con el objetivo de mejorar la eficiencia y precisión.
+
+El objetivo detrás de este tipo de algoritmos es utilizar a las \textbf{GAs} como método principal de búsqueda y exploración. Tras ir poco a poco convergiendo a una solución, se suelen utilizar métodos de búsqueda local o enfriamiento para mejorar y refinar la fase de explotación del algoritmo.
+
+A continuación se detallan algunos de estos métodos \cite{García-Martínez2018} de hibridación y se explicarán las ventajas de cada uno y algunos ejemplos dentro de estos métodos de hibridación.
+
+\subsection{Hibridaciones colaborativas}
+Estas estrategias implican la interacción entre algoritmos independientes que intercambian información durante su ejecución.
+\subsubsection{Colaborativas \textit{teamwork}}
+Varios algoritmos se ejecutan en paralelo, compartiendo información periódicamente.
+\begin{enumerate}
+    \item Ejemplo $1$: Los \textbf{GA} distribuidos (\textbf{DGAs}) dividen la población en subpoblaciones (islas), cada una procesada por un \textbf{GA} independiente. Las migraciones entre islas introducen diversidad. Por ejemplo, en \cite{843494}, se utilizan subpoblaciones con distintos parámetros (alta mutación para exploración, baja para explotación).
+    \item Ejemplo $2$: En \cite{cosearch}, se combinan \textbf{GA}, búsqueda tabú y búsqueda local. Los \textbf{GA} generan soluciones en zonas no exploradas usando una memoria adaptativa que registra el historial de búsqueda de otros algoritmos.
+\end{enumerate}
+
+\subsubsection{Colaborativas \textit{relay}}
+Los algoritmos se ejecutan secuencialmente en una canalización.
+\begin{enumerate}
+    \item Ejemplo $1$: Un \textbf{GA} global seguido de un \textbf{GA} local. El primero explora el espacio de búsqueda, y el segundo refina las mejores soluciones encontradas.
+    \item Ejemplo $2$: Un \textbf{GA} se combina con el método Nelder-Mead: el \textbf{GA} realiza una exploración global, y Nelder-Mead mejora las soluciones prometedoras. El método de Nelder-Mead es un método numérico utilizado para encontrar el mínimo o el máximo de una función objetivo en un espacio multidimensional. Es un método de búsqueda directa (basado en la comparación de funciones) y suele aplicarse a problemas de optimización no lineal para los que pueden no conocerse las derivadas.
+\end{enumerate}
+
+\subsection{Hibridaciones integrativas}
+Un algoritmo actúa como componente de otro, integrándose en su funcionamiento interno.
+
+\subsubsection{Integrativas \textit{teamwork}}
+Un metaheurística se incrusta dentro de otra como componente clave.
+\begin{enumerate}
+    \item Ejemplo $1$: Algoritmos meméticos \cite{memetics}, donde un \textbf{GA} se combina con búsqueda local. 
+    \item Ejemplo $2$: Micro-GA ($\mu$\textbf{GA}) \cite{930311}, usado como operador de refinamiento. Un \textbf{GA} con población pequeña (ej. $5$ individuos) mejora soluciones específicas del \textbf{GA} principal, aprovechando su capacidad para seguir crestas en espacios complejos.
+\end{enumerate}
+
+\subsubsection{Integrativas \textit{relay}}
+Un \textbf{GA} realiza funciones específicas dentro de otra metaheurística dominante.
+
+\begin{enumerate}
+    \item Ejemplo $1$: Un \textbf{GA} \textit{steady-state} genera soluciones candidatas para un \textit{simulated annealing} (\textbf{SA}). El SA decide aceptar o rechazar las soluciones, integrando exploración (\textbf{GA}) y explotación (\textbf{SA}).
+    \item Ejemplo $2$: En \cite{microchc}, un $\mu$\textbf{CHC} (variante de \textbf{GA} con alta presión selectiva) actúa como operador de perturbación en una búsqueda local iterada, introduciendo diversidad sin perder calidad.
+\end{enumerate}
+
+Las hibridaciones de algoritmos genéticos representan un campo en constante evolución dentro de la computación evolutiva y la optimización metaheurística. El éxito demostrado por estas técnicas híbridas ha llevado a un creciente interés en desarrollar nuevas combinaciones y estrategias que puedan abordar problemas cada vez más complejos. La tendencia actual apunta hacia la integración con técnicas de aprendizaje profundo y otros métodos de inteligencia artificial.
+
+\newpage
+\section{Bibliografía}
+
+\printbibliography[heading=none, category=cited]
+\end{document}

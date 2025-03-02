@@ -1,0 +1,261 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[a4paper, top=1.2in, bottom=1.4in, left=1in, right=1in]{geometry}
+\usepackage{graphicx} % Required for inserting images
+\graphicspath{ {./img/} }
+\usepackage[spanish]{babel}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{fancyhdr}
+\setlength{\parskip}{1em}  % Adds space between paragraphs (1em)
+\usepackage{amsmath,amssymb}
+\usepackage{tikz}
+\newcommand{\tikzmark}[1]{\tikz[baseline,remember picture] \coordinate (#1) {};}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shadows,arrows.meta} % For adding edges label
+\usetikzlibrary{calc}
+\usepackage{eso-pic}
+\usepackage[backend=biber, defernumbers=true, citestyle=numeric-comp, bibstyle=ieee, sorting=none]{biblatex}
+\addbibresource{bibliography/bibliography.bib}
+\DeclareBibliographyCategory{cited}
+\AtEveryCitekey{\addtocategory{cited}{\thefield{entrykey}}}
+% Configurando BibLaTeX
+\DefineBibliographyStrings{spanish}{
+  url = {URL},
+  andothers={et ~al\adddot}
+}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\AddToShipoutPictureBG{%
+\begin{tikzpicture}[remember picture, overlay]
+\node[opacity=.15, inner sep=0pt]
+    at(current page.center){\includegraphics[scale=1.5]{img/logo-ugr2.png}};
+\end{tikzpicture}%
+}
+
+\title{Técnicas de Soft Computing - Práctica 1}
+\author{Miguel García López}
+\date{Diciembre 2024}
+
+\pagestyle{fancyplain}
+\headheight 35pt
+\lhead{Miguel García López}            
+\chead{\textbf{\small Práctica 1}}
+\rhead{Master Ciencia de Datos \\ \today}
+\lfoot{\scriptsize\LaTeX}
+\cfoot{\small Técnicas de Soft Computing}
+\rfoot{\small\thepage}
+\headsep 1.5em
+
+\author{Miguel García López} % Nombre y apellidos
+
+\date{\normalsize\today} % Incluye la fecha actual
+
+\begin{document}
+\begin{titlepage}
+\begin{figure}
+    \vspace{-1.3cm}
+    \begin{center}
+        \includegraphics[width=0.75\textwidth]{img/UGR-Logo.png}
+    \end{center}
+\end{figure}
+\vspace{1.3cm}
+\centering
+\normalfont \normalsize
+\textsc{\textbf{Técnicas de Soft Computing 2024-2025} \\ \vspace{.15cm} Master Ciencia de Datos\\ \vspace{.15cm} Universidad de Granada} \\ [25pt] 
+    \huge Optimización - Problema de Diversidad Máxima
+
+\normalfont \normalsize \vspace{.30cm}
+\textsc{Miguel García López}
+
+\end{titlepage}
+
+\tableofcontents
+\listoffigures
+\listoftables
+\newpage
+
+\section{Introducción}
+El problema de diversidad máxima es un problema común de optimización combinatoria. Este problema consiste en encontrar un subconjunto $M$ de $m$ elementos, es decir, $|M| = m$ a partir de un conjunto inicial $N$ con $n$ elementos (siendo $n$ > $m$), de forma que ese subconjunto $M$ sea de máxima diversidad, es decir, sus elementos deben ser los más diversos entre sí.
+
+La diversidad es una métrica a elegir, ya que puede representar multitud de operaciones. En este caso se escoge como diversidad la diferencia absoluta entre dos elementos $i$ y $j$, es decir, $d_{ij}|N_i-N_j|$.
+
+El problema se puede definir como un problema de optimización sujeto a restricciones de la siguiente manera:
+
+\begin{equation}
+    \begin{aligned}
+        \text{Maximizar}\quad & MD(X)=\sum_{i=1}^{n-1}\sum_{j=i}^n d_{ij}x_ix_j \\
+        \text{sujeto a}\quad & \sum_{i=1}^nx_i=m \\
+        & x_i=\{0,1\}, i=1,...,n
+    \end{aligned}
+\end{equation}
+
+Donde $x_i$ representa una solución al problema que consiste en un vector binario donde $x_i=1$ representa que el elemento en la posición $i$ ha sido seleccionado y donde $d_{ij}$ es la diversidad entre un elemento en la posición $i$ y otro elemento en la posición $j$.
+
+\section{Solución heurística}
+Para la solución heurística \textit{ad-hoc}, es decir, un método diseñado específicamente para resolver un problema en particular sin seguir un enfoque generalizable o teóricamente óptimo siguiendo simplificaciones o intuiciones que funcionan bien, se propone un algoritmo \textbf{Greedy}.
+
+\subsection{Greedy}
+Un algoritmo \textbf{Greedy} (o voraz) es un enfoque de resolución de problemas que toma decisiones paso a paso, eligiendo en cada paso la opción que parece ser la mejor en ese momento, con la esperanza de que esta estrategia lleve a una solución óptima o cercana a ella.
+
+Este tipo de método se llama voraz ya que no considera decisiones pasadas y solo se mueve hacia delante tomando la mejor decisión en cada momento, de forma que es bastante eficiente en tiempo. Al tomar este tipo de estrategia es posible que se acabe en óptimos locales, ya que se pierde parte de la potencia combinatoria y de exploración de otros algoritmos. Pese a ello es una solución intuitiva y fácil de implementar.
+
+\subsection{Pseudocódigo}
+
+\begin{algorithm}
+    \caption{Heurística Voraz para el Problema de Máxima Diversidad}
+    \begin{algorithmic}[1]
+    \Procedure{HeurísticaVoraz}{$N, m$}
+    \State \textbf{Entrada:} Conjunto $N = \{N_1, N_2, \ldots, N_n\}$ con valores numéricos, y $m$ elementos a seleccionar
+    \State \textbf{Salida:} Subconjunto $M$ de índices tal que $|M| = m$ y maximice la diversidad
+    
+    \If{$m > n$}
+        \State \textbf{error:} ``$m$ no puede ser mayor que $n$"
+    \EndIf
+    
+    \State $i_{max} \gets \text{índice del máximo valor en } N$
+    \State $i_{min} \gets \text{índice del mínimo valor en } N$
+    \State $M \gets \{i_{max}, i_{min}\}$
+    
+    \While{$|M| < m$}
+        \State $R \gets \{1, 2, \ldots, n\} \setminus M$ \Comment{Elementos no seleccionados}
+        
+        \State $i_{mejor} \gets \arg\max_{i \in R} \sum_{j \in M} |N_i - N_j|$
+        
+        \State $M \gets M \cup \{i_{mejor}\}$
+    \EndWhile
+    
+    \State \textbf{return} $M$
+    \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+El algoritmo \textbf{Greedy} comienza eligiendo dos índices, los índices de los valores máximo y mínimo del conjunto inicial. A partir de ahí se itera hasta que el subconjunto $M$ alcance el tamaño especificado por el parámetro $m$ de la función. 
+
+En cada iteración se escoge el índice de aquel elemento que no esté en el subconjunto $M$ y que maximice la diversidad entre el mismo elemento $i$ y todos aquellos elementos pertenecientes ya a $M$.
+
+\subsection{Resultados}
+Pese a no ser necesario realizar el código, tan solo con el pseudocódigo bastaba, se ha escrito una implentación del algoritmo voraz y se han corrido experimentos $30$  veces con un $N$ de tamaño $1000$ y un tamaño $m$ para el subconjunto $M$ de $20$ comparándolo con una solución aleatoria para ver la eficaz del mismo. Los resultados se pueden ver en la tabla \ref{tab:mdp_results}
+
+\begin{table}[htp]
+    \centering
+    \begin{tabular}{l c}
+        \hline
+        \multicolumn{2}{c}{\textbf{Parameters}} \\
+        \hline
+        Number of experiments & 30 \\
+        Set size ($n$) & 1000 \\
+        Subset size ($m$) & 20 \\
+        \hline
+        \multicolumn{2}{c}{\textbf{Average Diversity Values}} \\
+        \hline
+        Greedy solution & 38617.90 $\pm$ 580.52 \\
+        Random solution & 19501.69 $\pm$ 2780.59 \\
+        \hline
+        \multicolumn{2}{c}{\textbf{Improvement Ratios}} \\
+        \hline
+        Greedy over Random & 2.02$\times$ \\
+        \hline
+    \end{tabular}
+    \caption{Maximum Diversity Problem Experiment Results}
+    \label{tab:mdp_results}
+\end{table}
+
+\section{Solución búsqueda local}
+La búsqueda local es un algoritmo heurístico básico que se basa en el principio de \textit{explotación}, es decir, mejora una solución base refinándola lo máximo posible. 
+
+Como se ha dicho, mejora sobre una solución base, por lo que es necesario que esa solución sea obtenida con un algoritmo de búsqueda previo o incluso puede aplicarse sobre una solución aleatoria. Obviamente tiene más potencia cuando la solución en la que se basa es buena.
+
+Este algoritmo evalua la solución inicial e itera sobre esta cambiando elementos de la misma (de manera aleatoria o con búsqueda exhaustiva) durante un número de iteraciones máximas definido o hasta alcanzar una métrica mínima de mejora a alcanzar. Si durante el proceso iterativo se mejora, se utiliza esa nueva solución, si no, se queda con la anterior.
+
+\subsection{Pseudocódigo}
+\begin{algorithm}
+    \caption{Búsqueda Local para Máxima Diversidad}
+    \begin{algorithmic}[1]
+    \Procedure{BúsquedaLocal}{$N, m, \text{max\_iter}$}
+    \State $M \gets$ \textsc{HeurísticaVoraz}$(N, m)$
+    \State $V \gets$ \textsc{Evaluar}$(M, N)$
+    
+    \For{$\text{iter} = 1$ \textbf{to} $\text{max\_iter}$}
+        \State $\text{mejor\_swap} \gets \text{None}$
+        
+        \For{$i \in M, j \in N \setminus M$}
+            \State $M' \gets M$ con $i$ reemplazado por $j$
+            \If{\textsc{Evaluar}$(M', N) > V$}
+                \State $\text{mejor\_swap} \gets (i, j)$
+                \State $V \gets$ \textsc{Evaluar}$(M', N)$
+            \EndIf
+        \EndFor
+        
+        \If{$\text{mejor\_swap} = \text{None}$}
+            \State \textbf{break}
+        \Else
+            \State Intercambiar en $M$
+        \EndIf
+    \EndFor
+
+    \State \textbf{return} $M$
+    \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+Como puede verse en el pseudocódigo, se comienza con una solución basada en \textbf{Greedy} y se itera evaluando cada nueva solución fruto de un intercambio de elementos en el vector solución final. Este cambio solo se queda en el vector si mejora la solución de la que parte.
+
+\subsection{Resultados}
+Los resultados obtenidos se han obtenido bajo las mismas condiciones explicadas en la sección de resultados anterior.
+\begin{table}[htp]
+    \centering
+    \begin{tabular}{l c}
+        \hline
+        \multicolumn{2}{c}{\textbf{Parameters}} \\
+        \hline
+        Number of experiments & 30 \\
+        Set size ($n$) & 1000 \\
+        Subset size ($m$) & 20 \\
+        \hline
+        \multicolumn{2}{c}{\textbf{Average Diversity Values}} \\
+        \hline
+        Greedy solution & 38617.90 $\pm$ 580.52 \\
+        Local search solution & 39565.44 $\pm$ 98.95 \\
+        Random solution & 19501.69 $\pm$ 2780.59 \\
+        \hline
+        \multicolumn{2}{c}{\textbf{Improvement Ratios}} \\
+        \hline
+        Greedy over Random & 2.02$\times$ \\
+        Local Search over Random & 2.07$\times$ \\
+        Local Search over Greedy & 1.02$\times$ \\
+        \hline
+    \end{tabular}
+    \caption{Maximum Diversity Problem Experiment Results}
+    \label{tab:mdp_results_2}
+\end{table}
+
+
+\end{document}
