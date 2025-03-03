@@ -5,17 +5,20 @@ import numpy as np
 import pandas as pd
 
 
-def greedy_heuristic(s: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+def greedy_heuristic(
+    s: np.ndarray, num_swaps: int = 0
+) -> Tuple[np.ndarray, np.ndarray]:
     """
-    Implements a greedy solution for the M2NP problem.
+    Implements a greedy solution for the M2NP problem with optional random swaps.
     Args:
         s: 2D NumPy array representing a collection of vectors.
+        num_swaps: Number of random swaps to perform on the sorted indices to introduce randomness.
     Returns:
         Tuple[np.ndarray, np.ndarray] Tuple of 2D arrays, each containing a collection of vectors.
     """
 
     # Get number of vectors and dimensions
-    _, d = s.shape
+    n, d = s.shape
 
     # Initialize sets S1 and S2 with indices
     s1_indices = []
@@ -28,6 +31,15 @@ def greedy_heuristic(s: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     # Sort vectors by norm (as a heuristic to process more impactful vectors first)
     vector_norms = np.linalg.norm(s, axis=1)
     sorted_indices = np.argsort(vector_norms)[::-1]  # Sort in descending order
+
+    # Introduce randomness by performing random swaps
+    if num_swaps > 0:
+        sorted_indices = sorted_indices.copy()  # To avoid modifying the original array
+        for _ in range(num_swaps):
+            # Generate two distinct random positions
+            i, j = np.random.choice(n, 2, replace=False)
+            # Swap the indices at positions i and j
+            sorted_indices[i], sorted_indices[j] = sorted_indices[j], sorted_indices[i]
 
     # Greedily assign each vector to minimize the maximum difference
     for idx in sorted_indices:
@@ -54,6 +66,34 @@ def greedy_heuristic(s: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     s2 = s[s2_indices]
 
     return s1, s2
+
+
+def iterative_greedy(
+    s: np.ndarray, iterations: int = 10, num_swaps: int = 2
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Implements an iterative greedy approach with random perturbations for the M2NP problem.
+    Args:
+        s: 2D NumPy array representing a collection of vectors.
+        iterations: Number of iterations to run the greedy heuristic with perturbations.
+        num_swaps: Number of random swaps to perform in each iteration's sorting step.
+    Returns:
+        Tuple[np.ndarray, np.ndarray] Best solution found.
+    """
+    best_solution = None
+    best_value = float("inf")
+
+    for _ in range(iterations):
+        # Run greedy heuristic with random swaps
+        current_solution = greedy_heuristic(s, num_swaps=num_swaps)
+        current_value = evaluate_solution(current_solution)
+
+        # Update best solution if current is better
+        if current_value < best_value:
+            best_solution = current_solution
+            best_value = current_value
+
+    return best_solution
 
 
 def local_search(
@@ -154,8 +194,8 @@ def run_experiment(
         pd.DataFrame: Results of all experiments
     """
     # Set random seeds for reproducibility
-    # np.random.seed(seed)
-    # random.seed(seed)
+    np.random.seed(seed)
+    random.seed(seed)
 
     # Create a DataFrame to store results
     results = []
@@ -168,22 +208,21 @@ def run_experiment(
         greedy_solution = greedy_heuristic(s)
         local_search_solution = local_search(s)
         random_solution = generate_random_solution(s)
+        iterative_greedy_solution = iterative_greedy(s)
 
         # Evaluate solutions
         greedy_value = evaluate_solution(greedy_solution)
         local_search_value = evaluate_solution(local_search_solution)
         random_value = evaluate_solution(random_solution)
+        iterative_greedy_value = evaluate_solution(iterative_greedy_solution)
 
         # Calculate improvement differences (for minimization, positive means better)
-        greedy_vs_random = (
-            random_value - greedy_value
-        )  # Positive means greedy is better than random
-        local_vs_random = (
-            random_value - local_search_value
-        )  # Positive means local is better than random
-        local_vs_greedy = (
-            greedy_value - local_search_value
-        )  # Positive means local is better than greedy
+        greedy_vs_random = random_value - greedy_value
+        local_vs_random = random_value - local_search_value
+        local_vs_greedy = greedy_value - local_search_value
+        iterative_vs_greedy = greedy_value - iterative_greedy_value
+        iterative_vs_local = local_search_value - iterative_greedy_value
+        iterative_vs_random = random_value - iterative_greedy_value
 
         # Store results
         results.append(
@@ -192,9 +231,13 @@ def run_experiment(
                 "greedy_value": greedy_value,
                 "local_search_value": local_search_value,
                 "random_value": random_value,
+                "iterative_greedy_value": iterative_greedy_value,
                 "greedy_over_random": greedy_vs_random,
                 "local_over_random": local_vs_random,
                 "local_over_greedy": local_vs_greedy,
+                "iterative_over_greedy": iterative_vs_greedy,
+                "iterative_over_local": iterative_vs_local,
+                "iterative_over_random": iterative_vs_random,
             }
         )
 
@@ -205,7 +248,7 @@ def run_experiment(
     print("=== M2NP PROBLEM EXPERIMENT RESULTS ===")
     print(f"Parameters: {num_experiments} experiments, size={size}")
     print("\nAVERAGE FITNESS VALUES (lower is better):")
-    for method in ["greedy", "local_search", "random"]:
+    for method in ["greedy", "local_search", "random", "iterative_greedy"]:
         mean_val = df_results[f"{method}_value"].mean()
         std_val = df_results[f"{method}_value"].std()
         print(f"{method.upper()} solution: {mean_val:.2f} ± {std_val:.2f}")
@@ -214,6 +257,15 @@ def run_experiment(
     print(f"Greedy over Random: {df_results['greedy_over_random'].mean():.2f}")
     print(f"Local Search over Random: {df_results['local_over_random'].mean():.2f}")
     print(f"Local Search over Greedy: {df_results['local_over_greedy'].mean():.2f}")
+    print(
+        f"Iterative Greedy over Greedy: {df_results['iterative_over_greedy'].mean():.2f}"
+    )
+    print(
+        f"Iterative Greedy over Local: {df_results['iterative_over_local'].mean():.2f}"
+    )
+    print(
+        f"Iterative Greedy over Random: {df_results['iterative_over_random'].mean():.2f}"
+    )
 
     return df_results
 

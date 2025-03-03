@@ -5,6 +5,8 @@
 \usepackage[spanish]{babel}
 \usepackage{float}
 \usepackage{fancyhdr}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 \setlength{\parskip}{1em}  % Adds space between paragraphs (1em)
 \usepackage{amsmath,amssymb}
 \usepackage{tikz}
@@ -108,7 +110,7 @@ Se recabará información a través del buscador de \textit{Scopus} para realiza
 
 Se explicará, además, el funcionamiento básico del algoritmo genético original y el de algunas de sus variantes e hibridaciones. Para ello se explicarán los operadores que lo conforman así como el \textit{workflow} o procesos que sigue el algoritmo y cómo interactúan los operadores entre sí para hacer funcionar al algoritmo de optimización.
 
-Además, después de la revisión de algoritmos genéticos, se explicará el problema de \textit{Multidimensional Two-way Number Partitioning} o \textbf{M2NP}. Se realizará una búsqueda bibliográfica sobre el problema, se explicarán una serie de soluciones propuestas para resolver este problema, entre ellas \textbf{Greedy}, \textbf{Iterative Greedy}, y se aplicarán y explicarán una serie de operadores de representación así como un algoritmo genético adaptado al problema.
+Además, después de la revisión de algoritmos genéticos, se explicará el problema de \textit{Multidimensional Two-way Number Partitioning} o \textbf{M2NP}. Se realizará una búsqueda bibliográfica sobre el problema, se explicarán una serie de soluciones propuestas para resolver este problema, entre ellas \textbf{Greedy}, \textbf{Iterated Greedy}, y se aplicarán y explicarán una serie de operadores de representación así como un algoritmo genético adaptado al problema.
 
 \section{Contexto}
 Los algoritmos genéticos están inspirados en la selección natural y se emplean tanto en problemas de optimización con restricciones como en aquellos sin ellas. Esta metaheurística modifica de manera repetida una población de soluciones individuales, seleccionando soluciones ``padre" que generarán la siguiente generación de soluciones en la siguiente iteración del algoritmo.
@@ -374,7 +376,7 @@ El problema \textbf{M2NP} es un problema de optimización binario que consiste e
 \end{equation}
 
 \subsection{Revisión bibliográfica}
-Se han estudiado diversas aproximaciones para resolver el problema \textbf{M2NP}. 
+Se han estudiado diversas aproximaciones para resolver el problema \textbf{M2NP}.
 
 Los primeros trabajos, como el de \cite{KOJIC20102302} en $2010$, trataron de formular el problema como uno de programación lineal. En este trabajo se demuestra que este problema, una generalización del problema clásico de partición de números, es \textbf{NP-difícil} y más complejo que su versión unidimensional. Se proponen restricciones y una formulación matemática para resolverlo con solvers de \textbf{ILP} como \textbf{CPLEX}, pero los resultados experimentales muestran que el problema sigue siendo difícil de resolver para dimensiones altas. Se sugiere el uso de métodos exactos o heurísticos como futuras líneas de investigación.
 
@@ -387,6 +389,170 @@ Tres años después, en \cite{RODRIGUEZ2017243} se propone un nuevo método para
 Se publican varios artículos en relación al problema, donde el último que parece realizar mejoras sobre en el \textit{estado del arte} es de $2021$ en \cite{SANTUCCI2021114938}, donde se presenta \textbf{IMADEB}, un algoritmo memético de evolución diferencial algebraica mejorado para resolver el problema \textbf{M2NP}. \textbf{IMADEB} supera a su predecesor \textbf{MADEB} y a \textbf{GRASP+ePR} al utilizar una representación de bits no redundante, un operador de búsqueda local optimizado y una mutación diferencial adaptativa basada en vuelos de \textit{Lévy}, logrando $145$ nuevas soluciones óptimas y estableciendo un nuevo estándar en el campo.
 
 \subsection{Greedy y Iterated Greey}
+
+Básicamente, la búsqueda voraz ordena el vector $S$ inicialmente por su norma en orden decreciente. De esta forma se asegura que el vector/conjunto principal tiene primero aquellos vectores con mayor magnitud, es decir, sus elementos son los más grandes, por lo que a la hora de asignarlos de forma iterativa a los diferentes conjuntos es más cómodo. Se guardan en un grupo u otro intentando mantener un equilibrio entre la diferencia de potenciales sumas de los vectores, de forma que se va equilibrando la adición de vectores de forma voraz.
+
+El algoritmo iterativo voraz o \textit{Iterate Greedy} aplica un número de intercambios (perturbaciones) de forma aleatoria sobre la solución de \textit{greedy} un número de veces igual a las iteraciones permitidas. Se queda con la mejor solución. De esta forma se incorpora una aleatoriedad sobre el algoritmo que hace que este explore de forma aleatoria el espacio de soluciones, evitando mínimos locales.
+
+\begin{algorithm}[htp]
+    \caption{Greedy}
+    \begin{algorithmic}[1]
+        \Procedure{HeurísticaVoraz}{$S$, $num\_swaps$}
+        \State Ordenar vectores en $S$ por norma descendente
+        \State Aplicar $num\_swaps$ intercambios aleatorios en el orden
+        \State $S1 \gets \emptyset$, $S2 \gets \emptyset$
+        \State $sum1 \gets \vec{0}$, $sum2 \gets \vec{0}$
+
+        \For{cada vector $v_i$ en orden modificado}
+        \State $sum1_{temp} \gets sum1 + v_i$
+        \State $sum2_{temp} \gets sum2 + v_i$
+        \State $diff1 \gets \max(|sum1_{temp} - sum2|)$
+        \State $diff2 \gets \max(|sum1 - sum2_{temp}|)$
+
+        \If{$diff1 \leq diff2$}
+        \State $S1 \gets S1 \cup \{v_i\}$
+        \State $sum1 \gets sum1_{temp}$
+        \Else
+        \State $S2 \gets S2 \cup \{v_i\}$
+        \State $sum2 \gets sum2_{temp}$
+        \EndIf
+        \EndFor
+
+        \State \textbf{return} $(S1, S2)$
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[htp]
+    \caption{Iterated Greedy}
+    \begin{algorithmic}[1]
+        \Procedure{HeurísticaIterativa}{$S$, $iteraciones$, $num\_swaps$}
+        \State $mejor\_sol \gets \emptyset$
+        \State $mejor\_valor \gets \infty$
+
+        \For{$i \gets 1$ \textbf{to} $iteraciones$}
+        \State $(S1, S2) \gets \textsc{HeurísticaVoraz}(S, num\_swaps)$
+        \State $valor \gets \textsc{Evaluar}(S1, S2)$
+
+        \If{$valor < mejor\_valor$}
+        \State $mejor\_sol \gets (S1, S2)$
+        \State $mejor\_valor \gets valor$
+        \EndIf
+        \EndFor
+
+        \State \textbf{return} $mejor\_sol$
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+
+\subsection{Búsqueda Local}
+Dado el tipo de problema que se plantea resolver se platea un operador de vecindario de tipo \textbf{intercambio} o \textit{swap}. Este tipo de operador trata de intercambiar vectores entre los subconjuntos definidos de $S_1$ y $S_2$.
+Dado este tipo de operador es posible definir una búsqueda local que vaya intercambiando elementos de $S_1$ a $S_2$ y viceversa, guardando en el camino solo las soluciones que superen el \textit{score} actual.
+
+\begin{algorithm}[htp]
+    \caption{Búsqueda Local}
+    \begin{algorithmic}[1]
+        \Procedure{BúsquedaLocal}{$S$, $max\_iteraciones$}
+        \State $(S1, S2) \gets \textsc{HeurísticaVoraz}(S)$
+        \State $valor\_actual \gets \textsc{Evaluar}(S1, S2)$
+        \State $iteracion \gets 0$
+        \State $mejorado \gets \text{True}$
+
+        \While{$iteracion < max\_iteraciones$ \textbf{y} $mejorado$}
+        \State $mejorado \gets \text{False}$
+        \State $mejor\_solucion \gets (S1, S2)$
+        \State $mejor\_valor \gets valor\_actual$
+
+        \For{cada $i$ en $S1$}
+        \State $S1' \gets S1$ sin el elemento $i$
+        \State $S2' \gets S2$ con el elemento $i$ añadido
+
+        \If{$S1'$ está vacío}
+        \State \textbf{continuar}
+        \EndIf
+
+        \State $valor\_nuevo \gets \textsc{Evaluar}(S1', S2')$
+
+        \If{$valor\_nuevo < mejor\_valor$}
+        \State $mejor\_solucion \gets (S1', S2')$
+        \State $mejor\_valor \gets valor\_nuevo$
+        \State $mejorado \gets \text{True}$
+        \EndIf
+        \EndFor
+
+        \For{cada $j$ en $S2$}
+        \State $S2' \gets S2$ sin el elemento $j$
+        \State $S1' \gets S1$ con el elemento $j$ añadido
+
+        \If{$S2'$ está vacío}
+        \State \textbf{continuar}
+        \EndIf
+
+        \State $valor\_nuevo \gets \textsc{Evaluar}(S1', S2')$
+
+        \If{$valor\_nuevo < mejor\_valor$}
+        \State $mejor\_solucion \gets (S1', S2')$
+        \State $mejor\_valor \gets valor\_nuevo$
+        \State $mejorado \gets \text{True}$
+        \EndIf
+        \EndFor
+
+        \If{$mejorado$}
+        \State $(S1, S2) \gets mejor\_solucion$
+        \State $valor\_actual \gets mejor\_valor$
+        \EndIf
+
+        \State $iteracion \gets iteracion + 1$
+        \EndWhile
+
+        \State \textbf{return} $(S1, S2)$
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+\subsection{Representación para algoritmos genéticos}
+El problema sería facilmente representable con un vector de \textit{bits} $c$ donde cada índice $i$ representa la posición de un vector en el conjunto original $S$ y donde $c_i=0$ significaría que ese vector $i$ está en el subconjunto $S_1$ y $c_i=1$ que ese vector $i$ está en el subconjunto $S_2$:
+\[
+c_i = 
+\begin{cases}
+0, & \text{si el vector } i \text{ está en } S_1, \\
+1, & \text{si el vector } i \text{ está en } S_2.
+\end{cases}
+\]
+
+Para el operador de cruce puede aplicarse un cruce de tipo ``un punto'' o \textit{One-point crossover}, donde dados dos padres $a,b$ se selecciona un punto de corte $j$ y se intercambian las secciones de los cromosomas a partir del punto de corte para generar dos hijos \ref{fig:onepointcrossover}:
+\[
+\text{Hijo}_1 = [a_1, a_2, \dots, a_j, b_{j+1}, b_{j+2}, \dots, b_n],
+\]
+\[
+\text{Hijo}_2 = [b_1, b_2, \dots, b_j, a_{j+1}, a_{j+2}, \dots, a_n],
+\]
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/onepointcrossover.png}
+    \caption{Operador de cruce de un punto para \textbf{GAs}.}
+    \label{fig:onepointcrossover}
+\end{figure}
+
+En cuanto al operador de mutación, se proponela mutación \textit{bit-flip}, donde con una probabilidad baja se invierte el valor de un gen en un cromosoma. Introduce pequeñas variaciones para escapar de óptimos locales. La probabilidad baja asegura que no se perturbe demasiado la estructura de soluciones prometedoras:
+\[
+c_i' = 
+\begin{cases}
+1 - c_i, & \text{con probabilidad } p_m, \\
+c_i, & \text{con probabilidad } 1 - p_m,
+\end{cases}
+\]
+
+\subsubsection{Inicialización}
+La literatura propone multitud de posibilidades a la hora de inicializar la población. Si se utilizase un vector con todo ceros como punto de partida, la exploración del espacio de soluciones podría verse limitada, ya que la búsqueda partiría de una configuración homogénea y potencialmente alejada de soluciones óptimas.
+
+En problemas de optimización combinatoria, es común emplear heurísticas constructivas para generar soluciones iniciales con buena diversidad, por ello el uso de \textit{Greedy} o \textit{Iterated Greedy} podrían ser buenas heurísticas iniciales para inicializar la solución de partida.
+
+También es posible conformar una solución inicial de forma aleatoria, de forma que el algoritmo se beneficiaría más de un punto de partida con mayor posibilidad de exploración, ya que usar heurísticas como \textit{Greedy} podrían afectar a la balanza de exploración y explotación, sesgando la solución haciendo que la población inicial caiga en una zona del espacio concreta.
+
+Por ello se considera que quizá comenzar con un \textit{Iterated Greedy} con un número de iteraciones pequeñas podría ser interesante, ya que este algoritmo incorpora una componente aleatoria (ligera exploración inicial) y además mejora la solución acercándola a zonas del espacio ``prometedoras''. Se le asignan un número de iteraciones bajo para no sesgar demasiado y romper el balance con la exploración y explotación.
 
 \newpage
 \section{Bibliografía}
