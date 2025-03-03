@@ -67,10 +67,10 @@
 \pagestyle{fancyplain}
 \headheight 35pt
 \lhead{Miguel García López}            
-\chead{\textbf{\small Revisión de los Algoritmos Genéticos}}
+\chead{\textbf{\small Genéticos y M2NP}}
 \rhead{Master Ciencia de Datos \\ \today}
 \lfoot{\scriptsize\LaTeX}
-\cfoot{\small Revisión de los Algoritmos Genéticos}
+\cfoot{\small Genéticos y M2NP}
 \rfoot{\small\thepage}
 \headsep 1.5em
 
@@ -80,20 +80,20 @@
 
 \begin{document}
 \begin{titlepage}
-\begin{figure}
-    \vspace{-1.3cm}
-    \begin{center}
-        \includegraphics[width=0.75\textwidth]{img/UGR-Logo.png}
-    \end{center}
-\end{figure}
-\vspace{1.3cm}
-\centering
-\normalfont \normalsize
-\textsc{\textbf{Técnicas de Soft Computing para Aprendizaje y optimización. Redes Neuronales y Metaheurísticas, programación evolutiva y bioinspirada 2024-2025} \\ \vspace{.15cm} Master Ciencia de Datos\\ \vspace{.15cm} Universidad de Granada} \\ [25pt] 
-    \huge Revisión de los Algoritmos Genéticos
+    \begin{figure}
+        \vspace{-1.3cm}
+        \begin{center}
+            \includegraphics[width=0.75\textwidth]{img/UGR-Logo.png}
+        \end{center}
+    \end{figure}
+    \vspace{1.3cm}
+    \centering
+    \normalfont \normalsize
+    \textsc{\textbf{Técnicas de Soft Computing para Aprendizaje y optimización. Redes Neuronales y Metaheurísticas, programación evolutiva y bioinspirada 2024-2025} \\ \vspace{.15cm} Master Ciencia de Datos\\ \vspace{.15cm} Universidad de Granada} \\ [25pt]
+    \huge Revisión de los Algoritmos Genéticos y problema M2NP
 
-\normalfont \normalsize \vspace{.30cm}
-\textsc{Miguel García López}
+    \normalfont \normalsize \vspace{.30cm}
+    \textsc{Miguel García López}
 
 \end{titlepage}
 
@@ -102,11 +102,13 @@
 \newpage
 
 \section{Introducción}
-En esta revisión se va a proceder a explicar qué son los \textbf{algoritmos genéticos}, de dónde vienen y cómo surgen a lo largo del tiempo como una solución bio-inspirada para solucionar problemas de optimización con codificación binaria. Se explicará cómo estos algoritmos surgieron y fueron ``evolucionando" con el tiempo, adaptándose a nuevos problemas y creando variaciones del algoritmo original. 
+En esta revisión se va a proceder a explicar qué son los \textbf{algoritmos genéticos}, de dónde vienen y cómo surgen a lo largo del tiempo como una solución bio-inspirada para solucionar problemas de optimización con codificación binaria. Se explicará cómo estos algoritmos surgieron y fueron ``evolucionando" con el tiempo, adaptándose a nuevos problemas y creando variaciones del algoritmo original.
 
 Se recabará información a través del buscador de \textit{Scopus} para realizar un análisis bibliométrico, con el que se analizará la producción científica y académica y se medirá el impacto, la calidad y la evolución de publicaciones, autores, revistas e instituciones en el área específica de los algoritmos genéticos.
 
 Se explicará, además, el funcionamiento básico del algoritmo genético original y el de algunas de sus variantes e hibridaciones. Para ello se explicarán los operadores que lo conforman así como el \textit{workflow} o procesos que sigue el algoritmo y cómo interactúan los operadores entre sí para hacer funcionar al algoritmo de optimización.
+
+Además, después de la revisión de algoritmos genéticos, se explicará el problema de \textit{Multidimensional Two-way Number Partitioning} o \textbf{M2NP}. Se realizará una búsqueda bibliográfica sobre el problema, se explicarán una serie de soluciones propuestas para resolver este problema, entre ellas \textbf{Greedy}, \textbf{Iterative Greedy}, y se aplicarán y explicarán una serie de operadores de representación así como un algoritmo genético adaptado al problema.
 
 \section{Contexto}
 Los algoritmos genéticos están inspirados en la selección natural y se emplean tanto en problemas de optimización con restricciones como en aquellos sin ellas. Esta metaheurística modifica de manera repetida una población de soluciones individuales, seleccionando soluciones ``padre" que generarán la siguiente generación de soluciones en la siguiente iteración del algoritmo.
@@ -135,34 +137,35 @@ Esos padres son cruzados entre sí mediante el operador de cruce para obtener un
 A partir de ahí, se introducen los hijos en la población, si se pueden introducir, y se vuelve a iterar. La condición de parada puede ser llegar a un valor de \textit{fitness}, condición de tiempo o condición de iteraciones máximas.
 
 \begin{algorithm}
-\caption{Algoritmo Genético con Elitismo}
-\begin{algorithmic}[1]
-\Require Tamaño de población \( N \), tasa de cruce \( C \), tasa de mutación \( M \), porcentaje de elitismo \( E \), condición de terminación
-\Ensure La mejor solución encontrada
-\State Inicializar población aleatoria \( P \) con \( N \) individuos
-\While{no se cumpla la condición de terminación}
-    \State Evaluar fitness de cada individuo en \( P \)
-    \State Ordenar \( P \) de mejor a peor según fitness
-    \State \( P_{\text{elite}} \gets \) primeros \( E \times N \) individuos de \( P \)
-    \State Inicializar \( P_{\text{descendencia}} \gets \emptyset \)
-    \For{$i$ desde 1 hasta \( N $}
+    \caption{Algoritmo Genético con Elitismo}
+    \begin{algorithmic}[1]
+        \Require Tamaño de población \( N \), tasa de cruce \( C \), tasa de mutación \( M \), porcentaje de elitismo \( E \), condición de terminación
+        \Ensure La mejor solución encontrada
+        \State Inicializar población aleatoria \( P \) con \( N \) individuos
+        \While{no se cumpla la condición de terminación}
+        \State Evaluar fitness de cada individuo en \( P \)
+        \State Ordenar \( P \) de mejor a peor según fitness
+        \State \( P_{\text{elite}} \gets \) primeros \( E \times N \) individuos de \( P \)
+        \State Inicializar \( P_{\text{descendencia}} \gets \emptyset \)
+        \For{$i \gets 1$ \textbf{to} \( N \)}
         \State Seleccionar padres \( p_1, p_2 \) de \( P \) usando selección por ruleta/torneo
-        \State \textbf{if} \( \text{rand}() < C \) \textbf{then}
-            \State \( h \gets \text{Cruce}(p_1, p_2) \)
-        \State \textbf{else}
-            \State \( h \gets \) copia de \( p_1 \) o \( p_2 \) (aleatorio)
-        \State \textbf{endif}
-        \State \textbf{if} \( \text{rand}() < M \) \textbf{then}
-            \State \( h \gets \text{Mutación}(h) \)
-        \State \textbf{endif}
+        \If{\( \text{rand}() < C \)}
+        \State \( h \gets \text{Cruce}(p_1, p_2) \)
+        \Else
+        \State \( h \gets \) copia de \( p_1 \) o \( p_2 \) (aleatorio)
+        \EndIf
+        \If{\( \text{rand}() < M \)}
+        \State \( h \gets \text{Mutación}(h) \)
+        \EndIf
         \State Agregar \( h \) a \( P_{\text{descendencia}} \)
-    \EndFor
-    \State Reemplazar los \( E \times N \) peores individuos en \( P_{\text{descendencia}} \) con \( P_{\text{elite}} \)
-    \State \( P \gets P_{\text{descendencia}} \)
-\EndWhile
-\State \Return mejor individuo en \( P \)
-\end{algorithmic}
+        \EndFor
+        \State Reemplazar los \( E \times N \) peores individuos en \( P_{\text{descendencia}} \) con \( P_{\text{elite}} \)
+        \State \( P \gets P_{\text{descendencia}} \)
+        \EndWhile
+        \State \Return mejor individuo en \( P \)
+    \end{algorithmic}
 \end{algorithm}
+
 
 \subsection{Operadores principales}
 Se procede a definir los operadores principales de los algoritmos genéticos, al menos los básicos o más usados, ya que cubrir todos los operadores de todas las variaciones es inabarcable.
@@ -187,13 +190,13 @@ ambos progenitores \cite{DAGDIA2020283}.
 Dados dos padres (los cromosomas) \( P_1 = (p_1^1, p_2^1, \dots, p_n^1) \) y \( P_2 = (p_1^2, p_2^2, \dots, p_n^2) \), se selecciona un punto de cruce \( k \) aleatorio. Los hijos \( H_1 \) y \( H_2 \) se generan como:
 
 \begin{equation}
-H_1 = (p_1^1, p_2^1, \dots, p_k^1, p_{k+1}^2, \dots, p_n^2)
-\label{eq:one_point_h1}
+    H_1 = (p_1^1, p_2^1, \dots, p_k^1, p_{k+1}^2, \dots, p_n^2)
+    \label{eq:one_point_h1}
 \end{equation}
 
 \begin{equation}
-H_2 = (p_1^2, p_2^2, \dots, p_k^2, p_{k+1}^1, \dots, p_n^1)
-\label{eq:one_point_h2}
+    H_2 = (p_1^2, p_2^2, \dots, p_k^2, p_{k+1}^1, \dots, p_n^1)
+    \label{eq:one_point_h2}
 \end{equation}
 
 \textbf{Blend crossover (continuo)}: Dado dos números reales para cada uno de los genes de
@@ -202,25 +205,25 @@ para cada gen que conforme al vector cromosómico \cite{purduelecture}.
 Dados dos padres \( P_1 = (p_1^1, p_2^1, \dots, p_n^1) \) y \( P_2 = (p_1^2, p_2^2, \dots, p_n^2) \), para cada gen \( i \), se calcula un intervalo \( [c_{\text{min}}, c_{\text{max}}] \), donde:
 
 \begin{equation}
-c_{\text{min}} = \text{min}(p_i^1, p_i^2) - \alpha \cdot d
-\label{eq:blx_cmin}
+    c_{\text{min}} = \text{min}(p_i^1, p_i^2) - \alpha \cdot d
+    \label{eq:blx_cmin}
 \end{equation}
 
 \begin{equation}
-c_{\text{max}} = \text{max}(p_i^1, p_i^2) + \alpha \cdot d
-\label{eq:blx_cmax}
+    c_{\text{max}} = \text{max}(p_i^1, p_i^2) + \alpha \cdot d
+    \label{eq:blx_cmax}
 \end{equation}
 
 \begin{equation}
-d = |p_i^1 - p_i^2|
-\label{eq:blx_d}
+    d = |p_i^1 - p_i^2|
+    \label{eq:blx_d}
 \end{equation}
 
 El valor del gen \( i \) en el hijo \( H \) se genera aleatoriamente dentro del intervalo \( [c_{\text{min}}, c_{\text{max}}] \):
 
 \begin{equation}
-H_i = \text{rand}(c_{\text{min}}, c_{\text{max}})
-\label{eq:blx_hi}
+    H_i = \text{rand}(c_{\text{min}}, c_{\text{max}})
+    \label{eq:blx_hi}
 \end{equation}
 
 Por supuesto existen muchos más tipos de cruces tanto para versiones en dominio continuo como en dominio discreto y binario, pero los principales operadores y que más suelen utilizarse son los descritos.
@@ -231,23 +234,23 @@ El operador de mutación tiene como propósito principal favorecer la exploraci�
 \textbf{Mutación binaria}: Este operador básico y clásico consiste en cambiar un \textit{bit} arbitrario de un genotipo o solución de un algoritmo genético binario a su estado inverso dada una probabilidad de mutación \cite{mirjalili2019genetic}.
 
 \begin{equation}
-x_i' = 
-\begin{cases}
-1 - x_i & \text{con probabilidad } p_m, \\
-x_i     & \text{con probabilidad } 1 - p_m.
-\end{cases}
-\label{eq:binary_mutation}
+    x_i' =
+    \begin{cases}
+        1 - x_i & \text{con probabilidad } p_m,     \\
+        x_i     & \text{con probabilidad } 1 - p_m.
+    \end{cases}
+    \label{eq:binary_mutation}
 \end{equation}
 
 \textbf{Mutación continua}: Este tipo de mutación se utiliza especialmente en problemas en los que se busca una exploración más amplia del espacio de búsqueda, ya que la distribución de \textit{Cauchy} tiene colas pesadas y puede generar valores aleatorios alejados del centro con mayor probabilidad en comparación con una distribución normal. La mutación se define como:
 
 \begin{equation}
-m(x_i) = 
-\begin{cases}
-(2r)^{\frac{1}{\eta + 1}} - 1 & \text{si } p \leq 0.5, \\
-1 - (2r)^{\frac{1}{\eta + 1}} & \text{si } p > 0.5,
-\end{cases}
-\label{eq:cauchy_mutation}
+    m(x_i) =
+    \begin{cases}
+        (2r)^{\frac{1}{\eta + 1}} - 1 & \text{si } p \leq 0.5, \\
+        1 - (2r)^{\frac{1}{\eta + 1}} & \text{si } p > 0.5,
+    \end{cases}
+    \label{eq:cauchy_mutation}
 \end{equation}
 
 donde:
@@ -298,27 +301,27 @@ Estos datos han sido obtenido mediante el buscador de \textit{Scopus}. Utilizand
 A partir de los artículos más citados en Scopus relacionados con Genetic Algorithms (\textbf{GAs}), los temas más candentes parecen estar relacionados con:
 \begin{enumerate}
     \item \textbf{Optimización y mejora de algoritmos genéticos}
-    \begin{itemize}
-        \item Revisión del estado del arte de los \textbf{GAs} y sus mejoras a lo largo del tiempo.
-        \item Optimización de hiperparámetros en modelos de aprendizaje automático, clave para la implementación eficiente de \textbf{GAs}.
-    \end{itemize}
+          \begin{itemize}
+              \item Revisión del estado del arte de los \textbf{GAs} y sus mejoras a lo largo del tiempo.
+              \item Optimización de hiperparámetros en modelos de aprendizaje automático, clave para la implementación eficiente de \textbf{GAs}.
+          \end{itemize}
 
     \item \textbf{Metaheurísticas bioinspiradas y nuevas variantes}
-    \begin{itemize}
-        \item Desarrollo de nuevos algoritmos de optimización como \textit{Marine Predators Algorithm}, \textit{Equilibrium Optimizer} y \textit{Arithmetic Optimization Algorithm}.
-        \item Técnicas para mejorar la convergencia y evitar estancamientos en óptimos locales.
-    \end{itemize}
+          \begin{itemize}
+              \item Desarrollo de nuevos algoritmos de optimización como \textit{Marine Predators Algorithm}, \textit{Equilibrium Optimizer} y \textit{Arithmetic Optimization Algorithm}.
+              \item Técnicas para mejorar la convergencia y evitar estancamientos en óptimos locales.
+          \end{itemize}
 
     \item \textbf{Aplicaciones en biología y bioinformática}
-    \begin{itemize}
-        \item Uso de \textbf{GAs} para predecir estructuras de proteínas con aprendizaje profundo.
-        \item Aplicaciones en la clasificación evolutiva de sistemas \textit{CRISPR-Cas}.
-    \end{itemize}
+          \begin{itemize}
+              \item Uso de \textbf{GAs} para predecir estructuras de proteínas con aprendizaje profundo.
+              \item Aplicaciones en la clasificación evolutiva de sistemas \textit{CRISPR-Cas}.
+          \end{itemize}
 
     \item \textbf{Optimización multiobjetivo y herramientas avanzadas}
-    \begin{itemize}
-        \item Desarrollo de herramientas como \textit{Pymoo}, una biblioteca en Python para optimización multiobjetivo con \textbf{GAs} y otras metaheurísticas.
-    \end{itemize}
+          \begin{itemize}
+              \item Desarrollo de herramientas como \textit{Pymoo}, una biblioteca en Python para optimización multiobjetivo con \textbf{GAs} y otras metaheurísticas.
+          \end{itemize}
 \end{enumerate}
 
 \section{Hibridaciones}
@@ -350,7 +353,7 @@ Un algoritmo actúa como componente de otro, integrándose en su funcionamiento 
 \subsubsection{Integrativas \textit{teamwork}}
 Un metaheurística se incrusta dentro de otra como componente clave.
 \begin{enumerate}
-    \item Ejemplo $1$: Algoritmos meméticos \cite{memetics}, donde un \textbf{GA} se combina con búsqueda local. 
+    \item Ejemplo $1$: Algoritmos meméticos \cite{memetics}, donde un \textbf{GA} se combina con búsqueda local.
     \item Ejemplo $2$: Micro-GA ($\mu$\textbf{GA}) \cite{930311}, usado como operador de refinamiento. Un \textbf{GA} con población pequeña (ej. $5$ individuos) mejora soluciones específicas del \textbf{GA} principal, aprovechando su capacidad para seguir crestas en espacios complejos.
 \end{enumerate}
 
@@ -363,6 +366,27 @@ Un \textbf{GA} realiza funciones específicas dentro de otra metaheurística dom
 \end{enumerate}
 
 Las hibridaciones de algoritmos genéticos representan un campo en constante evolución dentro de la computación evolutiva y la optimización metaheurística. El éxito demostrado por estas técnicas híbridas ha llevado a un creciente interés en desarrollar nuevas combinaciones y estrategias que puedan abordar problemas cada vez más complejos. La tendencia actual apunta hacia la integración con técnicas de aprendizaje profundo y otros métodos de inteligencia artificial.
+
+\section{Problema Multidimensional Two-way Number Partitioning}
+El problema \textbf{M2NP} es un problema de optimización binario que consiste en partir un conjunto de vectores enteros $S$ en dos grupos disjuntos de forma que se minimice la máxima diferencia entre la suma por coordenadas de los elementos de cada grupo. Específicamente, dado un conjunto de $n$ vectores de dimensión $d$, $S=\{w_i|w_i=(w_{i1}, w_{i2},...,w_{id}), i=1,...,d)\}$, el objetivo de este problema consiste en repartir los elementos de $S$ en dos conjuntos $S_1, S_2$ tal que $S_1\cap S_2=\varnothing$ y $S_1\cup S_2$ y $t$ es mínimo, siendo $t$:
+\begin{equation}
+    t= max\{|\sum_{i\in S_1}w_{ij}-\sum_{i\in S_2}w_{ij}|:j=1,...,d\}
+\end{equation}
+
+\subsection{Revisión bibliográfica}
+Se han estudiado diversas aproximaciones para resolver el problema \textbf{M2NP}. 
+
+Los primeros trabajos, como el de \cite{KOJIC20102302} en $2010$, trataron de formular el problema como uno de programación lineal. En este trabajo se demuestra que este problema, una generalización del problema clásico de partición de números, es \textbf{NP-difícil} y más complejo que su versión unidimensional. Se proponen restricciones y una formulación matemática para resolverlo con solvers de \textbf{ILP} como \textbf{CPLEX}, pero los resultados experimentales muestran que el problema sigue siendo difícil de resolver para dimensiones altas. Se sugiere el uso de métodos exactos o heurísticos como futuras líneas de investigación.
+
+En \cite{POP20139191}, de $2013$, se presenta un algoritmo memético para resolver el problema. La propuesta combina un algoritmo genético con una búsqueda local, mejorando la calidad y el tiempo de solución en comparación con el método basado en programación entera mixta con \textbf{CPLEX}. Los resultados experimentales muestran que el enfoque memético supera a \textbf{CPLEX} y a los algoritmos genéticos puros (\cite{10.1007/978-3-642-44973-4_10}) en términos de eficiencia y precisión.
+
+Más tarde en $2014$, el trabajo \cite{KRATICA201459} presenta dos enfoques metaheurísticos, \textit{Variable Neighborhood Search} (\textbf{VNS}) y \textit{Electromagnetism-like} (\textbf{EM}), para resolver el problema. Ambos métodos utilizan procedimientos de búsqueda local y se comparan con resultados de la literatura, demostrando que superan a otros métodos existentes, con \textbf{EM} mostrando un ligero mejor rendimiento general.
+
+Tres años después, en \cite{RODRIGUEZ2017243} se propone un nuevo método para resolver el problema de \textbf{M2NP} combinando \textbf{GRASP} (\textit{Greedy Randomized Adaptive Search Procedure}) con una variante de \textit{Path Relinking} llamada  \textit{Exterior Path Relinking} (\textbf{ePR}). Además, se introduce un nuevo procedimiento de búsqueda local restringida (\textbf{RFI}) que mejora la eficiencia del algoritmo. Los experimentos computacionales muestran que esta combinación supera a los métodos existentes, como \textbf{VNS} y CPLEX, especialmente en instancias grandes. El enfoque propuesto aprovecha la construcción heurística, la búsqueda local restringida y el esquema de \textit{Path Relinking} para obtener soluciones de alta calidad en tiempos razonables.
+
+Se publican varios artículos en relación al problema, donde el último que parece realizar mejoras sobre en el \textit{estado del arte} es de $2021$ en \cite{SANTUCCI2021114938}, donde se presenta \textbf{IMADEB}, un algoritmo memético de evolución diferencial algebraica mejorado para resolver el problema \textbf{M2NP}. \textbf{IMADEB} supera a su predecesor \textbf{MADEB} y a \textbf{GRASP+ePR} al utilizar una representación de bits no redundante, un operador de búsqueda local optimizado y una mutación diferencial adaptativa basada en vuelos de \textit{Lévy}, logrando $145$ nuevas soluciones óptimas y estableciendo un nuevo estándar en el campo.
+
+\subsection{Greedy y Iterated Greey}
 
 \newpage
 \section{Bibliografía}

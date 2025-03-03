@@ -1,6 +1,5 @@
 import random
-from ast import Tuple
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -11,7 +10,7 @@ def greedy_heuristic(n: np.ndarray, m: int) -> List[int]:
     Implements a greedy solution for the Maximum Diversity Problem.
 
     Args:
-    n: 1D NumPy array representing the diversity values of elements.
+    n: 1D NumPy array containing the elements.
     m: Number of elements to select.
 
     Returns:
@@ -39,7 +38,7 @@ def local_search(n: np.ndarray, m: int, max_iterations: int = 100) -> List[int]:
     """
     Implements a local search for the Maximum Diversity Problem.
     Args:
-        n: 1D NumPy array representing the diversity values of elements.
+        n: 1D NumPy array containing the elements.
         m: Number of elements to select.
         max_iterations: Maximum number of iterations for local search.
     Returns:
@@ -118,8 +117,8 @@ def run_diversity_experiment(
         pd.DataFrame: Results of all experiments
     """
     # Set random seeds for reproducibility
-    np.random.seed(seed)
-    random.seed(seed)
+    #np.random.seed(seed)
+    #random.seed(seed)
 
     # Create a DataFrame to store results
     results = []
@@ -183,6 +182,5 @@ def run_diversity_experiment(
     return df_results
 
 
-# Example usage
 if __name__ == "__main__":
     results = run_diversity_experiment()
