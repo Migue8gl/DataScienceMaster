@@ -1,0 +1,372 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[a4paper, top=1.2in, bottom=1.4in, left=1in, right=1in]{geometry}
+\usepackage{graphicx} % Required for inserting images
+\graphicspath{ {./img/} }
+\usepackage[spanish]{babel}
+\usepackage{float}
+\usepackage{fancyhdr}
+\setlength{\parskip}{1em}  % Adds space between paragraphs (1em)
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{subcaption}
+\newcommand{\tikzmark}[1]{\tikz[baseline,remember picture] \coordinate (#1) {};}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shadows,arrows.meta} % For adding edges label
+\usetikzlibrary{calc}
+\usepackage{eso-pic}
+\usepackage[backend=biber, defernumbers=true, citestyle=numeric-comp, bibstyle=ieee, sorting=none]{biblatex}
+\addbibresource{bibliography/bibliography.bib}
+\DeclareBibliographyCategory{cited}
+\AtEveryCitekey{\addtocategory{cited}{\thefield{entrykey}}}
+% Configurando BibLaTeX
+\DefineBibliographyStrings{spanish}{
+  url = {URL},
+  andothers={et ~al\adddot}
+}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\AddToShipoutPictureBG{%
+\begin{tikzpicture}[remember picture, overlay]
+\node[opacity=.15, inner sep=0pt]
+    at(current page.center){\includegraphics[scale=1.5]{img/logo-ugr2.png}};
+\end{tikzpicture}%
+}
+
+\title{Clasificación de texto jerarárquica.}
+\author{Miguel García López}
+\date{Febrero 2025}
+
+\pagestyle{fancyplain}
+\headheight 35pt
+\lhead{Miguel García López}            
+\chead{\textbf{\small Hierarchical Classification}}
+\rhead{Master Ciencia de Datos \\ \today}
+\lfoot{\scriptsize\LaTeX}
+\cfoot{\small Técnicas de clasificación de clases con relaciones jerárquicas}
+\rfoot{\small\thepage}
+\headsep 1.5em
+
+\author{Miguel García López} % Nombre y apellidos
+
+\date{\normalsize\today} % Incluye la fecha actual
+
+\begin{document}
+\begin{titlepage}
+    \begin{figure}
+        \vspace{-1.3cm}
+        \begin{center}
+            \includegraphics[width=0.75\textwidth]{img/UGR-Logo.png}
+        \end{center}
+    \end{figure}
+    \vspace{1.3cm}
+    \centering
+    \normalfont \normalsize
+    \textsc{\textbf{Clasificación de texto jerarárquica 2024-2025} \\ \vspace{.15cm} Master Ciencia de Datos\\ \vspace{.15cm} Universidad de Granada} \\ [25pt]
+    \huge Clasificación Jerárquica de Textos
+
+    \normalfont \normalsize \vspace{.30cm}
+    \textsc{Miguel García López}
+
+\end{titlepage}
+
+\tableofcontents
+\listoffigures
+\listoftables
+\newpage
+
+\section{Introducción}
+La clasificación de textos es una de las tareas fundamentales en el procesamiento del lenguaje natural (PLN), permitiendo la asignación automática de etiquetas a documentos en función de su contenido. Tradicionalmente, los enfoques de clasificación han tratado las etiquetas de forma independiente, aplicando modelos \textit{flat} que ignoran las relaciones inherentes entre ellas. Sin embargo, en muchos contextos reales, las etiquetas están organizadas de forma jerárquica, lo que implica relaciones de dependencia y estructuras taxonómicas complejas.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.7\linewidth]{img/htc.png}
+    \caption{Ejemplo de clasificación jerarárquica de texto.}
+    \label{fig:hierarchical_text_class}
+\end{figure}
+
+La \textbf{clasificación jerárquica de textos} (HTC, por sus siglas en inglés) surge para abordar esta limitación, aprovechando la estructura de árbol o de grafo que organiza las etiquetas. Este enfoque no solo permite capturar la relación entre categorías padre e hijo, sino que también facilita la generalización de modelos frente a nuevas clases derivadas de categorías pre-existentes.
+
+En este documento se experimenta con tecnologías como \textbf{PyTorch} para abordar este problemas y ahondar en la arquitectura de redes como \textit{LSTM} para la clasificación de texto. Además se implementan arquitecturas multi-modelo específicamente propuestos para abordar este tipo de problemas jerárquicos.
+
+\section{Estructura del problema}
+
+Sea \( D = \{d_1, d_2, \dots, d_n\} \) un conjunto de documentos de texto, donde cada \( d_i \) representa un documento individual.
+
+Sea \( L = \{l_1, l_2, \dots, l_m\} \) un conjunto de etiquetas organizadas en una estructura jerárquica, que puede representarse como un árbol o un grafo.
+
+La relación jerárquica entre las etiquetas se define mediante una función \( H: L \times L \rightarrow \{0, 1\} \), donde:
+\[
+    H(l_i, l_j) =
+    \begin{cases}
+        1, & \text{si } l_i \text{ es un ancestro de } l_j \text{ en la jerarquía}, \\
+        0, & \text{en caso contrario}.
+    \end{cases}
+\]
+
+El objetivo es encontrar una función de clasificación que asigne a cada documento \( d_i \) un conjunto de etiquetas \( L_i \subseteq L \), respetando la jerarquía de etiquetas. Es decir, no se puede clasificar un documento $d_i$ como ``categoría 2'' si esta no es hija de ``categoria 1'' y previamente ese documento fue clasificado con esa etiqueta, es una discrepancia estructural con el grafo de jerarquía.
+
+\section{Tipos de clasificadores}
+\subsection{Flat}
+En este enfoque se ignora la jerarquía y se trata cada etiqueta de forma independiente, reduciendo el problema a una clasificación tradicional (ya sea multicategoría o \textit{multilabel}). Normalmente, solo se consideran los nodos hoja, de modo que se pierde la información estructural de la jerarquía.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.3\linewidth]{img/htc_flat.png}
+    \caption{Arquitectura de clasificadores plana.}
+    \label{fig:htc_flat}
+\end{figure}
+
+\subsection{Local Classifiers}
+Estos métodos dividen el problema en subproblemas que se ajustan a la estructura jerárquica. Se pueden identificar tres subtipos:
+\begin{itemize}
+    \item \textbf{Local por Nodo:} Se entrena un clasificador binario para cada nodo de la jerarquía, tratando cada etiqueta de forma individual.
+    \item \textbf{Local por Nivel:} Se entrena un clasificador para cada nivel de la jerarquía, aprovechando la información compartida por las etiquetas del mismo nivel.
+    \item \textbf{Local por Padre:} Cada clasificador asociado a un nodo padre decide entre sus hijos, permitiendo capturar la dependencia directa entre categorías.
+\end{itemize}
+
+\begin{figure}[htp]
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{img/htc_node.png}
+        \caption{Clasificación por nodo.}
+        \label{fig:htc_node}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{img/htc_level.png}
+        \caption{Clasificación por nivel.}
+        \label{fig:htc_level}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{img/htc_father.png}
+        \caption{Clasificación por padre.}
+        \label{fig:htc_father}
+    \end{subfigure}
+    \caption{Diferentes arquitecturas de clasificación jerárquica.}
+    \label{fig:htc_methods}
+\end{figure}
+
+\subsection{Global Classifiers}
+En este enfoque se utiliza un único modelo que integra de forma global la estructura jerárquica de las etiquetas. Este modelo considera toda la información estructural durante el proceso de entrenamiento y la inferencia, lo que puede resultar en una mejor generalización y coherencia en las predicciones.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.3\linewidth]{img/htc_global.png}
+    \caption{Clasificador global.}
+    \label{fig:htc_global}
+\end{figure}
+
+\section{Dataset}
+El conjunto de datos \textbf{Hierarchical Text Classification}, disponible en \textit{Kaggle}, proporciona información estructurada para la clasificación jerárquica de textos, basada en reseñas de productos de \textit{Amazon}. Su objetivo es facilitar el desarrollo y la comparación de métodos de clasificación de texto que aprovechen la estructura jerárquica de las etiquetas.
+
+Este dataset contiene reseñas de productos de Amazon organizadas en una jerarquía de tres niveles de categorías:
+
+\begin{itemize}
+    \item \textbf{Nivel 1:} 6 categorías principales (ej. salud y cuidado personal, juguetes y juegos, belleza, entre otros).
+    \item \textbf{Nivel 2:} 64 subcategorías derivadas de las clases principales.
+    \item \textbf{Nivel 3:} 510 categorías más específicas dentro de cada subcategoría.
+\end{itemize}
+
+Se presentan tres archivos de datos:
+
+\begin{itemize}
+    \item \textbf{train\_40k.csv:} Conjunto de entrenamiento con 40,000 reseñas de productos.
+    \item \textbf{valid\_10k.csv:} Conjunto de validación con 10,000 reseñas.
+\end{itemize}
+
+Cada fila del conjunto de datos contiene:
+
+\begin{itemize}
+    \item ID del producto.
+    \item Título de la reseña.
+    \item ID del usuario.
+    \item Información sobre la utilidad de la reseña.
+    \item Puntaje de calificación otorgado por otros usuarios.
+    \item Fecha de la reseña.
+    \item Texto completo de la reseña.
+    \item Etiquetas de clasificación para los niveles 1, 2 y 3.
+\end{itemize}
+
+
+\begin{figure}[htp]
+    \centering
+    \begin{subfigure}[b]{0.6\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{img/cat1_dist_amazon.png}
+        \caption{Distribución de etiquetas para la clase 1.}
+        \label{fig:cat1_amazon}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.6\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{img/cat2_dist_amazon.png}
+        \caption{Distribución de etiquetas para la clase 2.}
+        \label{fig:cat2_amazon}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.6\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{img/cat3_dist_amazon.png}
+        \caption{Distribución de etiquetas para la clase 3.}
+        \label{fig:cat3_amazon}
+    \end{subfigure}
+    \caption{Distribuciones de las etiquetas en \textit{dataset} de \textit{Kaggle}.}
+    \label{fig:kaggle_amazon}
+\end{figure}
+
+\subsection{Posibles Enfoques de Clasificación}
+
+El dataset permite explorar distintas estrategias de clasificación jerárquica, entre ellas:
+
+\begin{itemize}
+    \item \textbf{Clasificación plana:} Concatenación de los nombres de las clases (ej. "nivel1/nivel2/nivel3") y entrenamiento de un modelo multicategoría estándar.
+    \item \textbf{Clasificación jerárquica por padre:} Uso de modelos en cascada donde primero se predice la clase de nivel 1, luego la de nivel 2 y finalmente la de nivel 3.
+    \item \textbf{Enfoques avanzados:} Modelos secuencia-a-secuencia (\textit{seq2seq}) en los que la entrada es la reseña y la salida es la secuencia de etiquetas jerárquicas.
+\end{itemize}
+
+En este documento se detallarán los experimentos llevados a cabo para realizar clasificación por padre y clasificación por nivel.
+
+\subsection{Dataset sintético}
+También se ha producido un \textit{dataset} sintético para la realización de pruebas iniciales. Este ha sido generado totalmente por \textit{ChatGPT} y contiene tres niveles de jerarquía.
+
+Este \textit{dataset} contiene información sobre diversos temas científicos clasificados en tres niveles: dominio, subcampo y especialización. Cada fila proporciona un fragmento de texto explicativo sobre un concepto dentro de un área específica del conocimiento.
+Las columnas son:
+\begin{itemize}
+    \item text: Explicación detallada de un concepto científico.
+    \item domain: Campo general de estudio (Ej. Física, Química, Ciencias de la Tierra).
+    \item subfield: Subcategoría dentro del dominio (Ej. Mecánica Clásica, Termodinámica, Química Física).
+\end{itemize}
+
+\begin{figure}[htp]
+    \centering
+    \begin{subfigure}[b]{0.6\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{img/cat1_dist.png}
+        \caption{Distribución de etiquetas para la clase 1.}
+        \label{fig:cat1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.6\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{img/cat2_dist.png}
+        \caption{Distribución de etiquetas para la clase 2.}
+        \label{fig:cat2}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.6\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{img/cat3_dist.png}
+        \caption{Distribución de etiquetas para la clase 3.}
+        \label{fig:cat3}
+    \end{subfigure}
+    \caption{Distribuciones de las etiquetas en el \textit{dataset} sintético.}
+    \label{fig:synthetic}
+\end{figure}
+
+\section{Implementaciones}
+\subsection{Naive Bayes}
+Existen múltiples enfoques para abordar el problema de \textit{HTC}, y uno de los métodos más simples y eficientes es el clasificador \textbf{Naïve Bayes}, que se basa en la aplicación del Teorema de Bayes con la suposición de independencia condicional entre características.
+
+Este tipo de clasificador, junto a un pre-procesamiento adecuado, es un potente clasificador de texto para tareas simples. Por ello se propone como algoritmo base como ejemplo para demostrar la potencia de las arquitecturas propuestas.
+
+\subsection{Resultados de Naive Bayes}
+
+\begin{table}[htp]
+    \centering
+    \begin{tabular}{lcccc}
+        \toprule
+        \textbf{Algoritmo} & \textbf{Métrica}   & \textbf{cat1} & \textbf{cat2} & \textbf{cat3} \\
+        \midrule
+        \textbf{NB per parent}  & Accuracy  & 0.6641  & 0.3510  & 0.2186  \\
+                                & F1        & 0.6354  & 0.3139  & 0.1715  \\
+                                & Recall    & 0.6641  & 0.3510  & 0.2186  \\
+                                & Precision & 0.7758  & 0.4943  & 0.2636  \\
+        \midrule
+        \textbf{NB per level}   & Accuracy  & 0.6641  & 0.2816  & 0.1010  \\
+                                & F1        & 0.6354  & 0.2232  & 0.0613  \\
+                                & Recall    & 0.6641  & 0.2816  & 0.1010  \\
+                                & Precision & 0.7758  & 0.4955  & 0.2282  \\
+        \bottomrule
+    \end{tabular}
+    \caption{Resultados de Naive Bayes por categoría y métrica}
+    \label{tab:nb-results}
+\end{table}
+
+
+En la tabla \ref{tab:nb-results} se pueden observar los resultados obtenidos por cada arquitectura. Obviamente los nodos raíz parten de la misma base en ambos y por ello obtienen los mismos resultados. La mejora empieza a observarse a partir del segundo nivel. La categoría dos mejora casi un $10\%$ en todas las métricas. Esto se debe a que el clasificador de la primera categoría es más fácil (hay menor número de clases), por lo que tiene mayor porcentaje de acierto. De esta manera, al filtrar las clases posibles para la segunda etiqueta con una primera predicción de la etiqueta padre, las clases predichas se reducen, los modelos de ese nivel son menos complejos y la clasificación mejora. En el nivel tres es donde de verdad se alcanza una mejora muy sustantiva.
+
+\subsection{LSTM}
+Las redes neuronales de memoria a corto y largo plazo (\textit{Long Short-Term Memory}, \textit{LSTM}) son un tipo de red neuronal recurrente (\textit{Recurrent Neural Network}, RNN) diseñadas para manejar secuencias de datos. Su capacidad para capturar dependencias a largo plazo en los textos las hace especialmente adecuadas para tareas de clasificación de textos, incluyendo la clasificación jerárquica de textos (\textit{HTC}).
+
+A diferencia de los métodos tradicionales como \textit{Naïve Bayes}, que tratan las palabras de manera independiente, \textit{LSTM} mantiene un estado interno que le permite recordar información relevante en la secuencia, lo que ayuda a mejorar la clasificación al considerar el contexto del texto completo.
+
+De igual forma que con \textit{Naïve Bayes}, se realizarán modelos basados en arquitecturas \textit{local per level} y \textit{local per parent} y se compararán los resultados.
+
+Además se aprovecha para implementar una red sencilla basada en \textit{PyTorch} y aprender el \textit{framework}.
+
+\subsection{Resultados de LSTM}
+
+\begin{table}[htp]
+    \centering
+    \begin{tabular}{lcccc}
+        \toprule
+        \textbf{Algoritmo} & \textbf{Métrica}   & \textbf{cat1} & \textbf{cat2} & \textbf{cat3} \\
+        \midrule
+        \textbf{LSTM per parent}  & Accuracy  & 0.6950  & 0.4253  & 0.2969  \\
+                                   & F1        & 0.6600  & 0.393  & 0.2526  \\
+                                   & Recall    & 0.6950  & 0.4208  & 0.2940  \\
+                                   & Precision & 0.8000  & 0.5900  & 0.3270  \\
+        \midrule
+        \textbf{LSTM per level}   & Accuracy  & 0.6950  & 0.3500  & 0.1842  \\
+                                   & F1        & 0.6600  & 0.3800  & 0.1400  \\
+                                   & Recall    & 0.6950  & 0.3591  & 0.1816  \\
+                                   & Precision & 0.8000  & 0.5702  & 0.2900  \\
+        \bottomrule
+    \end{tabular}
+    \caption{Resultados de LSTM por categoría y métrica}
+    \label{tab:lstm-results}
+\end{table}
+En la tabla \ref{tab:lstm-results} se presentan los resultados de dos variantes del algoritmo LSTM: \textit{LSTM-per-parent} y \textit{LSTM-per-level}, evaluados en tres categorías distintas (cat1, cat2, cat3) a través de varias métricas: precisión (Accuracy), F1, recall y precisión (Precision). Como pasaba con \textit{Naïve Bayes}, en la primera categoría (cat1) los valores de las métricas son prácticamente idénticos. En \textit{LSTM-per-parent}, la segunda categoría (cat2) presenta un rendimiento significativamente superior en comparación con \textit{LSTM-per-level}, especialmente en las métricas de F1 y precisión. Esto sugiere que al considerar la etiqueta padre, el modelo puede filtrar mejor las posibles clases, mejorando el rendimiento en categorías más complejas. La tercera categoría (cat3), aunque con menores mejoras, sigue mostrando un patrón similar, con \textit{LSTM-per-parent} superando a \textit{LSTM-per-level}, lo que resalta la importancia del modelo en la predicción de categorías más difíciles.
+
+\section{Conclusión}
+La clasificación jerárquica de texto (\textit{HTC}) es un enfoque esencial para abordar tareas de clasificación cuando las etiquetas poseen una estructura organizativa jerárquica, como ocurre en diversos dominios, desde la categorización de productos hasta la clasificación de contenido educativo. Este modelo permite mantener la coherencia entre las categorías padre e hijo, lo que es vital para evitar inconsistencias en las predicciones.
+
+En este contexto, los clasificadores pueden adoptar diferentes enfoques: \textit{flat}, donde se ignora la jerarquía; local classifiers, que dividen el problema en subproblemas a nivel de nodo, nivel o padre; y global classifiers, que toman en cuenta toda la jerarquía de manera integrada. Cada enfoque tiene sus ventajas y desventajas dependiendo del tipo de problema y la estructura de las etiquetas.
+
+El uso de redes neuronales y técnicas como LSTM, junto con plataformas como PyTorch, permite implementar soluciones eficientes para el procesamiento de textos jerárquicos. La experimentación con estos métodos, utilizando datasets como el proporcionado por Kaggle, facilita el desarrollo de modelos que no solo son precisos, sino también capaces de generalizar y manejar estructuras complejas de etiquetas.
+
+En resumen, la clasificación jerárquica de textos presenta un desafío técnico importante, pero ofrece una solución robusta para tareas con relaciones intrínsecas entre las etiquetas, mejorando la precisión y coherencia en las predicciones de modelos de clasificación.
+
+\end{document}

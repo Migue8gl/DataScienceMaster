@@ -1,0 +1,352 @@
+{
+  "categories": {
+    "Chemistry": {
+      "subfields": {
+        "Organic Chemistry": {
+          "specializations": [
+            "Synthetic organic chemistry",
+            "Medicinal chemistry",
+            "Organometallic chemistry",
+            "Natural products chemistry",
+            "Polymer chemistry",
+            "Supramolecular chemistry",
+            "Photochemistry",
+            "Stereochemistry",
+            "Physical organic chemistry",
+            "Green chemistry",
+            "Computational organic chemistry",
+            "Peptide chemistry"
+          ]
+        },
+        "Inorganic Chemistry": {
+          "specializations": [
+            "Coordination chemistry",
+            "Bioinorganic chemistry",
+            "Organometallic chemistry",
+            "Solid-state chemistry",
+            "Supramolecular chemistry",
+            "Cluster chemistry",
+            "Materials chemistry",
+            "Nanochemistry",
+            "Synthetic inorganic chemistry",
+            "Lanthanide chemistry",
+            "Actinide chemistry",
+            "Transition metal chemistry"
+          ]
+        },
+        "Analytical Chemistry": {
+          "specializations": [
+            "Chromatography",
+            "Spectroscopy",
+            "Mass spectrometry",
+            "Electroanalytical methods",
+            "Environmental analysis",
+            "Forensic analysis",
+            "Bioanalytical chemistry",
+            "Thermal analysis",
+            "Chemometrics",
+            "Quality control",
+            "Microscopy techniques",
+            "Sensor technology"
+          ]
+        },
+        "Physical Chemistry": {
+          "specializations": [
+            "Thermodynamics",
+            "Quantum chemistry",
+            "Kinetics",
+            "Surface chemistry",
+            "Spectroscopy",
+            "Statistical mechanics",
+            "Electrochemistry",
+            "Photochemistry",
+            "Solid-state chemistry",
+            "Computational chemistry",
+            "Molecular dynamics",
+            "Biophysical chemistry"
+          ]
+        },
+        "Biochemistry": {
+          "specializations": [
+            "Enzymology",
+            "Structural biology",
+            "Metabolomics",
+            "Proteomics",
+            "Genetic engineering",
+            "Lipid biochemistry",
+            "Glycobiology",
+            "Bioinformatics",
+            "Molecular biology",
+            "Signal transduction",
+            "Neurochemistry",
+            "Immunology"
+          ]
+        },
+        "Environmental Chemistry": {
+          "specializations": [
+            "Atmospheric chemistry",
+            "Aquatic chemistry",
+            "Soil chemistry",
+            "Environmental toxicology",
+            "Waste management and remediation",
+            "Environmental biotechnology",
+            "Environmental monitoring and analysis",
+            "Geochemistry",
+            "Green chemistry",
+            "Chemical ecology",
+            "Environmental policy and regulation",
+            "Sustainable chemistry"
+          ]
+        },
+        "Theoretical Chemistry": {
+          "specializations": [
+            "Quantum mechanics",
+            "Molecular modeling",
+            "Computational chemistry",
+            "Statistical mechanics",
+            "Density functional theory",
+            "Molecular dynamics",
+            "Theoretical organic chemistry",
+            "Theoretical inorganic chemistry",
+            "Chemical kinetics",
+            "Reaction mechanism modeling",
+            "Electronic structure theory",
+            "Monte Carlo simulations"
+          ]
+        }
+      }
+    },
+    "Physics": {
+      "subfields": {
+        "Classical Mechanics": {
+          "specializations": [
+            "Newtonian mechanics",
+            "Lagrangian mechanics",
+            "Hamiltonian mechanics",
+            "Celestial mechanics",
+            "Fluid dynamics",
+            "Rigid body dynamics",
+            "Continuum mechanics",
+            "Analytical mechanics",
+            "Perturbation methods",
+            "Chaos theory",
+            "Acoustics",
+            "Biomechanics"
+          ]
+        },
+        "Electromagnetism": {
+          "specializations": [
+            "Electrostatics",
+            "Magnetostatics",
+            "Electrodynamics",
+            "Computational electromagnetism",
+            "Plasma physics",
+            "Optics",
+            "Quantum electrodynamics",
+            "Superconductivity",
+            "Electromagnetic theory",
+            "Microwave engineering",
+            "Antenna theory",
+            "Electromagnetic compatibility"
+          ]
+        },
+        "Thermodynamics": {
+          "specializations": [
+            "Statistical thermodynamics",
+            "Chemical thermodynamics",
+            "Equilibrium thermodynamics",
+            "Non-equilibrium thermodynamics",
+            "Classical thermodynamics",
+            "Heat transfer",
+            "Phase transitions",
+            "Thermoeconomics",
+            "Cryogenics",
+            "Psychrometrics",
+            "Renewable energy",
+            "Thermal analysis"
+          ]
+        },
+        "Quantum Mechanics": {
+          "specializations": [
+            "Quantum field theory",
+            "Quantum computation",
+            "Quantum entanglement",
+            "Quantum cryptography",
+            "Quantum tunneling",
+            "Quantum statistical mechanics",
+            "Many-body theory",
+            "Non-relativistic quantum mechanics",
+            "Scattering theory",
+            "Quantum optics",
+            "Quantum gravity",
+            "Quantum information theory"
+          ]
+        },
+        "Relativity": {
+          "specializations": [
+            "General relativity",
+            "Special relativity",
+            "Cosmology",
+            "Gravitational waves",
+            "Black hole physics",
+            "Relativistic astrophysics",
+            "Numerical relativity",
+            "Theoretical relativity",
+            "Experimental tests of relativity",
+            "Relativistic fluid dynamics",
+            "Space-time symmetries",
+            "Compact objects"
+          ]
+        },
+        "Statistical Mechanics": {
+          "specializations": [
+            "Equilibrium statistical mechanics",
+            "Non-equilibrium statistical mechanics",
+            "Computational statistical mechanics",
+            "Kinetic theory",
+            "Monte Carlo simulation",
+            "Renormalization group",
+            "Phase transition theory",
+            "Critical phenomena",
+            "Lattice models",
+            "Percolation theory",
+            "Fluctuation phenomena",
+            "Polymer physics"
+          ]
+        },
+        "Nuclear Physics": {
+          "specializations": [
+            "Nuclear structure",
+            "Nuclear reactions",
+            "Radioactivity",
+            "Nuclear astrophysics",
+            "Particle physics",
+            "Quantum chromodynamics",
+            "Nuclear medicine",
+            "Nuclear engineering",
+            "Heavy ion physics",
+            "Neutron physics",
+            "Nuclear instrumentation",
+            "Nuclear safety"
+          ]
+        }
+      }
+    },
+    "Earth Science": {
+      "subfields": {
+        "Geology": {
+          "specializations": [
+            "Mineralogy",
+            "Petrology",
+            "Structural Geology",
+            "Sedimentology",
+            "Volcanology",
+            "Geochemistry",
+            "Paleogeography",
+            "Hydrogeology",
+            "Geomorphology",
+            "Economic Geology",
+            "Planetary Geology",
+            "Biogeology"
+          ]
+        },
+        "Meteorology": {
+          "specializations": [
+            "Weather Forecasting",
+            "Atmospheric Dynamics",
+            "Cloud Physics",
+            "Tropical Meteorology",
+            "Radar Meteorology",
+            "Mesoscale Meteorology",
+            "Synoptic Meteorology",
+            "Agricultural Meteorology",
+            "Aviation Meteorology",
+            "Climatology",
+            "Physical Meteorology",
+            "Satellite Meteorology"
+          ]
+        },
+        "Oceanography": {
+          "specializations": [
+            "Physical Oceanography",
+            "Chemical Oceanography",
+            "Biological Oceanography",
+            "Geological Oceanography",
+            "Marine Geology",
+            "Paleoceanography",
+            "Marine Ecology",
+            "Ocean Biogeochemistry",
+            "Deep-Sea Ecology",
+            "Coastal Oceanography",
+            "Ocean Acoustics",
+            "Marine Pollution"
+          ]
+        },
+        "Climatology": {
+          "specializations": [
+            "Paleoclimatology",
+            "Bioclimatology",
+            "Global Climate Modeling",
+            "Historical Climatology",
+            "Urban Climatology",
+            "Applied Climatology",
+            "Climate Dynamics",
+            "Climate Change Mitigation",
+            "Climate Risk Management",
+            "Climate Policy",
+            "Extreme Weather Analysis",
+            "Regional Climatology"
+          ]
+        },
+        "Geophysics": {
+          "specializations": [
+            "Seismology",
+            "Magnetotellurics",
+            "Gravimetry",
+            "Geodynamics",
+            "Paleomagnetism",
+            "Exploration Geophysics",
+            "Earthquake Physics",
+            "Geophysical Fluid Dynamics",
+            "Marine Geophysics",
+            "Environmental Geophysics",
+            "Computational Geophysics",
+            "Planetary Geophysics"
+          ]
+        },
+        "Paleontology": {
+          "specializations": [
+            "Vertebrate Paleontology",
+            "Invertebrate Paleontology",
+            "Paleobotany",
+            "Micropaleontology",
+            "Paleoecology",
+            "Paleobiogeography",
+            "Taphonomy",
+            "Biostratigraphy",
+            "Paleoenvironmental Reconstruction",
+            "Evolutionary Biology",
+            "Ichnology",
+            "Paleogenomics"
+          ]
+        },
+        "Environmental Science": {
+          "specializations": [
+            "Environmental Chemistry",
+            "Environmental Biology",
+            "Conservation Science",
+            "Environmental Policy",
+            "Environmental Health",
+            "Ecotoxicology",
+            "Natural Resource Management",
+            "Environmental Impact Assessment",
+            "Sustainability Science",
+            "Climate Change Adaptation",
+            "Waste Management",
+            "Environmental Restoration"
+          ]
+        }
+      }
+    }
+  }
+}
