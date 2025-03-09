@@ -1,0 +1,132 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[a4paper, top=1.2in, bottom=1.4in, left=1in, right=1in]{geometry}
+\usepackage{graphicx} % Required for inserting images
+\graphicspath{ {./img/} }
+\usepackage[spanish]{babel}
+\usepackage{float}
+\usepackage{fancyhdr}
+\setlength{\parskip}{1em}  % Adds space between paragraphs (1em)
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{subcaption}
+\newcommand{\tikzmark}[1]{\tikz[baseline,remember picture] \coordinate (#1) {};}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shadows,arrows.meta} % For adding edges label
+\usetikzlibrary{calc}
+\usepackage{eso-pic}
+\usepackage[backend=biber, defernumbers=true, citestyle=numeric-comp, bibstyle=ieee, sorting=none]{biblatex}
+\addbibresource{bibliography/bibliography.bib}
+\DeclareBibliographyCategory{cited}
+\AtEveryCitekey{\addtocategory{cited}{\thefield{entrykey}}}
+% Configurando BibLaTeX
+\DefineBibliographyStrings{spanish}{
+  url = {URL},
+  andothers={et ~al\adddot}
+}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\AddToShipoutPictureBG{%
+\begin{tikzpicture}[remember picture, overlay]
+\node[opacity=.15, inner sep=0pt]
+    at(current page.center){\includegraphics[scale=1.5]{img/logo-ugr2.png}};
+\end{tikzpicture}%
+}
+
+\title{Práctica: Series Temporales}
+\author{Miguel García López}
+\date{Marzo 2025}
+
+\pagestyle{fancyplain}
+\headheight 35pt
+\lhead{Miguel García López}            
+\chead{\textbf{\small Práctica: Series Temporales}}
+\rhead{Master Ciencia de Datos \\ \today}
+\lfoot{\scriptsize\LaTeX}
+\cfoot{\small Práctica: Series Temporales}
+\rfoot{\small\thepage}
+\headsep 1.5em
+
+\author{Miguel García López} % Nombre y apellidos
+
+\date{\normalsize\today} % Incluye la fecha actual
+
+\begin{document}
+\begin{titlepage}
+    \begin{figure}
+        \vspace{-1.3cm}
+        \begin{center}
+            \includegraphics[width=0.75\textwidth]{img/UGR-Logo.png}
+        \end{center}
+    \end{figure}
+    \vspace{1.3cm}
+    \centering
+    \normalfont \normalsize
+    \textsc{\textbf{Práctica: Series Temporales 2024-2025} \\ \vspace{.15cm} Master Ciencia de Datos\\ \vspace{.15cm} Universidad de Granada} \\ [25pt]
+    \huge Práctica: Series Temporales
+
+    \normalfont \normalsize \vspace{.30cm}
+    \textsc{Miguel García López}
+
+\end{titlepage}
+
+\tableofcontents
+\listoffigures
+\listoftables
+\newpage
+
+\section{Introducción}
+La práctica de la asignatura de \textbf{Series Temporales y Minería de Flujos de Datos} consiste en, a partir de una conjunto de datos dado, revolser un problema de series temporales. Concretamente el conjunto de datos dado es \textbf{Oikolab Weather}, el cual contiene $8$ series temporales sobre datos climáticos, aunque en esta práctica se debe trabajar tan solo con la variable de temperatura. Los datos se empezaron a medir el $1$ de Enero de $2010$.
+
+El objetivo es predecir la temperatura para los meses restantes del año donde termina la serie, es decir, $2021$. Según se avance en el trabajo, se irán respondiendo cuestiones planteadas en el guión de prácticas.
+
+\section{Tareas}
+\subsection{¿Es necesario realizar algún tipo de preprocesamiento en la serie? Tanto en el caso
+afirmativo como en el negativo, justifique su respuesta e incluya el código Python
+requerido, si es el caso.}
+
+Considero que no es necesario aplicar ningún tipo de preprocesamiento a la serie temporal. Analizando los datos no se ha encontrado ningún valor faltante. La serie no parece tener ningún tipo de valor anómalo a simple vista y parece bastante sencilla.
+
+Además, aunque se vaya a responder en las siguientes cuestiones, la serie parece estacionaria, es decir, no presenta tendencia y su varianza es constante a lo largo de los meses, por lo que no aplicaría ninguna transformación (como la logarítimica).
+
+\subsection{¿Tiene tendencia la serie? Tanto en el caso afirmativo como en el negativo,
+justifique su respuesta e incluya el código Python requerido, si es el caso,
+justificando el modelo de tendencia.}
+
+La serie no presenta tendencia ya que la media de esta es constante. Esto se puede analizar visualmente a través de la imagen en la figura \ref{fig:temperature_ts}.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.3\linewidth]{../../temperature_train.jpg}
+    \caption{Serie temporal de la temperatura (partición de \textit{train}).}
+    \label{fig:temperature_ts}
+\end{figure}
+
+\end{document}
