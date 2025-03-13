@@ -38,3 +38,25 @@ learned_independence_5000 <- iamb(data_5000)
 learned_independence_5000 <- cextend(learned_independence_5000)
 modelstring(learned_independence_5000)
 graphviz.plot(learned_independence_5000)
+
+# Learn parameters of the DAGs
+fit_hc_200 <- bn.fit(learned_score_200, data_200)
+fit_hc_5000 <- bn.fit(learned_score_5000, data_5000)
+fit_iamb_200 <- bn.fit(learned_independence_200, data_200)
+fit_iamb_5000 <- bn.fit(learned_independence_5000, data_5000)
+
+# Originales
+sachs$Erk
+sachs$PKA
+
+# HC
+fit_hc_200$Erk
+fit_hc_5000$Erk
+fit_hc_200$PKA
+fit_hc_5000$PKA
+
+# IAMB
+fit_iamb_200$Erk
+fit_iamb_5000$Erk
+fit_iamb_200$PKA
+fit_hc_5000$PKA
