@@ -2,6 +2,7 @@ library(lattice)
 library(gridExtra)
 library(gRain)
 library(bnlearn)
+library(Rgraphviz)
 
 "Creamos la red inicial."
 dag <- empty.graph(nodes = c("A", "S", "E", "O", "R", "T"))
@@ -75,3 +76,10 @@ Podemos usar un algoritmo greedy basado en scores."
 learned <- hc(survey)
 modelstring((learned))
 score(learned, data = survey, type = "bic")
+
+"Para crear las redes con los algoritmos de restricciones se pueden hacer con
+las funciones gs, iamb, fast.iamb, inter.iamb, mmpc, si.hiton.pc y
+hpc."
+
+"Para comparar dos redes se puede usar el algoritmo compare, que devuelve el ratio
+de falsos positivos, verdaderos positivos, etc."
