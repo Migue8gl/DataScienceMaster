@@ -135,17 +135,47 @@ Adaptación de la validación cruzada tradicional: divide el flujo en bloques te
 
 \textbf{Ventanas Deslizantes (Sliding Windows)}
 Evalúa el modelo solo en datos recientes. Las ventanas pueden ser fijas (mantienen tamaño constante, como los últimos $10000$ ejemplos) o adaptativas (ajustan dinámicamente el tamaño usando umbrales de error \cite{Bifet2009}). Un ejemplo clásico es \textit{VFDT} \cite{Domingos2000}, que usa ventanas para limitar el uso de memoria en flujos infinitos, descartando datos obsoletos.
-
+\newpage
 \subsection{Describe tres algoritmos de clasificación en flujos de datos y compara
-ventajas/desventajas}
+    ventajas/desventajas}
 El primer algoritmo y uno de los más usados es el \textbf{VFDT} (\textit{Very Fast Decision Tree}) o Árbol de \textit{Hoeffding}.
 El \textbf{VFDT}, propuesto por \textit{Domingos} y \textit{Hulten} ($2000$), es un algoritmo incremental que construye árboles de decisión utilizando el \textit{Hoeffding bound} (HB), un límite estadístico que garantiza con alta probabilidad que la mejor división en un nodo, basada en una muestra de datos, será la misma que si se usara el flujo completo. Opera en tiempo constante por muestra y memoria limitada. La cota \textit{Hoeffding} se describe como:
 $$HB=\sqrt\frac{R^2ln(1/\delta)}{2n}$$
 Donde $R$ es el rango de clases (diferencia máxima posible en las métricas de división, como ganancia de información), $n$ el número de muestras en el nodo, y $\delta$ la probabilidad de error \cite{Domingos2000}.
 
-Usa la cota de \textit{Hoeffding} para garantizar que, con alta probabilidad, la mejor elección de división con una muestra será la misma que si se usara todo el flujo de datos. Esto permite hacer divisiones rápidamente sin necesidad de almacenar todos los datos históricos.
+Usa la cota de \textit{Hoeffding} para garantizar que, con alta probabilidad, la mejor elección de división con una muestra será la misma que si se usara todo el flujo de datos. Esto permite hacer divisiones rápidamente sin necesidad de almacenar todos los datos históricos. Para realizar la división se tiene que:
 
+$$\Delta H(X_i)\le HB< \tau$$
 
+Lo que indica que la diferencia de ganancia de información entre los dos mejores atributos es menor o igual que la cota de \textit{Hoeffding} y esta a su vez es menor que un umbral fijo $\tau$.
+
+Otro ejemplo de algoritmo, basado en el ya mencionado \textbf{VFDT}, es el \textit{Optimized Very Fast Decision Tree} (\textbf{OVFDT}), el cual implementa un mecanismo de \textit{split} de nodos más eficiente \cite{Yang2013}.
+Este algoritmo utiliza tres tipos de clasificadores en los nodos hoja
+\begin{itemize}
+    \item Clase Mayoritaria (MC): Predice la clase más frecuente (igual que \textbf{VFDT}).
+    \item Naive Bayes (NB): Calcula probabilidades condicionales para mejorar la precisión en datos ruidosos.
+    \item Naive Bayes Ponderado (WNB): Añade pesos a las clases para mitigar distribuciones desbalanceadas.
+\end{itemize}
+
+Reemplaza el umbral fijo $\tau$ de \textbf{VFDT} por un valor dinámico calculado como la media de los \textit{Hoeffding Bounds} históricos en cada hoja. A diferencia del algoritmo original, que elegía este valor de forma fija, \textbf{OVFDT} lo calcula automáticamente, se puede adaptar al ruido.
+
+$$
+    \tau_{\text{adaptativo}} = \frac{1}{k} \sum_{i=1}^k \mu_l \times \text{HB}_i
+$$
+
+Donde $k$ es el número de evaluaciones de \textit{splits} realizadas en la hoja $l$, $\mu_l$ es una variable binaria que indica que $HB$ se calculó para esa hoja y $HB_i$ es la cota de \textit{Hoeffding} para esa i-ésima evaluación.
+
+Por último, destacar que se han mencionado dos algoritmos basados en árboles. En clasificación básica, los algoritmos basados en técnicas como \textit{bagging} son mucho más potentes que los modelos simples, un ejemplo de esto son los árboles de decisión y los \textit{random forest}.
+
+El algoritmo \textit{Adaptive Random Forest} o \textbf{ARF} es un algoritmo que combina la robustez de \textit{Random Forest} con técnicas adaptativas para flujos de datos \cite{gomes2017adaptive}. Este es capaz de detectar y adaptarse a los cambios de concepto (\textit{concept drift}) mediante monitoreo individual de cada árbol. Cada árbol en el ensemble tiene un detector \textbf{ADWIN} que monitorea su error de clasificación.
+
+Si se detecta \textit{drift}, el árbol afectado se marca como obsoleto y se reemplaza por un nuevo árbol entrenado en datos recientes.
+
+\textbf{VFDT} destaca por su velocidad y bajo consumo de memoria, pero carece de adaptación a \textit{concept drift} y es sensible a ruido. \textbf{OVFDT} lo mejora con un umbral de desempate adaptativo y hojas funcionales (NB/WNB), logrando mayor precisión y control de tamaño del árbol que a diferencia de las hojas clásicas (que solo predicen la clase mayoritaria), estas incorporan modelos de clasificación locales para tomar decisiones más inteligentes, aunque sigue limitado a un único modelo. \textbf{ARF}, al ser un \textit{ensemble} adaptativo, ofrece robustez superior frente a ruido, cambios de concepto y desbalance, pero requiere más memoria para albergar todos los modelos mayor potencia computacional para realizar el monitoreo.
+\newpage
+
+\subsection{Explica en qué consiste el problema de concept drift y describe qué técnicas conoces
+    para resolverlo en clasificación, clustering y patrones frecuentes}
 
 \newpage
 \section{Bibliografía}
