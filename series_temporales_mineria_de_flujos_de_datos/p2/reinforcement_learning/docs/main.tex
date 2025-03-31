@@ -1,0 +1,454 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[a4paper, top=1.2in, bottom=1.4in, left=1in, right=1in]{geometry}
+\usepackage{graphicx} % Required for inserting images
+\graphicspath{ {./img/} }
+\usepackage[spanish]{babel}
+\usepackage{float}
+\usepackage{fancyhdr}
+\setlength{\parskip}{1em}  % Adds space between paragraphs (1em)
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{listings}
+\usepackage[utf8]{inputenc}
+
+\usepackage{xcolor}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\footnotesize,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{orange},
+    showstringspaces=false,
+    frame=single,
+    breaklines=true
+}
+\usepackage{subcaption}
+\newcommand{\tikzmark}[1]{\tikz[baseline,remember picture] \coordinate (#1) {};}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shadows,arrows.meta} % For adding edges label
+\usetikzlibrary{calc}
+\usepackage{eso-pic}
+\usepackage[backend=biber, defernumbers=true, citestyle=numeric-comp, bibstyle=ieee, sorting=none]{biblatex}
+\addbibresource{bibliography/bibliography.bib}
+\DeclareBibliographyCategory{cited}
+\AtEveryCitekey{\addtocategory{cited}{\thefield{entrykey}}}
+% Configurando BibLaTeX
+\DefineBibliographyStrings{spanish}{
+  url = {URL},
+  andothers={et ~al\adddot}
+}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\AddToShipoutPictureBG{%
+\begin{tikzpicture}[remember picture, overlay]
+\node[opacity=.15, inner sep=0pt]
+    at(current page.center){\includegraphics[scale=1.5]{img/logo-ugr2.png}};
+\end{tikzpicture}%
+}
+
+\title{Reinforcement Learning}
+\author{Miguel García López}
+\date{Marzo 2025}
+
+\pagestyle{fancyplain}
+\headheight 35pt
+\lhead{Miguel García López}            
+\chead{\textbf{\small Reinforcement Learning}}
+\rhead{Minería de Flujo de Datos \\ \today}
+\lfoot{\scriptsize\LaTeX}
+\cfoot{\small Reinforcement Learning}
+\rfoot{\small\thepage}
+\headsep 1.5em
+
+\author{Miguel García López} % Nombre y apellidos
+
+\date{\normalsize\today} % Incluye la fecha actual
+
+\begin{document}
+\begin{titlepage}
+    \begin{figure}
+        \vspace{-1.3cm}
+        \begin{center}
+            \includegraphics[width=0.75\textwidth]{img/UGR-Logo.png}
+        \end{center}
+    \end{figure}
+    \vspace{1.3cm}
+    \centering
+    \normalfont \normalsize
+    \textsc{\textbf{Minería de Flujo de Datos - 2024-2025} \\ \vspace{.15cm} Minería de Flujo de Datos - Reinforcement Learning\\ \vspace{.15cm} Universidad de Granada} \\ [25pt]
+    \huge Práctica de Flujos de Datos - Balanceo del Poste
+
+    \normalfont \normalsize \vspace{.30cm}
+    \textsc{Miguel García López}
+
+\end{titlepage}
+
+\tableofcontents
+\listoffigures
+\listoftables
+\newpage
+
+\section{Introducción}
+En esta práctica se requiere dar solución a un problema de aprendizaje por refuerzo (\textit{reinforcement learning}. El problema consiste en un carrito con un poste anclado a este, el cuál ha de equilibrarse a medida que el carrito se mueve a la izquierda o a la derecha para que no se caiga.
+
+Es un problema de flujo de datos pues en cada momento de simulación entran nuevos datos sobre la posición, velocidad, ángulo, etc, del carrito y el poste. Según la entidad se va moviendo, se actualizan estos datos y han de ser utilizados para la predicción de la acción más correcta, mover el carrito a la izquierda o a la derecha.
+
+El objetivo principal, además de conseguir un modelo robusto y preciso para este problema, es el de analizar tres tipos de clasificador y compararlos entre ellos. Como clasificador base se impone el uso de \textit{Naive Bayes} con modelado Gaussiano de clases.
+
+Se deben comparar los distintos algoritmos por el \textit{accuracy} conseguido en los datos, así como el rendimiento de ellos en el entorno simulado (recompensa obtenida).
+
+\section{Datos}
+Se dispone de un fichero \textit{csv} con datos que contienen las siguientes características:
+
+\begin{itemize}
+    \item \textbf{Posición del carro (Atributo Cart Position)}: Numérico (Valores $>0$ hacia la derecha, valores $<0$ hacia la izquierda, valor $=0$ en el centro).
+
+    \item \textbf{Velocidad del carro (Atributo Cart Velocity)}: Numérico. Contiene la velocidad del carro ($<0$ hacia la izquierda; $>0$ hacia la derecha; $0$ = sin movimiento).
+
+    \item \textbf{Ángulo del poste con respecto a la vertical (Atributo Pole Angle)}: Numérico ($<0$ inclinado a la izquierda; $>0$ inclinado a la derecha).
+
+    \item \textbf{Velocidad angular a la que se mueve el poste (Atributo Pole Angular Velocity)}: Numérico ($<0$ hacia la izquierda; $>0$ hacia la derecha).
+
+    \item \textbf{Pseudo-mejor acción posible a realizar (Atributo objetivo o clase, Action)}: Valor entero ($0$ = mover a la izquierda; $1$ = mover a la derecha).
+\end{itemize}
+
+\section{Algoritmos usados}
+\section{Naive Bayes}
+El algoritmo base para las comparaciones es el \textit{Naive Bayes}. El clasificador bayesiano es un algoritmo de clasificación basado en el Teorema de Bayes, el cual calcula la probabilidad a posteriori de una clase dado un conjunto de características de entrada. A pesar de su simplicidad, es una técnica poderosa y ampliamente utilizada en problemas de clasificación.
+
+El modelo recibe el calificativo de ``\textit{naive}'' (ingenuo) debido a su principal asunción: \textbf{independencia condicional entre las características}, es decir, se supone que todas las variables predictoras son independientes entre sí dado el valor de la clase.
+
+Aunque esta asunción rara vez se cumple en escenarios del mundo real, \textit{Naive Bayes} funciona de manera efectiva en muchos contextos, especialmente en dominios donde las relaciones entre variables no son complejas.
+
+\subsection{Asunciones del Naive Bayes}
+\begin{itemize}
+    \item \textbf{Independencia condicional}: Se asume que las características son independientes entre sí.
+          En este caso, se asume que la variabilidad de una característica no depende del valor de otra. No obstante, las variables con las que se van a trabajar seguramente no cumplan esta condición. Es obvio que si la velocidad angular del poste cambia, lo hará el ángulo, al igual que si la posición y velocidad del carrito se modifican, éstas tendrán gran influencia en el ángulo del poste. Todas las variables están relacionadas.
+    \item \textbf{Distribución de los datos:} \textit{Naive Bayes} asume que las características siguen una distribución normal dentro de cada clase.
+    \item \textbf{Balance de clases}: El modelo puede ser sensible al desequilibrio de clases (cuando una clase es mucho más frecuente que otra), lo que puede sesgar las predicciones hacia la clase mayoritaria si no se toma en cuenta.
+\end{itemize}
+
+\subsection{Preprocesamiento}
+Para implementar el \textit{Naive Bayes} de manera efectiva, es crucial preparar los datos adecuadamente.
+En este caso, no existen variables categóricas que necesiten codificarse numéricamente ya que todas las características son numéricas y continuas.
+El algoritmo, dado que calcula distribuciones de probabilidad para cada clase~\cite{NaiveBayes} sin basarse en distancia, es invariante a la escala de los datos y, por ello, no es necesario escalar los datos.
+
+\section{HoeffdingTreeClassifier}
+El \textit{HoeffdingTreeClassifier} o \textit{VFDT} es un algoritmo de clasificación en flujo de datos diseñado para entornos no estacionarios \cite{Domingos2000}. Basado en el árbol de Hoeffding tradicional. Utiliza el límite de Hoeffding para tomar decisiones de división de nodos con garantías estadísticas, optimizando el equilibrio entre precisión y eficiencia computacional en contextos de alta velocidad de datos.
+
+Este clasificador es especialmente eficaz en escenarios donde las relaciones entre características y clases evolucionan con el tiempo, manteniendo un modelo actualizado sin requerir re-procesamiento completo de los datos.
+
+\subsection{Propiedades del HoeffdingTreeClassifier}
+\begin{itemize}
+    \item \textbf{Procesamiento incremental}: Cada instancia se procesa una sola vez, consumiendo memoria constante en tiempo de ejecución, ideal para flujos de datos continuos.
+    \item \textbf{Tolerancia a no estacionariedad}: No asume una distribución fija de los datos, permitiendo adaptarse a patrones cambiantes mediante mecanismos de detección y corrección activa.
+    \item \textbf{Uso del límite de Hoeffding}: Determina la confiabilidad estadística de las divisiones utilizando muestras limitadas, garantizando decisiones cercanas a las que se obtendrían con datos completos.
+\end{itemize}
+
+\subsection{Preprocesamiento}
+Los árboles de decisión, incluyendo esta variante adaptativa, son invariantes a la escala de las variables al realizar divisiones basadas en umbrales relativos. Por tanto, no se requiere normalización ni estandarización de los datos.
+
+\section{ADWINBoostingClassifier}
+El \textit{ADWINBoostingClassifier} \cite{Oza2005} es un método de ensamble adaptativo que combina la técnica de boosting con el detector de deriva \textit{ADWIN}. Diseñado para flujos de datos con posibles cambios conceptuales, ajusta dinámicamente los pesos de las instancias y los componentes del ensamble cuando detecta deriva, manteniendo la precisión en entornos evolutivos.
+
+Utiliza modelos base débiles (típicamente árboles de decisión) y actualiza iterativamente sus pesos, focalizándose en instancias mal clasificadas mientras descarta componentes del ensamble afectados por deriva mediante el monitoreo continuo de \textit{ADWIN}.
+
+Para este caso concreto y dado que se está comparando la potencia del método de \textit{ensemble} de \textit{ADWIN}, se utiliza el modelo base de \textit{Naive Bayes}. De esta forma se podrá comparar con los resultados del modelo \textit{Naive Bayes} en singular.
+
+\subsection{Propiedades del ADWINBoostingClassifier}
+\begin{itemize}
+    \item \textbf{Boosting adaptativo}: Ajusta los pesos de las instancias en tiempo real, priorizando aquellas con errores recurrentes, mientras \textit{ADWIN} verifica si los errores reflejan deriva de concepto.
+    \item \textbf{Eliminación selectiva de componentes}: Cuando se detecta deriva, elimina los modelos base asociados a distribuciones obsoletas, preservando solo aquellos relevantes para el contexto actual.
+    \item \textbf{Balance precisión-velocidad}: Limita la profundidad de los árboles base y el tamaño del ensamble para garantizar eficiencia computacional en flujos de alta velocidad.
+    \item \textbf{Automonitoreo de rendimiento}: Evalúa continuamente la precisión predictiva mediante ventanas adaptativas para activar mecanismos de corrección proactivos.
+\end{itemize}
+
+\subsection{Preprocesamiento}
+Al operar con \textit{Naive Bayes} como modelo base, el algoritmo no requiere escalado de características. Las variables categóricas (inexistentes en este caso) necesitarían codificación, pero al trabajar con datos puramente numéricos, el preprocesamiento se reduce a garantizar un flujo continuo de datos sin transformaciones adicionales.
+
+\section{Experimentación}
+\subsection{Parámetros}
+\begin{table}[htp]
+    \centering
+    \caption{Parámetros por defecto de los modelos implementados}
+    \label{tab:modelos}
+    \begin{tabular}{|l|l|}
+        \hline
+        \textbf{Modelo} & \textbf{Parámetros por defecto} \\ \hline
+        Naive Bayes     &
+        \begin{tabular}[c]{@{}l@{}}
+            - No tiene hiperparámetros configurables
+        \end{tabular}           \\ \hline
+
+        Hoeffding Tree  &
+        \begin{tabular}[c]{@{}l@{}}
+            - \texttt{grace\_period=200}             \\
+            - \texttt{split\_criterion='info\_gain'} \\
+            - \texttt{split\_confidence=1e-7}        \\
+            - \texttt{leaf\_prediction='nba'}        \\
+            - \texttt{nb\_threshold=0}               \\
+            - \texttt{nominal\_attributes=None}      \\
+        \end{tabular}          \\ \hline
+
+        ADWIN Boosting  &
+        \begin{tabular}[c]{@{}l@{}}
+            - \texttt{model=GaussianNB()} \\
+            - \texttt{n\_models=10}       \\
+        \end{tabular}                     \\ \hline
+    \end{tabular}
+\end{table}
+
+En la tabla \ref{tab:modelos} se describen los parámetros usados por cada modelo. En general se han dejado los parámetros por defecto, para no influenciar demasiado en la comparación de los algoritmos. Otra opción sería realizar una búsqueda de hiperparámetros, pero es muy costoso en tiempo.
+
+El único parámetro que ha sido modificado es el número de modelos que tiene el modelo de \textit{boosting}, ya que por defecto solo implementa tres.
+
+\subsection{Entreno online}
+Se realiza un entrenamiento sobre los datos se realiza de manera secuencial, según estos van llegando. Además se guardan los valores de cada variable cada $100$ iteraciones para realizar un análisis posterior de \textit{concept drift}.
+
+\subsection{Análisis del desvío de concepto}
+En este análisis se grafican tendencias temporales para detectar cambios en las distribuciones de las distintas variables. Para ello se utiliza la técnica de media móvil $(ventana = min(100, len(data)//10))$, donde se suavizan las fluctuaciones para destacar tendencias a largo plazo. El objetivo es identificar cambios abruptos o graduales en las estadísticas de las variables.
+
+Otro análisis realizado es el siguiente: se dividen los datos en segmentos temporales y se comparan sus distribuciones. Se compara el \textit{coeficiente de variación de medias} para comprobar esos cambios de distribución mencionados.
+
+$$CV=\frac{std(segmento)}{mean(segmento)}$$
+
+\subsection{Detección del desvío de concepto}
+Se realiza una detección activa de \textit{concept drift} utilizando el algoritmo \textit{ADWIN} \cite{Bifet2009} (\textit{Adaptive Windowing}) en tiempo real sobre el flujo de datos del textit{CartPole}. Se intenta detectar tanto el desvío en las variables características como en la variable objetivo.
+
+\textit{ADWIN} es un algoritmo que ajusta dinámicamente el tamaño de una ventana de datos, descartando datos antiguos cuando detecta cambios en las estadísticas. Dada una ventana $W$, si existen dos subventanas $W_0$ y $W_1$
+suficientemente grandes y con medias suficientemente distintas, se puede concluir que los valores esperados son diferentes y se puede eliminar la parte antigua de $W$. Se utiliza un umbral $\lambda = 0.002$.
+
+Este método difiere con el anterior descrito dado que es una técnica de detección en tiempo real, mientras que el análisis anteriormente mencionado es más un método \textit{post-hoc}.
+
+\subsection{Comparación estadística de métricas}
+Se realiza un análisis estadístico comparativo entre dos métricas clave de los modelos evaluados, la precisión (\textit{accuracy}) de los modelos y en rendimiento basado en recompensas en el entorno de simulación.
+
+Se mide por correlación de \textit{Pearson} \cite{pearson1895vii} y correlación de \textit{Spearman} \cite{spearman1904proof} si las métricas de precisión y rendimiento están relacionadas entre ellas.
+
+\section{Resultados}
+
+\subsection{Análisis/Detección del desvío de concepto}
+Los resultados de la detección por medio del algoritmo \textit{ADWIN} han dado como resultado un total de $0$ puntos detectados, por lo que este método no ha detectado ningún desvío significativo durante el flujo de datos.
+
+En cuanto al análisis \textit{post-hoc}, si se establece un umbral de \textit{CV=0.1}, los resultados son que se detectan potenciales desvíos tras la recolecta de datos durante el flujo. Las variables que son potencialmente afectadas por este efecto son: velocidad angular del poste, ángulo del poste, velocidad del carro y posición del carro.
+
+El problema principal de este método es trata cada segmento como independiente, ignorando patrones temporales. Concretamente en \textit{CartPole}, variables como la velocidad angular (y prácticamente todas) suelen tener autocorrelación temporal.
+
+Los resultados de media y desviación estándar quedan registradas en las tablas \ref{tab:cartpocv}, \ref{tab:cartvecv}, \ref{tab:poleangcv}, \ref{tab:poleang2cv} y \ref{tab:actioncv}.
+
+% Cart Position
+\begin{table}[htp]
+    \centering
+    \begin{tabular}{lcc}
+        \toprule
+        Segment   & Mean   & Std    \\
+        \midrule
+        Segment 1 & 0.0081 & 0.1099 \\
+        Segment 2 & 0.0180 & 0.0887 \\
+        Segment 3 & 0.0005 & 0.1154 \\
+        Segment 4 & 0.0130 & 0.1164 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Cart Position Statistics}
+    \label{tab:cartpocv}
+\end{table}
+
+% Cart Velocity
+\begin{table}[htp]
+    \centering
+    \begin{tabular}{lcc}
+        \toprule
+        Segment   & Mean    & Std    \\
+        \midrule
+        Segment 1 & -0.0013 & 0.0375 \\
+        Segment 2 & 0.0026  & 0.0266 \\
+        Segment 3 & 0.0051  & 0.0381 \\
+        Segment 4 & -0.0017 & 0.0305 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Cart Velocity Statistics}
+    \label{tab:cartvecv}
+\end{table}
+
+% Pole Angle
+\begin{table}[htp]
+    \centering
+    \begin{tabular}{lcc}
+        \toprule
+        Segment   & Mean   & Std    \\
+        \midrule
+        Segment 1 & 0.0012 & 0.0139 \\
+        Segment 2 & 0.0011 & 0.0125 \\
+        Segment 3 & 0.0008 & 0.0144 \\
+        Segment 4 & 0.0007 & 0.0148 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Pole Angle Statistics}
+    \label{tab:poleangcv}
+\end{table}
+
+% Pole Angular Velocity
+\begin{table}[htp]
+    \centering
+    \begin{tabular}{lcc}
+        \toprule
+        Segment   & Mean    & Std    \\
+        \midrule
+        Segment 1 & 0.0002  & 0.0590 \\
+        Segment 2 & -0.0032 & 0.0424 \\
+        Segment 3 & -0.0075 & 0.0555 \\
+        Segment 4 & 0.0010  & 0.0551 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Pole Angular Velocity Statistics}
+    \label{tab:poleang2cv}
+\end{table}
+
+% Action
+\begin{table}[htp]
+    \centering
+    \begin{tabular}{lcc}
+        \toprule
+        Segment   & Mean   & Std    \\
+        \midrule
+        Segment 1 & 0.5480 & 0.4977 \\
+        Segment 2 & 0.5160 & 0.4997 \\
+        Segment 3 & 0.4880 & 0.4999 \\
+        Segment 4 & 0.4960 & 0.5000 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Action Statistics}
+    \label{tab:actioncv}
+\end{table}
+
+En las gráficas \ref{fig:concept_drift_analysis} se pueden observar los valores de cada variable en el tiempo. Los gráficos de \textit{Cart Position vs Pole Angle} tienen tendencias similares con picos y caídas en momentos parecidos. Esto sugiere una correlación positiva: cuando el carrito se mueve en una dirección, el ángulo del poste también cambia en la misma dirección, lo cual tiene sentido desde el punto de vista físico.
+
+Comparándo \textit{Cart Velocity vs Pole Angular Velocity}, a simple vista, los picos y valles de ambos gráficos parecen estar desfasados. Esto podría indicar una correlación inversa: cuando la velocidad del carrito aumenta en una dirección, la velocidad angular del poste se ajusta en la dirección opuesta para compensar el movimiento. Este comportamiento es consistente con el control del sistema: si el carrito acelera en un sentido, el poste intenta inclinarse en la dirección contraria para recuperar el equilibrio.
+
+Como es de esperar, muchas variables parecen estar relacionadas entre sí, por lo que la asunción de \textit{Naive Bayes} seguramente no se cumpliría.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/concept_drift_analysis.png}
+    \caption{Moving average of each variable}
+    \label{fig:concept_drift_analysis}
+\end{figure}
+
+\subsection{Métricas de los clasificadores}
+
+Según se puede ver en la tabla de resultados en \ref{tab:ranking}, el mejor modelo es \textit{HoeffdingTreeClassifier}, el cual es un modelo estacionario, es decir, asume que la distribución de los datos es constante (no hay \textit{concept drift}). Esto cuadra con los resultados de la detección de \textit{ADWIN}, por lo cuál tiene sentido que este modelo haya batido a \text{Naive Bayes} con tantísima diferencia.
+
+No solo es el que mejor \textit{accuracy} tiene, con una diferencia grande, sino que su rendimiento en \textit{test} es también el mejor. Se puede ver en la gráfica \ref{fig:accuracy_over_time}, que es el que mejor y más rápido converge, mientras que los dos modelos basados en \textit{Naive Bayes} rinden prácticamente igual. Lo mismo puede observarse en la figura de distribución de valores de recompensa \ref{fig:reward_dist}. Los valores son muy dispersos para \textit{HoeffdingTreeClassifier}, ya que el modelo va adaptándose e incrementando este valor según aprende, mientras que los otros dos no superan, salvo en pocas ocasiones, el umbral de los $100$ puntos.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/accuracy_over_time.png}
+    \caption{Accuracy over time for each model}
+    \label{fig:accuracy_over_time}
+\end{figure}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/reward_distributions.png}
+    \caption{Rewards distribution}
+    \label{fig:reward_dist}
+\end{figure}
+
+% Model Performance
+\begin{table}[htp]
+    \centering
+    \begin{tabular}{lcc}
+        \toprule
+        Model                   & Mean Reward & Std    \\
+        \midrule
+        NaiveBayes              & 64.50       & 21.91  \\
+        HoeffdingTreeClassifier & 365.50      & 205.47 \\
+        NaiveBayes\_ADWIN       & 52.80       & 12.41  \\
+        \bottomrule
+    \end{tabular}
+    \caption{Model Performance in CartPole Environment}
+    \label{tab:reward}
+\end{table}
+
+% Statistical Comparison of Models
+\begin{table}[htp]
+    \centering
+    \begin{tabular}{lccc}
+        \toprule
+        Model                   & Training Accuracy & Test Performance & Rank (Acc/Perf) \\
+        \midrule
+        NaiveBayes              & 0.8046            & 64.50            & 2 / 2           \\
+        HoeffdingTreeClassifier & 0.9370            & 365.50           & 1 / 1           \\
+        NaiveBayes\_ADWIN       & 0.8034            & 52.80            & 3 / 3           \\
+        \bottomrule
+    \end{tabular}
+    \caption{Statistical Comparison of Models}
+    \label{tab:ranking}
+\end{table}
+
+Tanto el \textit{test} de \textit{Spearman} como el de \textit{Pearson} dan valores de correlación cercanos a la unidad. Estos resultados, si bien relacionan directamente la métrica de \textit{accuracy} con los puntos de recompensa, no son concluyentes ni generalizables a otros problemas, pues los datos para poder relacionar ambas métricas son escasos.
+
+Si bien esto es así, podría decirse que en este problema, si parece que un modelo con buena precisión también funcionará bien en la simulación (\textit{test}).
+
+\section{Conclusiones}
+
+\subsection{¿Presenta el flujo de datos algún tipo de Concept Drift?}
+Los resultados experimentales muestran una discrepancia entre métodos de detección.
+\textit{ADWIN} no detectó ningún punto de deriva (\textit{0 drift points}), sugiriendo estabilidad en el flujo.
+
+El análisis \textit{post-hoc} con $CV=0.1$ identificó cambios potenciales en variables clave: posición del carro, velocidad angular del poste, y ángulo (Tablas \ref{tab:cartpocv}--\ref{tab:actioncv}).
+
+Sin embargo, la naturaleza física del CartPole explica estas variaciones: las oscilaciones naturales del sistema (Figura \ref{fig:concept_drift_analysis}) generan fluctuaciones estadísticas que el CV interpreta como drift, aunque corresponden a comportamientos esperados del entorno. Por tanto, no hay evidencia concluyente de \textit{concept drift} relevante que afecte la política de control óptima.
+
+\subsection{¿Es un modelo adaptativo mejor que uno estacionario en este problema?}
+El modelo estacionario \textit{HoeffdingTreeClassifier} superó ampliamente a las alternativas adaptativas. Esto se debe ausencia de \textit{drift} significativo y a que \textit{HoeffdingTree} aprovecha mejor las relaciones no lineales entre variables (Figura \ref{fig:concept_drift_analysis}), a diferencia de \textit{Naive Bayes}, que asume independencia condicional (incorrecta en este caso).
+
+En este escenario específico, los modelos estacionarios son suficientes y superiores.
+
+\subsection{¿Técnicas como ADWIN o similares son relevantes en este problema?}
+Aunque \textit{ADWIN} es un método robusto para detección de deriva, su utilidad aquí fue limitada ya que no identificó cambios estadísticamente significativos.
+
+Fruto de este resultado es que el algoritmo de \textit{boosting} basado en \textit{ADWIN} no supera al modelo singular en el que se basa, de hecho obtienen resultados idénticos (Figura \ref{fig:accuracy_over_time}).
+
+\subsection{¿Se necesita algún tipo de preprocesamiento para resolver el problema?}
+No es necesario por:
+\begin{enumerate}
+    \item Invariabilidad a escala: Tanto \textit{Naive Bayes} (basado en distribuciones) como \textit{HoeffdingTree} (divisiones por umbrales relativos) son insensibles a la normalización.
+    \item Datos puramente numéricos: La ausencia de variables categóricas elimina la necesidad de codificación.
+    \item Estructura temporal: Los algoritmos procesan directamente las observaciones en bruto (posición, velocidad, etc.) sin transformaciones.
+\end{enumerate}
+
+\newpage
+\section{Bibliografía}
+
+\printbibliography[heading=none, category=cited]
+\end{document}

@@ -1,0 +1,196 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[a4paper, top=1.2in, bottom=1.4in, left=1in, right=1in]{geometry}
+\usepackage{graphicx} % Required for inserting images
+\graphicspath{ {./img/} }
+\usepackage[spanish]{babel}
+\usepackage{float}
+\usepackage{fancyhdr}
+\setlength{\parskip}{1em}  % Adds space between paragraphs (1em)
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{listings}
+\usepackage[utf8]{inputenc}
+
+\usepackage{xcolor}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\footnotesize,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{orange},
+    showstringspaces=false,
+    frame=single,
+    breaklines=true
+}
+\usepackage{subcaption}
+\newcommand{\tikzmark}[1]{\tikz[baseline,remember picture] \coordinate (#1) {};}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shadows,arrows.meta} % For adding edges label
+\usetikzlibrary{calc}
+\usepackage{eso-pic}
+\usepackage[backend=biber, defernumbers=true, citestyle=numeric-comp, bibstyle=ieee, sorting=none]{biblatex}
+\addbibresource{bibliography/bibliography.bib}
+\DeclareBibliographyCategory{cited}
+\AtEveryCitekey{\addtocategory{cited}{\thefield{entrykey}}}
+% Configurando BibLaTeX
+\DefineBibliographyStrings{spanish}{
+  url = {URL},
+  andothers={et ~al\adddot}
+}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\AddToShipoutPictureBG{%
+\begin{tikzpicture}[remember picture, overlay]
+\node[opacity=.15, inner sep=0pt]
+    at(current page.center){\includegraphics[scale=1.5]{img/logo-ugr2.png}};
+\end{tikzpicture}%
+}
+
+\title{Práctica: Minería de Flujos de Datos}
+\author{Miguel García López}
+\date{Marzo 2025}
+
+\pagestyle{fancyplain}
+\headheight 35pt
+\lhead{Miguel García López}            
+\chead{\textbf{\small Práctica: Minería de Flujos de Datos}}
+\rhead{Master Ciencia de Datos \\ \today}
+\lfoot{\scriptsize\LaTeX}
+\cfoot{\small Práctica: Minería de Flujos de Datos}
+\rfoot{\small\thepage}
+\headsep 1.5em
+
+\author{Miguel García López} % Nombre y apellidos
+
+\date{\normalsize\today} % Incluye la fecha actual
+
+\begin{document}
+\begin{titlepage}
+    \begin{figure}
+        \vspace{-1.3cm}
+        \begin{center}
+            \includegraphics[width=0.75\textwidth]{img/UGR-Logo.png}
+        \end{center}
+    \end{figure}
+    \vspace{1.3cm}
+    \centering
+    \normalfont \normalsize
+    \textsc{\textbf{Práctica: Minería de Flujos de Datos 2024-2025} \\ \vspace{.15cm} Master Ciencia de Datos\\ \vspace{.15cm} Universidad de Granada} \\ [25pt]
+    \huge Práctica: Minería de Flujos de Datos
+    \normalfont \normalsize \vspace{.30cm}
+    \textsc{Miguel García López}
+
+\end{titlepage}
+
+\tableofcontents
+\listoffigures
+\listoftables
+\newpage
+
+\section{Cuestiones}
+\subsection{Explica en qué consisten los diferentes modos de evaluación/validación para clasificación en flujos de datos}
+
+En clasificación, concretamente en entornos de flujo de datos, los métodos de evaluación difieren de los enfoques estáticos tradicionales debido a la naturaleza dinámica, infinita y potencialmente no estacionaria de los flujos.
+
+\textbf{Holdout}
+Se toman instantáneas en diferentes momentos durante el entrenamiento del modelo para ver cómo varía la métrica de calidad. Sólo es válido si el conjunto de \textit{test} es similar a los datos actuales (sin \textit{concept drift}) \cite{Casillas2025}.
+
+\textbf{Test-Then-Train}
+Este enfoque procesa cada nuevo dato en dos fases secuenciales: primero evalúa el modelo (\textit{test}) y luego lo actualiza (\textit{train}). Simula entornos reales de flujos continuos y proporciona métricas en tiempo real, como precisión acumulada.
+
+\textbf{Prequencial}
+Variante de \textit{Test-Then-Train} que calcula métricas en ventanas deslizantes o bloques. Utiliza dos enfoques: ventanas fijas (evalúa últimos nn datos, como $1000$ ejemplos) o ventanas adaptativas (ajusta el tamaño según detección de \textit{drift}, como el algoritmo \textit{ADWIN} \cite{Bifet2007}). Su ventaja principal es reducir el sesgo hacia datos antiguos. En \cite{Gama2010}, se aplicó en flujos financieros para medir la adaptabilidad de modelos ante cambios de mercado.
+
+\textbf{Interleaved Validation}
+Adaptación de la validación cruzada tradicional: divide el flujo en bloques temporales y los rota para entrenamiento y prueba. Este método es útil para evaluar robustez frente a \textit{drift}. En \cite{Gama2014}, se empleó para comparar algoritmos como \textit{VFDT} y \textit{Hoeffding Adaptive Tree} en presencia de cambios sintéticos en la distribución.
+
+\textbf{Ventanas Deslizantes (Sliding Windows)}
+Evalúa el modelo solo en datos recientes. Las ventanas pueden ser fijas (mantienen tamaño constante, como los últimos $10000$ ejemplos) o adaptativas (ajustan dinámicamente el tamaño usando umbrales de error \cite{Bifet2009}). Un ejemplo clásico es \textit{VFDT} \cite{Domingos2000}, que usa ventanas para limitar el uso de memoria en flujos infinitos, descartando datos obsoletos.
+\newpage
+\subsection{Describe tres algoritmos de clasificación en flujos de datos y compara
+    ventajas/desventajas}
+El primer algoritmo y uno de los más usados es el \textbf{VFDT} (\textit{Very Fast Decision Tree}) o Árbol de \textit{Hoeffding}.
+El \textbf{VFDT}, propuesto por \textit{Domingos} y \textit{Hulten} ($2000$), es un algoritmo incremental que construye árboles de decisión utilizando el \textit{Hoeffding bound} (HB), un límite estadístico que garantiza con alta probabilidad que la mejor división en un nodo, basada en una muestra de datos, será la misma que si se usara el flujo completo. Opera en tiempo constante por muestra y memoria limitada. La cota \textit{Hoeffding} se describe como:
+$$HB=\sqrt\frac{R^2ln(1/\delta)}{2n}$$
+Donde $R$ es el rango de clases (diferencia máxima posible en las métricas de división, como ganancia de información), $n$ el número de muestras en el nodo, y $\delta$ la probabilidad de error \cite{Domingos2000}.
+
+Usa la cota de \textit{Hoeffding} para garantizar que, con alta probabilidad, la mejor elección de división con una muestra será la misma que si se usara todo el flujo de datos. Esto permite hacer divisiones rápidamente sin necesidad de almacenar todos los datos históricos. Para realizar la división se tiene que:
+
+$$\Delta H(X_i)\le HB< \tau$$
+
+Lo que indica que la diferencia de ganancia de información entre los dos mejores atributos es menor o igual que la cota de \textit{Hoeffding} y esta a su vez es menor que un umbral fijo $\tau$.
+
+Otro ejemplo de algoritmo, basado en el ya mencionado \textbf{VFDT}, es el \textit{Optimized Very Fast Decision Tree} (\textbf{OVFDT}), el cual implementa un mecanismo de \textit{split} de nodos más eficiente \cite{Yang2013}.
+Este algoritmo utiliza tres tipos de clasificadores en los nodos hoja
+\begin{itemize}
+    \item Clase Mayoritaria (MC): Predice la clase más frecuente (igual que \textbf{VFDT}).
+    \item Naive Bayes (NB): Calcula probabilidades condicionales para mejorar la precisión en datos ruidosos.
+    \item Naive Bayes Ponderado (WNB): Añade pesos a las clases para mitigar distribuciones desbalanceadas.
+\end{itemize}
+
+Reemplaza el umbral fijo $\tau$ de \textbf{VFDT} por un valor dinámico calculado como la media de los \textit{Hoeffding Bounds} históricos en cada hoja. A diferencia del algoritmo original, que elegía este valor de forma fija, \textbf{OVFDT} lo calcula automáticamente, se puede adaptar al ruido.
+
+$$
+    \tau_{\text{adaptativo}} = \frac{1}{k} \sum_{i=1}^k \mu_l \times \text{HB}_i
+$$
+
+Donde $k$ es el número de evaluaciones de \textit{splits} realizadas en la hoja $l$, $\mu_l$ es una variable binaria que indica que $HB$ se calculó para esa hoja y $HB_i$ es la cota de \textit{Hoeffding} para esa i-ésima evaluación.
+
+Por último, destacar que se han mencionado dos algoritmos basados en árboles. En clasificación básica, los algoritmos basados en técnicas como \textit{bagging} son mucho más potentes que los modelos simples, un ejemplo de esto son los árboles de decisión y los \textit{random forest}.
+
+El algoritmo \textit{Adaptive Random Forest} o \textbf{ARF} es un algoritmo que combina la robustez de \textit{Random Forest} con técnicas adaptativas para flujos de datos \cite{gomes2017adaptive}. Este es capaz de detectar y adaptarse a los cambios de concepto (\textit{concept drift}) mediante monitoreo individual de cada árbol. Cada árbol en el ensemble tiene un detector \textbf{ADWIN} que monitorea su error de clasificación.
+
+Si se detecta \textit{drift}, el árbol afectado se marca como obsoleto y se reemplaza por un nuevo árbol entrenado en datos recientes.
+
+\textbf{VFDT} destaca por su velocidad y bajo consumo de memoria, pero carece de adaptación a \textit{concept drift} y es sensible a ruido. \textbf{OVFDT} lo mejora con un umbral de desempate adaptativo y hojas funcionales (NB/WNB), logrando mayor precisión y control de tamaño del árbol que a diferencia de las hojas clásicas (que solo predicen la clase mayoritaria), estas incorporan modelos de clasificación locales para tomar decisiones más inteligentes, aunque sigue limitado a un único modelo. \textbf{ARF}, al ser un \textit{ensemble} adaptativo, ofrece robustez superior frente a ruido, cambios de concepto y desbalance, pero requiere más memoria para albergar todos los modelos mayor potencia computacional para realizar el monitoreo.
+\newpage
+
+\subsection{Explica en qué consiste el problema de concept drift y describe qué técnicas conoces
+    para resolverlo en clasificación, clustering y patrones frecuentes}
+
+El \textit{concept drift} se refiere a una dificultad que surge del aprendizaje de datos según estos fluyen con el tiempo. El cambio de concepto de los datos implica que un modelo aprendido en el pasado ya no es consistente con los datos recibidos en el presente.
+
+Un tratamiento adecuado con este efecto involucraría la actualización o creación de un nuevo modelo que tenga en cuenta nuevas características que entren en conflicto con asunciones pasadas, pero conservando asunciones basadas en datos antiguos que sigan cumpliéndose. El \textit{concept drift} es \textbf{real} si altera la frontero de decisión y es \textbf{virtual} si solo varía la distribución de los datos sin alterar esa frontera.
+
+\textbf{CVFDT} (\textit{Concept-adapting Very Fast Decision Tree}) \cite{hulten2001cvfdt} es una extensión de los árboles de decisión que mantiene estadísticas alternativas en cada nodo, permitiendo crear subárboles alternativos cuando detecta cambios significativos en los patrones de los datos. \textbf{Técnica:} Utiliza \textbf{ventanas deslizantes} sobre el flujo de datos y test de Hoeffding para comparar distribuciones entre ventanas temporales. Sin embargo, presenta limitaciones como la incapacidad de manejar atributos continuos y un mayor consumo computacional respecto a su versión base.
+
+El algoritmo \textbf{CluStream} divide su proceso en dos componentes principales \cite{clustream}. En la fase \textit{online}, mantiene modelos resumidos mediante estadísticos llamados \textit{microclusters}, que contienen información cuantitativa (número de datos, suma de valores, suma de cuadrados) y temporal (suma de tiempos y sus cuadrados) \cite{clustream}. Cada nuevo dato se asigna al \textit{microcluster} más cercano; si no coincide con ningún, se crea uno nuevo, eliminando o fusionando los más antiguos cuando se excede la capacidad. Emplea \textbf{detección implícita} mediante actualización continua de \textit{microclusters}. En la fase \textit{offline}, utiliza los \textit{microclusters} almacenados para reconstruir agrupaciones mediante algoritmos como \textit{k-means}. Los \textit{microclusters} se organizan en instantáneas temporales con estructura piramidal, optimizando el almacenamiento y permitiendo análisis multiescala. \textbf{CluStream} se adapta implícitamente a cambios en los datos mediante actualizaciones continuas, aunque \textbf{no detecta activamente el \textit{concept drift}}.
+
+\textbf{StreamDD} mejora este enfoque añadiendo detección explícita de \textit{drift} \cite{LEILA20241240}. Emplea el \textit{test} de \textit{Page-Hinkley} para monitorizar la distancia máxima promedio entre \textit{microclusters}. Combina \textbf{detección explícita} (test estadístico) con \textbf{ventanas adaptativas} que se redimensionan según la magnitud del \textit{drift} detectado. Al superar un umbral en la suma acumulada de cambios, activa una actualización del modelo en la fase \textit{offline}.
+
+En el ámbito de los patrones frecuentes, estos se relacionan con los ítems de las reglas de asociación. El algoritmo \textbf{Fuzzy-CSar} destaca por su procesamiento incremental con reglas difusas que manejan imprecisión \cite{ORRIOLSPUIG20131332}. Genera reglas dinámicamente mediante un \textit{operador de cobertura} (combina variables y términos lingüísticos aleatoriamente) y competencia en nichos por variable de salida, priorizando confianza y soporte. Aplica \textbf{adaptación reactiva} mediante algoritmos genéticos que reconfiguran reglas cuando su soporte cae bajo umbrales dinámicos. Además, utiliza algoritmos genéticos (\textit{AG}) para cruce y mutación de reglas, ajustando condiciones y términos lingüísticos en tiempo real.
+
+\newpage
+\section{Bibliografía}
+
+\printbibliography[heading=none, category=cited]
+\end{document}
