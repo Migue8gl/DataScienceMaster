@@ -1,0 +1,402 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[a4paper, top=1.2in, bottom=1.4in, left=1in, right=1in]{geometry}
+\usepackage{graphicx} % Required for inserting images
+\graphicspath{ {./img/} }
+\usepackage[spanish]{babel}
+\usepackage{float}
+\usepackage{fancyhdr}
+\setlength{\parskip}{1em}  % Adds space between paragraphs (1em)
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{listings}
+\usepackage[utf8]{inputenc}
+
+\usepackage{xcolor}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\footnotesize,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{orange},
+    showstringspaces=false,
+    frame=single,
+    breaklines=true
+}
+\usepackage{subcaption}
+\newcommand{\tikzmark}[1]{\tikz[baseline,remember picture] \coordinate (#1) {};}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shadows,arrows.meta} % For adding edges label
+\usetikzlibrary{calc}
+\usepackage{eso-pic}
+\usepackage[backend=biber, defernumbers=true, citestyle=numeric-comp, bibstyle=ieee, sorting=none]{biblatex}
+\addbibresource{bibliography/bibliography.bib}
+\DeclareBibliographyCategory{cited}
+\AtEveryCitekey{\addtocategory{cited}{\thefield{entrykey}}}
+% Configurando BibLaTeX
+\DefineBibliographyStrings{spanish}{
+  url = {URL},
+  andothers={et ~al\adddot}
+}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\AddToShipoutPictureBG{%
+\begin{tikzpicture}[remember picture, overlay]
+\node[opacity=.15, inner sep=0pt]
+    at(current page.center){\includegraphics[scale=1.5]{img/logo-ugr2.png}};
+\end{tikzpicture}%
+}
+
+\title{Reinforcement Learning}
+\author{Miguel García López}
+\date{Marzo 2025}
+
+\pagestyle{fancyplain}
+\headheight 35pt
+\lhead{Miguel García López}            
+\chead{\textbf{\small Análisis de Redes}}
+\rhead{Minería de Medios Sociales \\ \today}
+\lfoot{\scriptsize\LaTeX}
+\cfoot{\small Reinforcement Learning}
+\rfoot{\small\thepage}
+\headsep 1.5em
+
+\author{Miguel García López} % Nombre y apellidos
+
+\date{\normalsize\today} % Incluye la fecha actual
+
+\begin{document}
+\begin{titlepage}
+    \begin{figure}
+        \vspace{-1.3cm}
+        \begin{center}
+            \includegraphics[width=0.75\textwidth]{img/UGR-Logo.png}
+        \end{center}
+    \end{figure}
+    \vspace{1.3cm}
+    \centering
+    \normalfont \normalsize
+    \textsc{\textbf{Minería de Medios Sociales - 2024-2025} \\ \vspace{.15cm} Análisis de Redes\\ \vspace{.15cm} Universidad de Granada} \\ [25pt]
+    \huge Análisis de Redes con Gephi
+
+    \normalfont \normalsize \vspace{.30cm}
+    \textsc{Miguel García López} \\
+    \vspace{.15cm}
+    \textsc{77149865E} \\
+    \vspace{.15cm}
+    \textsc{migue8gl@correo.ugr.es}
+
+\end{titlepage}
+
+\tableofcontents
+\listoffigures
+\listoftables
+\newpage
+
+\section{Introducción}
+A lo largo de esta práctica, se estudiarán diversas medidas fundamentales en el análisis de redes, permitiendo comprender las características estructurales de una red social y la influencia de sus actores principales.
+
+En esta práctica, se trabajará con datos provenientes de una red que codifica la estructura de un programa de \textit{Java} (\textit{S.Heymann, J.Palmier, 2008.}) (fig \ref{fig:graph}). Se trabajará esta red en el \textit{software} de \textit{Gephi} y se aplicarán herramientas de análisis y visualización para extraer información relevante sobre su estructura y dinámicas internas.
+
+A través de este proceso, se aplicarán conceptos de análisis de redes sociales, incluyendo medidas como el coeficiente de agrupamiento, la distribución de grado y la centralidad, esenciales para comprender la estructura global y local de la red. Además, se explorará la detección de comunidades dentro de la red, proporcionando una visión detallada de sus interacciones y sub-estructuras.
+
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/graph.png}
+    \caption{Red original de un programa de \textit{Java}}
+    \label{fig:graph}
+\end{figure}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/graphgiant.png}
+    \caption{Componente gigante del grafo}
+    \label{fig:graphgiant}
+\end{figure}
+
+
+\section{Análisis básico}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{ll}
+        \toprule
+        \textbf{Medida}                                         & \textbf{Valor} \\
+        \midrule
+        Número de nodos \( N \)                                 & 724            \\
+        Número de enlaces \( L \)                               & 1025           \\
+        Número máximo de enlaces \( L_{\max} \)                 & 524176         \\
+        Densidad del grafo \( \frac{L}{L_{\max}} \)             & 0.002          \\
+        Grado medio \( \langle k \rangle \)                     & 1.416          \\
+        Distancia media \( d \)                                 & 1.985          \\
+        Diámetro \( d_{\max} \)                                 & 5              \\
+        Coeficiente medio de clustering \( \langle C \rangle \) & 0.079          \\
+        Número de componentes conexas                           & 24             \\
+        Número de nodos componente gigante (y \%)               & 667 (92.13\%)  \\
+        Número de aristas componente gigante (y \%)             & 981 (95.71\%)  \\
+        \bottomrule
+    \end{tabular}
+    \caption{Métricas del grafo}
+    \label{tab:met_grafo}
+\end{table}
+
+
+Como puede verse en la tabla \ref{tab:met_grafo}, la densidad es de tan solo el $1.9\%$, lo que corresponde con un valor muy bajo dada la cantidad máxima de enlaces que la red puede tener, es una red poco densa.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.7\linewidth]{img/degree-distribution.png}
+    \caption{Distribución de grados de los nodos}
+    \label{fig:degree_distribution}
+\end{figure}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.7\linewidth]{img/indegree-distribution.png}
+    \caption{Distribución de grados (enlaces entrantes) de los nodos}
+    \label{fig:indegree_distribution}
+\end{figure}
+
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.7\linewidth]{img/outdegree-distribution.png}
+    \caption{Distribución de grados (enlaces salientes) de los nodos}
+    \label{fig:outdegree_distribution}
+\end{figure}
+
+En cuanto al grado medio, este tiene un valor de $1.41$, es decir, cada nodo tiene de media solo $1$ nodo referenciado. Siendo un programa de \textit{Java}, pese a que cada nodo podría tener potencialmente $724\cdot724$ referencias, ya que es un grafo dirigido cíclico ($N^2$), es normal que no todas las clases, métodos, funciones se referencien a todos ellas.
+
+Como puede observarse en la figura \ref{fig:degree_distribution}, la mayoría de los nodos, concretamente el $90\%$ tienen menos de $5$ referencias. Como cursiosidad, en la figura \ref{fig:graph_90_filtered} se ven el $90\%$ de los nodos con grado menor a $5$.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.5\linewidth]{img/graph_90\%_degree.png}
+    \caption{Grafo con solo nodos de $k\le 5$ ($90\%$)}
+    \label{fig:graph_90_filtered}
+\end{figure}
+
+En esta red se da la propiedad de libertad de escala, es decir, su distribución de grados sigue una ley de potencias. Esto quiere decir que la gran mayoría de nodos apenas tienen conexiones, solo unos pocos nodos abarcan la mayoría de enlaces.
+
+El $4.7\%$ de los nodos tienen una cantidad de enlaces superior a $9$ (fig \ref{fig:graph_4_filtered}), y solo el $0.55\%$ superan los $28$. Estos son los \textit{hubs} de esta red. Concretamente son clases como \texttt{CodeData}, \texttt{GEXFExporter} o \texttt{StdPage}, que sin tener conocimiento experto sobre su funcionamiento, son funcionalidades muy importantes y tiene sentido que tengan tantos enlaces. Esas clases además tienen su mayoría de enlaces entrantes (\textit{in-degree}), también tiene sentido ya que seguramente, al ser clases tan importantes, realicen una carga importante de trabajo y sean llamadas desde muchos archivos de código.
+
+Por el contrario, nodos como \texttt{add} o \texttt{build} son métodos con mayoría de enlaces salientes y ningún entrante. Esto es así ya que referencian clases como las ya mencionadas en sus argumentos.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.5\linewidth]{img/graph_4\%_degree.png}
+    \caption{Grafo con solo nodos de $k>9$ ($4.7\%$)}
+    \label{fig:graph_4_filtered}
+\end{figure}
+
+La distancia media es de $1.9$, es decir, la cantidad de enlaces entre dos nodos es casi $2$. La distancia máxima o diámetro es $5$, por lo que se puede recorrer cualquier camino del grafo con tan solo cinco saltos de nodo a nodo. Son valores bastante bajos.
+
+La red presenta $24$ componentes conexas, pero son agrupaciones de tan solo unos pocos nodos cada una de las componentes detectadas. Se tiene que el $92.13$ de los nodos están agrupados en una componente gigante. Esto es una señal de estructura robusta en términos de conectividad.
+
+El valor de coeficiente de \textit{clustering} medio es de $0.079$, es decir, es un valor bastante bajo que indica que solo el $7.9\%$ de las conexiones posibles entre vecinos de un nodo están realmente presentes, lo que indica poca cohesión local. Se puede ver que la distribución de estos coeficientes es dispersa (fig \ref{fig:clustering_coeff}), ya que la mayoría tienen valores cercanos a cero, mientras que existen algunos nodos atípicos que tiene un coeficiente mayor a $0.4$. También hay unos pocos en mitad de la distribución de valores de coeficiente, pero la mayoría se agrupan en cero.
+
+La densidad del grafo es muy baja, de tan solo el $2\%$ (pocos enlaces en la red) y el coeficiente medio de \textit{clustering} es también bastante bajo. Esto sugiere una estructura laxa, descentralizada y con pocos grupos fuertemente conectados. En la figura \ref{fig:clustering_coeff_degree} se observa como el coeficiente de \textit{clustering} es mayor en nodos poco conectados, aunque la tendencia sigue siendo que la mayoría de nodos tengan un coeficiente bajo, esto indica que los \textit{hubs} suelen formar estructuras más dispersas y los nodos con pocos enlaces se agrupan en zonas locales más densas (aunque no la mayoría).
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.5\linewidth]{img/clustering_distribution_scatter.png}
+    \caption{Distribución de los coeficientes de \textit{clustering}}
+    \label{fig:clustering_coeff}
+\end{figure}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.5\linewidth]{img/clustering_distribution_vs_degree.png}
+    \caption{Distribución de los coeficientes de \textit{clustering} por grado}
+    \label{fig:clustering_coeff_degree}
+\end{figure}
+
+\section{Identificación de actores principales}
+Los actores principales quedan identificados en las tablas \ref{tab:centrality1} y \ref{tab:centrality2}. A continuación de analizan todos ellos por métrica.
+\begin{table}[htp]
+    \centering
+    \small
+    \begin{tabular}{ll}
+        \hline
+        \textbf{Cercanía}                      & \textbf{Intermediación}              \\
+        \hline
+        \texttt{IExporter}: $1$                & \texttt{AbstractExporter}: $0.00066$ \\
+        \texttt{ICodeData}: $1$                & \texttt{GEXFExporter}: $0.00048$     \\
+        \texttt{AbstractScenario}: $1$         & \texttt{CodeData}: $0.00038$         \\
+        \texttt{ICodeMinerParser}: $1$         & \texttt{ICodeData}: $0.0003$         \\
+        \texttt{CodeminerResourceVisitor}: $1$ & \texttt{IExporter}: $0.0002$         \\
+        \hline
+    \end{tabular}
+    \caption{Medidas de Cercanía e Intermediación en la red (parte 1).}
+    \label{tab:centrality1}
+\end{table}
+
+\begin{table}[htp]
+    \centering
+    \small
+    \begin{tabular}{ll}
+        \hline
+        \textbf{Grado}                                  & \textbf{Vector propio}                   \\
+        \hline
+        \texttt{GEXFExporter}: $55$                     & \texttt{AbstractExporter}: $1$           \\
+        \texttt{CodeData}: $44$                         & \texttt{GEXFExporter}: $0.84$            \\
+        \texttt{StdPage}: $38$                          & \texttt{IInfoElement<T>}: $0.73$         \\
+        \texttt{ExtendedMethodDependenceDetector}: $28$ & \texttt{CodeData}: $0.61$                \\
+        \texttt{StdAnalyse}: $26$                       & \texttt{CodeDataChangesListener}: $0.59$ \\
+        \hline
+    \end{tabular}
+    \caption{Medidas de Grado y Vector Propio en la red (parte 2).}
+    \label{tab:centrality2}
+\end{table}
+
+\subsection{Centralidad de cercanía}
+Todos los nodos, e incluso muchos más fuera del top $5$, tienen una valor de cercanía máximo. Dado que la red tiene una distancia media de $1.9$ y un diámetro de $5$, por lo que es normal que existan muchísimos nodos con un valor tan alto en cuanto a cercanía con el resto de nodos. Dados estos resultados en los que hay tantísimos nodos con el mismo valor, se considera que no tiene sentido la detección de actores en esta métrica, al menos de forma aislada.
+
+\subsection{Centralidad de intermediación}
+Los actores con valores más altos en esta métrica actúan como ``puentes'' entre comunidades. \texttt{AbstractExporter} es una clase abstracta que centraliza la lógica de exportación, que podría estar conectando implementaciones concretas (\texttt{GEXFExporter}) con otros módulos. \texttt{CodeData} podría estar almacenando datos esenciales del programa, siendo un punto de paso obligado para operaciones de análisis.
+
+Lo mismo se aplica a las interfaces \texttt{ICodeData} y \texttt{IExplorer}, las cuales, tratándose de \textit{Java}, que es un lenguaje con paradigma de programación orientada a objetos, se utilizan en múltiples definiciones de clases, lo cual cuadra con que estén relacionadas con las clases más importantes y con su naturaleza de interfaz.
+
+\subsection{Centralidad de grado}
+Estos actores son \textit{hubs} con numerosas conexiones directas, concretamente conexiones \textit{in-degree} o entrantes. Posiblemente \texttt{GEXFExporter} sea una implementación concreta de exportación a formato \textit{GEXF}, referenciada por múltiples clases que necesitan generar salidas, y \texttt{CodeData} una clase que centraliza datos críticos, siendo accedida por numerosos componentes (métodos de análisis, visualización, etc.).
+Su alto grado refleja su rol como núcleos funcionales del programa.
+
+\subsection{Centralidad de vector propio}
+Estos actores están conectados a otros nodos influyentes, formando una élite estructural, ya que un nodo es considerado importante, si está conectado a otros nodos importantes. La clase abstracta \texttt{AbstractExporter} está conectada con  \texttt{GEXFExporter} y otras clases de exportación, lo cual le otorga influencia global. \texttt{IInfoElement<T>} es una interfaz genérica que probablemente define elementos de datos utilizados transversalmente en el sistema, lo cual hace que esté conectada a (seguramente) casi todas las clases importantes.
+
+\subsection{Información extraída del análsis de actores}
+Existen dependencias críticas en clases como \texttt{CodeData} y \texttt{GEXFExporter}, ya que son puntos únicos de fallo y cambios en estos nodos afectarían a gran parte del sistema. También parece existir un bajo acoplamiento, debido a la baja densidad general ($0.002$) que indica que la mayoría de nodos tienen responsabilidades especializadas, pero los \textit{hubs} aseguran la integración global.
+
+Se puede ver en la figura \ref{fig:eigenvector_and_closeness_centrality} una visualización de aquellos nodos con mayor valor en la centralidad de vector propio representado por el tamaño. Los nodos más oscuros son aquellos con mayor centralidad de cercanía. Como se puede observar hay actores, como por ejemplo \texttt{AbstractExporter}, que mantienen valores grandes en ambas métricas. Es interesante ver como la mayor parte de nodos con altos valores de centralidad de cercanía son nodos con un tamaño muy pequeño, es decir, con poca importancia en cuanto a enlaces a otros nodos importantes.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.9\linewidth]{img/graph_eigenvector_and_closeness_centrality.png}
+    \caption{Nodos más oscuros representa mayor centralidad cercanía. Nodos más grande mayor centralidad de vector propio}
+    \label{fig:eigenvector_and_closeness_centrality}
+\end{figure}
+
+Esto sugiere que estos nodos, aunque pueden acceder rápidamente a otros componentes del sistema (alta cercanía), no están necesariamente conectados a los actores más influyentes de la red, lo que se comentaba anteriormente del bajo acoplamiento.
+
+Esta distribución podría indicar un diseño modular donde ciertos componentes están bien posicionados para comunicarse eficientemente con el resto del sistema, pero no dependen exclusivamente de los nodos centrales. Tal estructura podría beneficiar la mantenibilidad y la escalabilidad del \textit{software}, permitiendo cambios localizados sin afectar significativamente a los componentes principales.
+
+En cambio, aquellos nodos con mayor valor de intermediación también son aquellos que mayor centralidad de vector propio tienen (fig \ref{fig:eigenvector_and_inbetweennes_centrality}). Esta correlación sugiere la existencia de un ``núcleo arquitectónico'' formado por clases como \texttt{AbstractExporter} y \texttt{CodeData}, que no solo controlan el flujo de información entre diferentes módulos del sistema, sino que también están integrados con otros componentes estructuralmente importantes. Esto podría ser una ventaja, por la mantenibilidad, y un riesgo crítico, al depender el sistema completo en estos componentes centrales.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.9\linewidth]{img/graph_eigenvector_and_inbetweeness_centrality.png}
+    \caption{Nodos más oscuros representa mayor centralidad de vector propio. Nodos más grande mayor centralidad intermediación}
+    \label{fig:eigenvector_and_inbetweennes_centrality}
+\end{figure}
+
+\section{Detección de comunidades}
+Para la detección de comunidades de han utilizado los algoritmos de \textit{Lovaina} y \textit{Statistical Inference}. Este último no tiene hyperparámetros. Mientras \textit{Lovaina} optimiza la modularidad mediante un enfoque jerárquico ascendente, \textit{Statistical Inference} utiliza un modelo probabilístico que puede capturar estructuras comunitarias distintas basadas en patrones estadísticos de conexión.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.9\linewidth]{img/community1.png}
+    \caption{Comunidades por \textit{Lovaina}}
+    \label{fig:communitylovaina}
+\end{figure}
+
+Los resultados obtenidos variando el valor de resolución son muy similares, entre $15-10$ resultados dan todas las ejecuciones. En \textit{Lovaina}, el mejor valor de modularidad siempre era obtenido por valores cercanos a $1$, donde la red llegaba a $15$ comunidades. Sin embargo, ningún valor de los probados bajaba de $0.7$ en modularidad, por lo que la red tiene unas comunidades claramente definidas. Además, el número de redes variaba entre rangos de valores muy cercanos y parecidos, alcanzando su máximo valor de modularidad en en valor de resolución $1$, aumentando de uno en uno por mucho que se aumentara en el tamaño de esta variable, por lo que como mínimo el algoritmo no parece encontrar (sin forzar demasiado este parámetro) más de $11-10$ comunidades. En la figura \ref{fig:communitylovaina} puede verse el grafo filtrado por comunidad usando los colores.
+
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.9\linewidth]{img/community2.png}
+    \caption{Comunidades por \textit{Statistical Inference}}
+    \label{fig:communityinferred}
+\end{figure}
+
+El algoritmo de \textit{Statistical Inference} devuelve un total de $10$ comunidades. En la figura \ref{fig:communityinferred} puede verse el grafo filtrado por comunidad usando los colores. Muchas de sus comunidades coinciden en la agrupación de varios nodos clave si se compara con los resultados obtenidos por \textit{Lovaina}.
+
+Se escoge el grafo con valor de resolución $1$, valor de comunidad $0.85$ y $15$ \textit{clusters} encontrados, ya que el valor de número de comunidades ha sido muy repetido y parece bastante robusto entre ejecuciones, además alcanza el mayor valor de modularidad de todos.
+
+\begin{figure}[htp]
+    \centering
+    \begin{subfigure}[htp]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{img/com1.png}
+        \caption{Comunidad 1: Análisis de elementos Java (InfoJavaElement, ParserJava). Manejo de estructuras de código y relaciones entre elementos.}
+        \label{fig:comunidad1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[htp]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{img/com2.png}
+        \caption{Comunidad 2: Exportación de datos (GEXFExporter, AbstractExporter). Conversión de resultados a formatos gráficos.}
+        \label{fig:comunidad2}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[htp]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{img/com3.png}
+        \caption{Comunidad 3: Interfaz de usuario (StdPage, ResultAreaDialog). Componentes para configuración y visualización.}
+        \label{fig:comunidad3}
+    \end{subfigure}
+    \vspace{0.5cm}
+    \begin{subfigure}[htp]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{img/com4.png}
+        \caption{Comunidad 4: Gestión de extensiones (ExtensionUtil). Coordinación de módulos y plugins.}
+        \label{fig:comunidad4}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[htp]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{img/com12.png}
+        \caption{Comunidad 12: Registro y logging (LogManager, DebugLogger). Monitorización del proceso de análisis.}
+        \label{fig:comunidad12}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[htp]{0.3\textwidth}
+        \phantom{} % Espacio vacío para alineación
+    \end{subfigure}
+    \caption{Análisis de comunidades en la estructura del software}
+    \label{fig:comunidades}
+\end{figure}
+
+En las figuras \ref{fig:comunidades} se observan algunas de las más cohesionadas semánticamente y más interesantes. 
+
+La Comunidad $1$ está centrada en elementos de enumeración y contenido de archivos, con nodos clave como \texttt{InfoJavaElement} y \texttt{ParserJava}. Se encarga de la representación y manejo de contenido de archivos, creando estructuras internas para el procesamiento de la información.
+
+La Comunidad $2$ abarca la interfaz de usuario, con nodos centrales como \texttt{StdPage} y \texttt{ResultAreaDialog}. Esta comunidad agrupa componentes de la capa de presentación, incluyendo páginas, diálogos y elementos de visualización. Su alta centralidad de grado (especialmente \texttt{StdPage} con grado muy alto) indica que estos componentes se comunican con muchas otras partes del sistema.
+
+La Comunidad $3$ se enfoca en \texttt{CodeData}, principalmente \textit{tests}. Esta comunidad maneja los componentes relacionados con la estructura de datos del código y, más significativamente, los casos de prueba que validan el funcionamiento de estas componentes.
+
+La Comunidad $4$ se dedica a la exportación de datos, con \texttt{GEXFExporter} y \texttt{AbstractExporter} como nodos principales. Esta comunidad implementa el patrón de diseño \textit{Strategy} para la exportación de datos, con \texttt{AbstractExporter} como clase base y especializaciones como \texttt{GEXFExporter}. Los valores altos de centralidad de intermediación en estos nodos confirman su papel como puente entre el análisis y la representación externa de datos.
+
+La Comunidad $12$ implementa el registro y \textit{logging}, con \texttt{LogManager} y \texttt{DebugLogger} como nodos centrales. Esta comunidad proporciona la infraestructura de \textit{logging}, crucial para la depuración y el seguimiento de la ejecución. Su estructura relativamente aislada pero con conexiones a múltiples comunidades refleja su naturaleza transversal en el sistema.
+
+El análisis de las conexiones entre comunidades revela patrones arquitectónicos importantes. Existen dependencias funcionales entre las comunidades $1$ (Enumeración y contenido) y $4$ (Exportación), donde el contenido procesado es posteriormente exportado en distintos formatos. La comunidad $3$ (\texttt{CodeData}) mantiene conexiones con prácticamente todas las demás comunidades. Las comunidades $2$ (Interfaz) y $4$ (Exportación) muestran una relación donde los datos exportados son visualizados a través de la interfaz de usuario.
+
+La comunidad $12$ (\textit{Logging}) funciona como servicio transversal, con conexiones hacia prácticamente todas las demás comunidades, indicando su naturaleza de servicio común utilizado por múltiples componentes. 
+
+La estructura modular identificada sugiere un diseño orientado a componentes con una arquitectura que separa claramente la representación de datos, la interfaz de usuario, las pruebas y la exportación. El bajo coeficiente de clustering general ($0.079$) indica un diseño donde los componentes tienen responsabilidades bien definidas y limitadas. La comunidad $12$ (\textit{Logging}) proporciona servicios utilizados transversalmente a lo largo de toda la arquitectura.
+
+\end{document}
