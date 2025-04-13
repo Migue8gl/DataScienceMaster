@@ -1,0 +1,122 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[a4paper, top=1.2in, bottom=1.4in, left=1in, right=1in]{geometry}
+\usepackage{graphicx} % Required for inserting images
+\graphicspath{ {./img/} }
+\usepackage[spanish]{babel}
+\usepackage{float}
+\usepackage{fancyhdr}
+\setlength{\parskip}{1em}  % Adds space between paragraphs (1em)
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{listings}
+\usepackage[utf8]{inputenc}
+
+\usepackage{xcolor}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\footnotesize,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{orange},
+    showstringspaces=false,
+    frame=single,
+    breaklines=true
+}
+\usepackage{subcaption}
+\newcommand{\tikzmark}[1]{\tikz[baseline,remember picture] \coordinate (#1) {};}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shadows,arrows.meta} % For adding edges label
+\usetikzlibrary{calc}
+\usepackage{eso-pic}
+\usepackage[backend=biber, defernumbers=true, citestyle=numeric-comp, bibstyle=ieee, sorting=none]{biblatex}
+\addbibresource{bibliography/bibliography.bib}
+\DeclareBibliographyCategory{cited}
+\AtEveryCitekey{\addtocategory{cited}{\thefield{entrykey}}}
+% Configurando BibLaTeX
+\DefineBibliographyStrings{spanish}{
+  url = {URL},
+  andothers={et ~al\adddot}
+}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\AddToShipoutPictureBG{%
+\begin{tikzpicture}[remember picture, overlay]
+\node[opacity=.15, inner sep=0pt]
+    at(current page.center){\includegraphics[scale=1.5]{img/logo-ugr2.png}};
+\end{tikzpicture}%
+}
+
+\title{Minería de Texto}
+\author{Miguel García López}
+\date{Marzo 2025}
+
+\pagestyle{fancyplain}
+\headheight 35pt
+\lhead{Miguel García López}            
+\chead{\textbf{\small Minería de Texto}}
+\rhead{Minería de Medios Sociales \\ \today}
+\lfoot{\scriptsize\LaTeX}
+\cfoot{\small Minería de Texti}
+\rfoot{\small\thepage}
+\headsep 1.5em
+
+\author{Miguel García López} % Nombre y apellidos
+
+\date{\normalsize\today} % Incluye la fecha actual
+
+\begin{document}
+\begin{titlepage}
+    \begin{figure}
+        \vspace{-1.3cm}
+        \begin{center}
+            \includegraphics[width=0.75\textwidth]{img/UGR-Logo.png}
+        \end{center}
+    \end{figure}
+    \vspace{1.3cm}
+    \centering
+    \normalfont \normalsize
+    \textsc{\textbf{Minería de Medios Sociales - 2024-2025} \\\vspace{.15cm} Universidad de Granada} \\ [25pt]
+    \huge Práctica de Minería de Texto - KNIME
+
+    \normalfont \normalsize \vspace{.30cm}
+    \textsc{Miguel García López}
+
+\end{titlepage}
+
+\tableofcontents
+\listoffigures
+\listoftables
+\newpage
+
+\section{Introducción}
+
+\end{document}
