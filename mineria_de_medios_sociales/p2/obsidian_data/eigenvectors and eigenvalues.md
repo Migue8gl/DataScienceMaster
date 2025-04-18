@@ -1,0 +1,15 @@
+- #eigenvectorsandeigenvalues | #vectorespropiosyvalorespropios
+
+- Los [[vector|vectores]] propios o **eigenvalores** o autovectores de un [[linear transformations|operador lineal]] son los vectores no nulos que, cuando son transformados por el operador, dan lugar a un vector múltiplo de sí mismos, es decir, da lugar al mismo vector multiplicado por un **escalar**, de forma que no cambian su dirección.
+- Este escalar recibe el nombre de **eigenvalor**, autovalor o valor propio. Se representa como $\lambda$. 
+- Una transformación puede quedar determinada por sus vectores y valores propios.
+- Si tenemos una matrix cuadrada, tenemos la siguiente fórmula:
+	- $Av=\lambda v$
+- Donde $A$ es la matriz que representa al operador.
+- Hay un vector propio por cada dimensión de la matriz y no todas las matrices pueden ser descompuestas en sus vectores y valores propios.
+- Un uso interesante de este concepto es la **descomposición de una matriz** en sus valores y vectores propios: ^049f57
+	- $A=Q\Delta Q^{-1}$
+- Donde $Q$ son los vectores propios y $\Delta$ los valores propios expresados en una [[special types of matrices#Matriz diagonal|matriz diagonal]].
+- Es muy interesante desde el punto de vista de la eficiencia computacional.
+- Los autovectores representan la **dirección** de la transformación, dirección de máxima variación.
+- Los autovalores representan el escalar de cuanto se varía en esa dirección representada por el autovector.

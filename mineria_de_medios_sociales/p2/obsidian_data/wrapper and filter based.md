@@ -1,0 +1,5 @@
+- #wrapper | #filter
+
+- Desde un punto de vista del [[feature selection|problema de selección de características]], hay dos categorías de métodos para afrontar el problema.
+- Los métodos **wrapper** miden la importancia de una característica en función de su utilidad a la hora de entrenar el modelo de aprendizaje automático con ella (dependen del algoritmo de aprendizaje). Por otro lado, los métodos de filtro (**filter**) seleccionan características en función de su relación con la variable objetivo (utilizan métodos basados en los propios datos, no depende del algoritmo de aprendizaje).
+- Los métodos de filtro son más rápidos que los wrappers, debido a que no necesitan llamar al algoritmo de aprendizaje. Discriminan características según la propia naturaleza de los datos (ej: por varianza). Pese a ello, se ha investigado muy profundamente los métodos wrapper y se ha observado que son capaces de encontrar subconjuntos que se adapten mejor al algoritmo de aprendizaje que se utilice.

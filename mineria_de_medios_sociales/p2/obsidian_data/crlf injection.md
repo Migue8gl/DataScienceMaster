@@ -1,0 +1,5 @@
+- #crlfinjection
+
+- La inserción de caracteres de retorno de carro y salto de línea -combinación conocida como CRLF- en campos de entrada de formularios web representa un método de ataque denominado inyección CRLF. Estos caracteres invisibles indican el final de una línea o el final de un comando en muchos protocolos tradicionales de Internet, como HTTP, MIME o NNTP.
+- Por ejemplo, la inserción de un CRLF en una petición HTTP, seguida de cierto código HTML, podría enviar páginas web personalizadas a los visitantes de un sitio web.
+- Este ataque puede realizarse en aplicaciones web vulnerables que no apliquen el filtrado adecuado a la entrada del usuario. Esta vulnerabilidad abre la puerta a otros tipos de ataques de inyección, como [[cross site scripting|XSS]] e [[code injection|inyección de código]], y también podría derivar en el secuestro de un sitio web.

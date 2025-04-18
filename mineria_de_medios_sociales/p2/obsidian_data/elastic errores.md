@@ -1,0 +1,2 @@
+- Si accedemos desde http -> error, en el archivo elasticsearch.yml `xpack.security.http.ssl` está a true (aconsejable dejarlo así y acceder desde https).
+- Si nos piden login podemos desactivarlo en elasticserach.yml -> ` xpack.security.enabled.

@@ -1,0 +1,8 @@
+- #dl | #alignment
+
+- En el contexto del deep learning, más concretamente en el de la [[attention|atención]], el **alineamiento** se refiere al proceso de identificar segmentos o partes de los datos de entrada que son más relevantes para una parte específica de la salida.
+
+## Funcionamiento
+- **SCORES**: En un mecanismo de atención, cada elemento de la secuencia de salida se genera teniendo en cuenta toda la secuencia de entrada. El modelo calcula un conjunto de puntuaciones de atención que cuantifican la relevancia de cada elemento de entrada para el elemento de salida actual. Estas puntuaciones suelen obtenerse mediante una función de compatibilidad (a menudo un [[dot product|producto escalar]]) entre el [[vector]] de consulta actual  (**query**) (que representa el elemento de salida actual) y los vectores clave (**key**) (que representan los elementos de entrada).
+- **SOFTMAX**: Las puntuaciones de atención se pasan por una función [[softmax]] para producir una distribución de probabilidad. Esta distribución representa la alineación de los elementos de entrada con el elemento de salida actual, donde las probabilidades más altas indican una alineación más fuerte.
+- **SUMA PONDERADA**: El vector de contexto final para el elemento de salida actual se calcula como una suma ponderada de los vectores de valores (**value**) de entrada, donde las ponderaciones son las *probabilidades de atención*. Este vector de contexto ($c$) se utiliza para producir el elemento de salida, garantizando que los elementos de entrada más relevantes contribuyan de forma más significativa.

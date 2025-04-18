@@ -85,7 +85,7 @@
 \chead{\textbf{\small Minería de Texto}}
 \rhead{Minería de Medios Sociales \\ \today}
 \lfoot{\scriptsize\LaTeX}
-\cfoot{\small Minería de Texti}
+\cfoot{\small Minería de Texto}
 \rfoot{\small\thepage}
 \headsep 1.5em
 
@@ -118,5 +118,138 @@
 \newpage
 
 \section{Introducción}
+Este documento trata sobre la \textbf{minería de texto} y alguna de las técnicas empleadas en todo el flujo completo del proceso. Este flujo de trabajo o \textit{workflow} será realizado con el \textit{software} \textit{KNIME}, el cual viene integrado con múltiples herramientas específicas para ello, además de contar con \textit{plugins} extra si fuese necesario. \textit{KNIME} tiene además la ventaja de ser una herramienta de construcción de \textit{ETL's} visual, de forma que es muy intuitivo ver el flujo de interacción con los datos.
+
+Para este trabajo se requiere crear dicho flujo utilizando como conjunto de datos una serie de documentos de texto. Se deben realizar al menos:
+\begin{enumerate}
+    \item Tres nodos de pre-procesado de los datos.
+    \item Una técnica de minería con su visualización.
+    \item Una técnica de visualización de los documentos.
+\end{enumerate}
+
+\section{Conjunto de datos}
+Los datos han sido seleccionados del baúl de \textit{Obsidian} del estudiante. Este \textit{software} permite la creación de notas ``minimalistas'' escritas en \textit{markdown} y la visualización de las mismas. \textit{Obsidian} tiene la característica principal de permitir enlazar notas con otras, creando un grafo dirigido en el proceso.
+
+El estudiante ha estado utilizado el \textit{software} durante años, comenzando su uso en mitad de la carrera de ingeniería informática, por lo que tiene una cantidad de notas suficiente, en total unas $350$ notas. En la figura \ref{fig:obsidian_preview} se puede visualizar algunas de las notas del estudiante y en la figura \ref{fig:obsidian_graph} se observa la estructura de grafo creada, la cual enlaza notas entre ellas según una mezcla de toma de notas estilo \textbf{MOC} (\textit{Map Of Concepto}) y \textit{Zettelkasten}, que es un estilo de organización que se basa en crear notas individuales (\textit{zettels}) que contienen ideas concretas y autocontenidas.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/obsidian.png}
+    \caption{Notas tomadas en el editor \textit{Obsidian}}
+    \label{fig:obsidian_preview}
+\end{figure}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/obsidian_graph.png}
+    \caption{Grafo que captura la relación de las notas tras años de toma en \textit{Obsidian}}
+    \label{fig:obsidian_graph}
+\end{figure}
+
+\section{Workflow en KNIME}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/knime_etl.png}
+    \caption{\textit{Workflow} de procesamiento o \textit{ETL} en \textit{KNIME}}
+    \label{fig:knime}
+\end{figure}
+
+En la figura \ref{fig:knime} se observa el flujo completo, con todos los nodos y sus conexiones. Inicialmente los datos se leen como texto plano de la carpeta de \text{Conceptos} del baúl del estudiante. Esta tabla puede observarse en la figura \ref{fig:raw_data}.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/raw_data_table.png}
+    \caption{Tabla inicial de los datos textuales en crudo}
+    \label{fig:raw_data}
+\end{figure}
+
+\subsection{Procesamiento del texto}
+Para el procesamiento previo del texto se usan una serie de nodos en serie que se van a proceder a explicar con detalle. Primero de todo, es necesario convertir la columna principal, \textit{Document Body Text}, de tipo de dato \textit{string} a \textit{document}. Esto se debe hacer ya que ciertos nodos no aceptan como entrada el tipo de datos \textit{string}.
+
+Seguido a ello se utiliza un nodo \textit{Case Converter} para pasar todo el texto a minúscula. Después, al estar tratando con texto en \textit{markdown}, es necesario filtrar ciertos caracteres especiales que ``ensucian'' la información que se pretende extraer.
+
+\textit{Markdown} utiliza signos de almohadilla ($\#$) para los encabezados, como títulos o secciones y sub-secciones. Además también utiliza símbolos especiales para las palabras escritas en \textit{itálica} o \textbf{negrita}. Todo ello se pre-procesa con las siguientes expresiones de \textit{Regex} utilizando algunos nodos de \textit{String Manipulation}.
+\begin{itemize}
+    \item \textbf{Caracteres especiales (exclamaciones, comillas, paréntesis angulares, asteriscos, etc)}:
+          \begin{verbatim}
+    regexReplace($Text$, "[>()\#.!?¡\"'*|,`-]", "")
+    \end{verbatim}
+
+    \item \textbf{Enlaces entre notas}:
+          \begin{verbatim}
+    regexReplace($Text$, "\[\[.*?\]\]", "")
+    \end{verbatim}
+\end{itemize}
+Todo ello vuelve a convertirse a tipo de dato \textit{document} con un nodo concreto. Después se utilizan dos nodos de filtrado de \textit{stop words}, que son palabras carentes de potencial significado semántico, tanto en español como en inglés, ya que los apuntes contienen notas en ambos idiomas.
+
+\subsection{Extracción de palabras clave}
+Posterior a la limpieza del texto y paralelo a otros procesos, se utiliza un nodo extractor de palabras clave. Este nodo funciona usando un método basado en grafos que, en primera instancia, selecciona un conjunto de términos de alta frecuencia y los añade al grafo como nodos, para después calcular la fuerza de asociación entre términos.
+
+Se filtran los $k$ términos más importantes dados este algoritmo de minería de texto y se visualizan. En las figuras \ref{fig:keywords_table} y \ref{fig:keywords_barchart} se pueden visualizar las $15$ palabras claves más relevantes extraídas. Cabe destacar que todas pertenecen al mismo sub-conjunto de apuntes pertenecientes a lógica y métodos discretos. El término más relevante es ``conjunto". Este término es muy utilizado y referenciado entre documentos, tiene sentido que sea el más relevante, así como tiene también cierto sentido que lógica y métodos discretos sea un sub-conjunto de documentos que contiene los términos más relevantes, ya que en estos textos se relatan y explican detalladamente conceptos relacionados con los grafos (las \textit{keywords} detallan explícitamente conceptos de grafos, como por ejemplo los vértices), los cuales son muy referenciados y usados en otros documentos, incluso en aquellos con temáticas totalmente opuestas, pues se hace referencia y se explican métodos que hacen uso de esta estructura.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/keywords-table.png}
+    \caption{Tabla con las $15$ palabras clave más importantes}
+    \label{fig:keywords_table}
+\end{figure}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/keywords-barchart.png}
+    \caption{Gráfico de barras con los $15$ términos más importantes}
+    \label{fig:keywords_barchart}
+\end{figure}
+
+\subsection{TF-IDF y descubrimiento de grupos}
+Partiendo del nodo final del flujo de limpieza y pre-procesado, se continua con el flujo de técnicas de descubrimiento de grupos. Se coloca un nodo cuya finalidad es convertir texto en una representación numérica llamada ``Bolsa de Palabras" (\textit{Bag of Words}). Esta técnica transforma documentos de texto en vectores numéricos contando la frecuencia de cada palabra en el documento. No preserva el orden de las palabras, sino que crea una ``bolsa" que contiene recuentos de palabras. 
+
+Después se calcula la frecuencia de términos, midiendo cuántas veces aparece cada palabra en un documento. La frecuencia de términos es un componente importante para determinar la relevancia de las palabras en un documento. Cuanto más frecuente sea una palabra en un documento específico, más importante podría ser para ese documento. Sin embargo, esta medida por sí sola puede sobrevalorar términos comunes. Por ello se utiliza esta métrica en conjunto con la frecuencia inversa de documentos.
+
+El siguiente nodo calcula la frecuencia inversa de documentos, una medida que otorga mayor peso a las palabras que aparecen en pocos documentos. El \textit{IDF} reduce la importancia de términos que son demasiado comunes en la colección de documentos. Multiplica una pequeña constante para términos que aparecen en muchos documentos, mientras que asigna un peso mayor a términos que aparecen en pocos documentos, destacando así las palabras que son más distintivas.
+
+Dadas ambas métricas, se calcula una nueva conocida como \textbf{TF-IDF}, un estadístico que refleja la importancia de una palabra en un documento dentro de una colección. Esta nueva métrica combina las bondades de los dos anteriormente explicadas.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/tagcloud.png}
+    \caption{Núbe de palabras por \textbf{TF-IDF}}
+    \label{fig:tag_cloud}
+\end{figure}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/tf-idf-table.png}
+    \caption{Tabla de datos tras calcular \textbf{TF-IDF}}
+    \label{fig:tf-idf-table}
+\end{figure}
+
+Posterior a este cálculo, se filtran aquellos términos cuyo calculo haya resultado en valores no numéricos. En la visualización de la figura \ref{fig:tag_cloud} se observa la nube de términos generada, donde el tamaño de cada palabra representa su frecuencia o importancia. Se puede observar también la tabla con los datos correspondientes en la figura \ref{fig:tf-idf-table}.
+
+Los términos más grandes son algunos muy genéricos como \textit{palabras}, \textit{números}, \textit{conjunto}. En cambio, también se resaltan otros más relevantes como \textit{moda} (estadístico), \textit{rvalue} (concepto de \texttt{c++}), \textit{polinomios}, \textit{clique}, etc. Todos estos términos orientados a un ámbito \textit{STEM} (\textit{Science, technology, engineering and mathematics}).
+
+Paralelamente se aplica el nodo extractor de \textit{topics}, que aplica \textit{Latent Dirichlet Allocation} (\textbf{LDA}), un modelo probabilístico que identifica temas ocultos en colecciones de documentos. \textbf{LDA} asume que cada documento contiene una mezcla de temas, y cada tema es una distribución de probabilidad sobre palabras. El procesamiento paralelo permite aplicar este algoritmo a grandes volúmenes de datos de manera eficiente.
+
+Este se utiliza junto a la métrica \textbf{TF-IDF} para identificar grupos mediante el algoritmo \textit{k-means}. Tras un pequeño post-procesado (\textit{PCA}, colores por \textit{cluster}, prueba de valores para $k$, etc.) se obtienen los siguientes grupos (figura \ref{fig:clusters}).
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\linewidth]{img/cluster.png}
+    \caption{Cluster obtenido de los términos}
+    \label{fig:clusters}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{cluster\_0}: Grafos, redes y relacionado. También se incluyen algunos conceptos de inversión.
+    \item \textbf{cluster\_1}: Conceptos de programación avanzada (principalmente C++), matemática aplicada y estructuras de datos.
+    \item \textbf{cluster\_2}: Metaheurísticas, algoritmos de optimización.
+\end{itemize}
+  
+El \textit{cluster} número $2$ es el más pequeño, se ha especializado mucho en algoritmos metaheheurísticos, de los cuales el estudiante tiene una gran cantidad de apuntes en relación a la temática de su \textit{TFG}. 
+
+Según el análisis anterior, los términos más relevantes tenían que ver con teoría de grafos, lo que se ve reflejado en el grupo $0$, que es además el que más elementos tiene y en relación a esa temática. 
+
+Por último, parece que el grupo $1$ grupa todos los conceptos más relacionados con matemáticas, \textit{machine learning} y programación.
 
 \end{document}

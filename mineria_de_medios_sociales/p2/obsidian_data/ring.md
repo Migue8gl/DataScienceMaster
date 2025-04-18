@@ -1,0 +1,11 @@
+- #field | #cuerpo | #ring | #anilo
+
+- Un anillo es una terna $(R,+,·)$ donde $R$ es un conjunto y $+, ·$ son dos operaciones sobre un conjunto que verifican las siguientes propiedades:
+	- La operación $+$ es conmutativa, asociativa, tiene elemento neutro (que denotaremos por $0$) y todo elemento tiene inverso (el inverso de $x$ es $-x$).
+	- La operación $·$ es asociativa, tiene elemento neutro (que denotaremos por $1$) y es distributiva.
+- Si además la operación $·$ es conmutativa, estaremos ante un anillo conmutativo.
+- Un cuerpo es un anillo conmutativo en el que todo elemento distinto de $0$ tiene inverso para el producto. ^4b1174
+- Ej:
+	- $(\mathbb{N},+,·)$ no es un anillo.
+	- $(\mathbb{Z},+,·)$ es anillo conmutativo y no es cuerpo.
+	- $(\mathbb{R},+,·)$ es cuerpo.

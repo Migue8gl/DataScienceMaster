@@ -1,0 +1,41 @@
+- #linux | #directory
+
+- **/** - El directorio raíz:
+	- Todos los archivos y directorios se encuentran debajo de *root*.
+- **/bin** - Binarios:
+	- Contiene la mayoría de archivos ejecutables de la mayoría de comando de la *shell*, como **ls, cp**, etc.
+	- Suelen estar en formato binario y son accesibles por todos los usuarios.
+- **/dev** - Archivos de dispositivo:
+	- Contiene archivos especiales, normalmente relacionados con los dispositivos. Son archivos virtuales, no están fisicamente localizados en el disco.
+	- **/dev/null**: puede usarse para destruir cualquier archivo o cadena.
+	- **/dev/zero**: contiene una secuencia infinita de ceros.
+	- **/dev/random**: contiene una secuencia infinita de valores aleatorios.
+- **/etc** - Archivos de configuración:
+	- Contiene archivos de configuración del sistea, usados normalmente por el usuario administrador y algunos servicios, como contraseñas y archivos de red.
+- **/usr** - Binarios de usuario y datos de programas:
+	- Suele contener todos los executables, librerías y código de los programas del sistema.
+	- **/usr/bin**: contiene los comandos básicos de usuario.
+	- **/usr/sbin**: contiene comandos adicionales del administrador.
+	- **/usr/lib**: contiene librerías del sistema.
+	- **/usr/share**: contiene documentación o archivos comunes a todas las librerías.
+- **/home** - Datos personales del usuario:
+	- Contiene el directorio personal de los distintos usuarios. Entre distintos directorios personales no se tienen permisos.
+- **/lib** - Librerías compartidas:
+	- Código compartido enntre múltiples ejecutables binarios. Suele aglomerar librerías necesarias para los programas alojados en **/bin** y **/sbin**.
+- **/sbin** - Binarios del sistema:
+	- Contiene lo mismo que **/bin**. La única diferencia es que estos programas solo pueden correr si se ejecutan como usuario *root*.
+- **/var** - Archivos de datos variables:
+	- En este directorio se almacena *logs* de sistema, *trackeo* del usuario, *cache* y otros archivos que el sistema crea y gestiona.
+	- Es un directorio importante para conocer el comportamiento del sistema, pues todos los *logs* suelen ir ahí.
+- **/boot** - Archivos *boot*:
+	- Contiene archivos del kernel y de la imagen de arranque. Normalmente este directorio esta alojado en una partición al principio del disco.
+- **/proc** - Software opcional:
+	- Se usa para instalar aplicaciones de terceros. Las buenas prácticas serían instalar ahí el software y linkear el binario en el **/bin** para hacerlo usable para todos los usuarios.
+- **/root** - Directorio personal del *root*:
+	- Se usa como el directorio personal del usuario *root*. No confundir con **/**.
+- **/media** - Punto de montaje para dispositivos extraíbles:
+	- El directorio de dispositivos como *USB, SD* o *DVDs* se crean bajo **/media**.
+- **/mnt** - Directorio de montaje:
+	- Es usado para montar manualmente un sistema de archivos.
+- **/srv** - Servicios de datos:
+	- Contiene datos para servicios del sistema. Si se corre un servidor, es buena práctica almacenar la web en este directorio.

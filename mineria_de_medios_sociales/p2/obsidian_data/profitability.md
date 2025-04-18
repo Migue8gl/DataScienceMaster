@@ -1,0 +1,8 @@
+- #economics  | #profitability | #rentabilidad
+
+- La rentabilidad es una medida financiera fundamental que evalúa el rendimiento de una inversión en términos de ganancias o pérdidas. Es esencialmente la capacidad de una inversión para generar beneficios en relación con su costo inicial.
+- $\text{Rentabilidad} = \frac{\text{Valor final}-\text{Valor inicial}}{\text{Valor inicial}\times 100}$
+
+- **Rentabilidad de la inversión**: Esta es la ganancia que esperas obtener con tu inversión a largo plazo. Se calcula generalmente dividiendo las ganancias totales (como dividendos, intereses o incremento en el valor de la inversión) por el costo inicial de la inversión y luego multiplicándolo por $100$ para obtener un porcentaje. Esta medida se enfoca en la estabilidad y el crecimiento a largo plazo. Por ejemplo, si inviertes $100€$ y obtienes $10€$ de ganancia al final del año, la rentabilidad de tu inversión sería del $10\%$.
+- **Rentabilidad especulativa**: Esta es más arriesgada y se centra en ganancias rápidas en un corto período de tiempo. Se refiere a las ganancias que puedes obtener mediante la compra y venta rápida de activos, como acciones o criptomonedas, aprovechando las fluctuaciones de precios en el mercado. No necesariamente implica un análisis profundo de la empresa o el activo en el que inviertes, sino más bien en comprar a bajo precio y vender a alto precio en un período corto de tiempo. Es más volátil y puede implicar más riesgo.
+![[total_profitability.gif|500e]]

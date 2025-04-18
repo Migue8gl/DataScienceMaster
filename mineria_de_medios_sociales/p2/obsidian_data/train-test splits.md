@@ -1,0 +1,5 @@
+- #train | #test | #split
+
+- Una técnica utilizada para mitigar los efectos del [[overfitting and variance|sobreajuste]] es la de entrenar el modelo usando un porcentaje del conjunto de datos (aproximadamente $2/3$) y usar el resto para hacer un test de rendimiento del resultado final.
+- En el caso de tener pocos datos dentro de nuestro conjunto, hacer una separación traint/test puede ser difícil. Si aportamos más datos al conjunto de entrenamiento podríamos sufrir una [[variance and standard deviation|varianza]] muy elevada como consecuencia del [[overfitting and variance|overfitting]]. Por el contrario, dar demasiados datos al conjunto de test puede provocar un "underfitting" en nuestro modelo, es decir, una función poco precisa con mucho [[bias#Sesgo en un modelo|sesgo]].
+- En estos casos se puede hacer una subdivisión train/test y aplicar la técnica de [[cross-validation]].

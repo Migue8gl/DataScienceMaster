@@ -1,0 +1,4 @@
+- #crosssitescripting |  #xss
+
+- Siempre que una aplicación inserta la entrada de un usuario dentro de la salida que genera, sin validarla ni codificarla, da la oportunidad a un atacante de enviar código malicioso a un usuario final diferente. Los ataques Cross-Site Scripting (XSS) aprovechan estas oportunidades para inyectar scripts maliciosos en sitios web de confianza, que en última instancia se envían a otros usuarios de la aplicación, que se convierten en las víctimas del atacante.
+- El navegador de las víctimas ejecutará el script malicioso sin saber que no es de confianza. Por lo tanto, el navegador le permitirá acceder a testigos de sesión, cookies o información sensible almacenada por el navegador. Si se programan adecuadamente, los scripts podrían incluso reescribir el contenido de un archivo HTML.

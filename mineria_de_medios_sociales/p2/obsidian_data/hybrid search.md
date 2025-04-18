@@ -1,0 +1,3 @@
+- **Links**:
+	- [pinecone doc](https://docs.pinecone.io/guides/data/understanding-hybrid-search)
+- #TODO hacer apuntes

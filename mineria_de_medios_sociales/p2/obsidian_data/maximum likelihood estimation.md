@@ -1,0 +1,4 @@
+- #maximunlikelihoodestimation | #MLE
+
+- **MLE** maximiza una [[likelihood function|función de probabilidad]] para estimar los parámetros de una distribución de probabilidad asumida. Se puede aplicar [[gradient descent|gradiente descendiente]] para minimizar el error.
+- Modelizamos un conjunto de observaciones como una [[sample|muestra]] aleatoria de una distribución de probabilidad conjunta desconocida que se expresa en términos de un conjunto de parámetros. El objetivo de la estimación de máxima [[probability#^40d5ba|probabilidad]] (verosimilitud) es determinar los parámetros para los que los datos observados tienen la mayor probabilidad conjunta. 

@@ -1,0 +1,1 @@
+- **X-Pack** aportó varias capacidades empresariales bien integradas al Elastic Stack, entre ellas, seguridad, alertas, monitoreo, reportes, analítica de grafo, UI de APM dedicado y machine learning.

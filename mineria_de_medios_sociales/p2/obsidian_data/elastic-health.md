@@ -1,0 +1,11 @@
+- #healthelastic
+
+- La salud o el término "health" se refiere al estado de salud de un nodo de Elasticsearch o de un índice específico en el clúster. Proporciona información sobre la disponibilidad y el rendimiento del clúster o del índice en general.
+- Podemos acceder a esta información con la siguiente petición:
+	- `GET /_cat/health`
+	- Opción verbose: `GET /_cat/health?v`
+- Los diferentes tipos de salud son:
+	- **Green**: todas los [[shards]] y sus réplicas están guardados. Todos los shards están asignados y en sincronización, y el clúster está operando normalmente sin problemas conocidos.
+	- **Yellow**: puede haber un problema potencial o algún shard que no se ha asignado o está en proceso de recuperación. Ocurre cuando faltan réplicas por guardar.
+	- **Red**: Si algún shard primario no se ha podido grabar por algún problema, como una caída de un nodo.
+- Un shard primario y su réplica no pueden estar en el mismo nodo y pasaría a un estado **Yellow**.

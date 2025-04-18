@@ -1,0 +1,4 @@
+- #pvalues
+
+- Los **p-values** son definidos como la probabilidad, bajo el supuesto de ausencia de efecto o diferencia (hipótesis nula), de obtener un resultado igual o más extremo que el realmente observado. La $P$ significa probabilidad y mide la probabilidad de que cualquier diferencia observada entre los grupos se deba al azar. 
+- Los valores próximos a $0$ indican que es improbable que la diferencia observada se deba al azar, mientras que un valor $P$ próximo a $1$ sugiere que no hay diferencia entre los grupos que no se deba al azar. Por ello, en las revistas médicas es frecuente ver adjetivos como "altamente significativo" o "muy significativo" después de citar el valor $P$, dependiendo de lo cercano a cero que esté el valor.

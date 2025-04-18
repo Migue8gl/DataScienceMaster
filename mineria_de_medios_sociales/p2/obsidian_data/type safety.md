@@ -1,0 +1,5 @@
+- Type safety es un concepto en programación que se refiere a la garantía de que un programa no permita operaciones con tipos de datos incompatibles. En un programa con type safety, todas las operaciones realizadas en variables o datos son revisadas en tiempo de compilación o en tiempo de ejecución para asegurarse de que los tipos de datos sean compatibles.
+
+- Por ejemplo, en un lenguaje con type safety, no se puede sumar una cadena de caracteres con un número, ya que son tipos de datos incompatibles. En cambio, en un lenguaje sin type safety, esto podría permitirse y resultar en resultados inesperados o errores de ejecución.
+
+- La implementación de type safety ayuda a prevenir errores comunes de programación que pueden ser difíciles de detectar, como la asignación de un valor a una variable de un tipo incorrecto. También facilita la comprensión del código y la detección de errores, ya que los programadores pueden confiar en que el compilador o el lenguaje detectará cualquier operación incorrecta en tiempo de compilación o en tiempo de ejecución.
