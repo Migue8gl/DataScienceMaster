@@ -1,0 +1,73 @@
+{
+  "version" : "5.4.3.v202503031608",
+  "projects" : [ {
+    "name" : "Practica KNIME Sentimientos",
+    "active" : false,
+    "origin" : {
+      "providerId" : "local",
+      "spaceId" : "local",
+      "relativePath" : "Practica KNIME Sentimientos"
+    }
+  }, {
+    "name" : "KNIME_project",
+    "active" : true,
+    "origin" : {
+      "providerId" : "local",
+      "spaceId" : "local",
+      "relativePath" : "KNIME_project"
+    }
+  }, {
+    "name" : "Sentiment Analysis",
+    "active" : false,
+    "origin" : {
+      "providerId" : "local",
+      "spaceId" : "local",
+      "relativePath" : "Análisis de sentimientos con KNIME-20250421/WorkFlows/Sentiment Analysis"
+    }
+  }, {
+    "name" : "Sentiment Classification",
+    "active" : false,
+    "origin" : {
+      "providerId" : "local",
+      "spaceId" : "local",
+      "relativePath" : "Análisis de sentimientos con KNIME-20250421/WorkFlows/Sentiment Classification"
+    }
+  } ],
+  "mostRecentlyUsedProjects" : [ {
+    "name" : "Practica KNIME Sentimientos",
+    "timeUsed" : "2025-04-21T21:52:14.121728189+02:00",
+    "origin" : {
+      "providerId" : "local",
+      "spaceId" : "local",
+      "projectType" : "WORKFLOW",
+      "relativePath" : "Practica KNIME Sentimientos"
+    }
+  }, {
+    "name" : "KNIME_project",
+    "timeUsed" : "2025-04-22T09:00:04.284568496+02:00",
+    "origin" : {
+      "providerId" : "local",
+      "spaceId" : "local",
+      "projectType" : "WORKFLOW",
+      "relativePath" : "KNIME_project"
+    }
+  }, {
+    "name" : "Sentiment Analysis",
+    "timeUsed" : "2025-04-22T21:12:17.318493515+02:00",
+    "origin" : {
+      "providerId" : "local",
+      "spaceId" : "local",
+      "projectType" : "WORKFLOW",
+      "relativePath" : "Análisis de sentimientos con KNIME-20250421/WorkFlows/Sentiment Analysis"
+    }
+  }, {
+    "name" : "Sentiment Classification",
+    "timeUsed" : "2025-04-22T21:29:56.714406822+02:00",
+    "origin" : {
+      "providerId" : "local",
+      "spaceId" : "local",
+      "projectType" : "WORKFLOW",
+      "relativePath" : "Análisis de sentimientos con KNIME-20250421/WorkFlows/Sentiment Classification"
+    }
+  } ]
+}

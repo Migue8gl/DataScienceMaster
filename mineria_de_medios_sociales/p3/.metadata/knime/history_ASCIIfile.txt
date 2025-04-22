@@ -1,0 +1,3 @@
+knime://knime.workflow/IMDb-sample.csv
+file:/home/idbis/knime-workspace/Sentiment%20Analysis/File%20Reader%20(%2325)/drop/subjclueslen1-HLTEMNLP05.tff
+file:/home/migue8gl/Master/mineria_de_medios_sociales/p3/Análisis%20de%20sentimientos%20con%20KNIME-20250421/WorkFlows/Sentiment%20Analysis/File%20Reader%20(%2325)/drop/subjclueslen1-HLTEMNLP05.tff

@@ -1,0 +1,5 @@
+/home/migue8gl/Master/mineria_de_medios_sociales/p3/senticnet.csv
+/home/migue8gl/Master/mineria_de_medios_sociales/p3/subjclue.csv
+/home/migue8gl/Master/mineria_de_medios_sociales/p3/IMDb-sample.csv
+/home/migue8gl/Master/mineria_de_medios_sociales/p3/sentiwordnet.csv
+/home/migue8gl/Master/mineria_de_medios_sociales/p3/Análisis de sentimientos con KNIME-20250421/IMDb-sample.csv
